@@ -4,8 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.00.003</AssemblyVersion>
-    <FileVersion>1.00.003</FileVersion>
+    <AssemblyVersion>1.00.004</AssemblyVersion>
+    <FileVersion>1.00.004</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
 
 </Project>
