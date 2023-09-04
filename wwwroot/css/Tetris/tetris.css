@@ -125,3 +125,7 @@ ul.tetris-column,
 .playground > ul {
 	padding-left: 0px;
 }
+
+.no-display {
+	display: none;
+}

@@ -14,7 +14,6 @@ $(document).ready(() => {
 					break;
 				case 40:
 					tetris.moveBlock('top', 1);
-					//tetris.dropBlock();
 					break;
 				case 38:
 					tetris.changeDirection();
@@ -30,6 +29,26 @@ $(document).ready(() => {
 
 	tetris.restart.bind('click', (e) => {
 		location.reload();
+	});
+
+	tetris.left.bind('click', (e) => {
+		tetris.moveBlock('left', -1);
+	});
+
+	tetris.up.bind('click', (e) => {
+		tetris.changeDirection();
+	});
+
+	tetris.down.bind('click', (e) => {
+		tetris.moveBlock('top', 1);
+	});
+
+	tetris.right.bind('click', (e) => {
+		tetris.moveBlock('left', 1);
+	});
+
+	tetris.space.bind('click', (e) => {
+		tetris.dropBlock();
 	});
 
 	tetris.record.bind('click', (e) => {
@@ -64,6 +83,8 @@ $(document).ready(() => {
 	$('#start').bind('click', (e) => {
 		tetris.generateNewBlock();
 		$(e.target).attr('disabled', 'disabled');
+		$('#arrowButtons').removeClass('no-display');
+		$('#start').remove();
 	});
 });
 
@@ -75,6 +96,11 @@ class Tetris {
 		this.scoreDisplay = $('#score');
 		this.restart = $('#restart');
 		this.record = $('#record');
+		this.left = $('#left');
+		this.up = $('#up');
+		this.down = $('#down');
+		this.right = $('#right');
+		this.space = $('#space');
 
 		// Settings
 		this.GAME_ROWS = 20;
