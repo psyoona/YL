@@ -9,10 +9,7 @@ namespace YL.Controllers.Apis
 	{
 		public BaseApiController(IConfiguration configuration)
 		{
-			if (CustomConfig.AppSettings == null)
-			{
-				CustomConfig.AppSettings = configuration;
-			}
+			CustomConfig.AppSettings ??= configuration;
 		}
 
 		public JsonSerializerOptions JsonSerializerOptions
