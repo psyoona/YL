@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html class="full-height">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta property="og:title" content="Tetris" />
+	<meta property="og:description" content="Let's enjoy Tetris together!" />
+	<meta property="og:image" content="~/Images/ChangePathUseful/ChangePathUseful.jpg?v=@ViewBag.Cacheversion" />
+
+	<title>Tetris Game</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/css/Tetris/tetris.css?v=@ViewBag.Cacheversion" />
+</head>
+<body id="body" data-url="@ViewBag.RequestUrl">
+	<div class="wrapper">
+		<div id="gameText" class="game-text">
+			<span>Game Over</span>
+			<input class="form-control recorder" id="recorder" placeholder="이름을 입력하세요." />
+			<div class="row">
+				<button class="btn btn-danger mr-2" id="restart">Restart</button>
+				<button class="btn btn-success" id="record">Record</button>
+			</div>
+		</div>
+		<div class="score">
+			<span>Score: </span>
+			<span id="score">0</span>
+		</div>
+		<div id="playground" class="playground">
+			<ul></ul>
+		</div>
+		<div>
+			<button></button>
+			<button></button>
+			<button></button>
+			<button></button>
+		</div>
+		<div class="start">
+			<button class="btn btn-primary" id="start">Start</button>
+		</div>
+	</div>
+
+	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script defer src="~/js/Tetris/blocks.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Tetris/tetris.js?v=@ViewBag.Cacheversion" type="module"></script>
+</body>
+</html>
