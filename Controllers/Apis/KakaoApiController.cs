@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using YL.Models.Dtos.Apis;
+using YL.Models.Services;
 
 namespace YL.Controllers.Apis
 {
@@ -21,7 +22,9 @@ namespace YL.Controllers.Apis
 			KakaoModel kakaoModel = JsonConvert.DeserializeObject<KakaoModel>(value.ToString());
 			//this.Logger.LogInformation($"Utterance: {kakaoModel.UserRequest.Utterance}");
 
-			return this.Json(new { answer = new { status = "normal", sentence = kakaoModel.UserRequest.Utterance, dialog = "finish" } });
+			string result = new ChatGptService().SendMessageGpt(kakaoModel.UserRequest.Utterance);
+
+			return this.Json(new { answer = new { status = "normal", sentence = result, dialog = "finish" } });
 		}
 	}
 }
