@@ -6,5 +6,8 @@ namespace YL.Models.Dtos.Apis
 	{
 		[JsonPropertyName("utterance")]
 		public string Utterance { get; set; }
+
+		[JsonPropertyName("user")]
+		public KakaoUser User { get; set; }
 	}
 }

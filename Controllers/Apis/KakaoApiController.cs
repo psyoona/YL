@@ -20,9 +20,10 @@ namespace YL.Controllers.Apis
 		public JsonResult GetResponse([FromBody]dynamic value)
 		{
 			KakaoModel kakaoModel = JsonConvert.DeserializeObject<KakaoModel>(value.ToString());
-			//this.Logger.LogInformation($"Utterance: {kakaoModel.UserRequest.Utterance}");
+			//string result = new ChatGptService().SendMessageGpt(kakaoModel.UserRequest.Utterance);
+			string result = kakaoModel.UserRequest.Utterance;
 
-			string result = new ChatGptService().SendMessageGpt(kakaoModel.UserRequest.Utterance);
+			//this.Logger.LogInformation($"Utterance: {kakaoModel.UserRequest.Utterance}");
 
 			return this.Json(new { answer = new { status = "normal", sentence = result, dialog = "finish" } });
 		}
