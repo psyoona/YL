@@ -4,7 +4,7 @@ namespace YL.Models.Dtos.Apis
 {
 	public class KakaoModel
 	{
-		[JsonPropertyName("action")]
-		public KakaoAction Action { get; set; }
+		[JsonPropertyName("userRequest")]
+		public KakaoUserRequest UserRequest { get; set; }
 	}
 }
