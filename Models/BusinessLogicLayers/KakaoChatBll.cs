@@ -18,7 +18,7 @@ namespace YL.Models.BusinessLogicLayers
 			}
 			else if (message.Equals("운세"))
 			{
-				result = "오늘의 운세입니다.";
+				result = new FortuneDao().GetFortuneMessage();
 			}
 			else
 			{
