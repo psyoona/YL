@@ -7,9 +7,9 @@ namespace YL.Models.Services
 	{
 		public string ApiKey { get; set; }
 
-		public ChatGptService()
+		public ChatGptService(string apiKey)
 		{
-			this.ApiKey = "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";
+			this.ApiKey = apiKey;
 		}
 
 		public string SendMessageGpt(string messageText)
