@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.03.004</AssemblyVersion>
-    <FileVersion>1.03.004</FileVersion>
+    <AssemblyVersion>1.03.005</AssemblyVersion>
+    <FileVersion>1.03.005</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,6 +15,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702;8618;8600;8602;0168;8625;8603;8604;</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Database\**" />
+    <Content Remove="Models\Database\**" />
+    <EmbeddedResource Remove="Models\Database\**" />
+    <None Remove="Models\Database\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

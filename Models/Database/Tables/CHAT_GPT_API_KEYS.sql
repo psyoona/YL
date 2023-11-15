@@ -19,5 +19,5 @@ INSERT	dbo.CHAT_GPT_API_KEYS
 )
 VALUES
 (
-	'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'
+	'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'
 );

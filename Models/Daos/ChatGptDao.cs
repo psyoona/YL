@@ -6,7 +6,10 @@ namespace YL.Models.Daos
 {
 	public class ChatGptDao : BaseCommonDao
 	{
-		public ChatGptDao() { }
+		public ChatGptDao() 
+		{
+			this.ConnectionString = this.GetConnectionString();
+		}
 
 		public string GetChatGptApiKey()
 		{
