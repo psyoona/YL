@@ -35,7 +35,7 @@ namespace YL.Models.Services
 			// Create the request body with the message and other parameters
 			var requestBody = new
 			{
-				model = "gpt-3.5-turbo",
+				model = "gpt-3.5-turbo-1106",
 				max_tokens = 1000,
 				n = 1,
 				stop = (string?)null,
