@@ -13,5 +13,13 @@ namespace YL.Controllers.Webs
 
 			return this.PartialView();
 		}
+
+		[HttpGet]
+		public ActionResult EncryptionTool()
+		{
+			this.Initialize();
+
+			return this.PartialView();
+		}
 	}
 }
