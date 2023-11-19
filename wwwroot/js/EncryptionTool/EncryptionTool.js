@@ -10,7 +10,13 @@ class EncryptionTool {
 
 	// Private event functions
 	#encryptButton_onClick(e) {
-		console.log('encrypt!');
+		if ($('#encryptType').val() == '0') {
+			alert('암호화 타입을 선택하세요');
+			return;
+		} else if (!$('#plainText').val()) {
+			alert('평문을 입력하세요.');
+			return;
+		}
 
 		webServer.getData(
 			'/Laboratory/EncryptString',
