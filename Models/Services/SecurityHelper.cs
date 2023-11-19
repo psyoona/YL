@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace YL.Models.Services
 {
@@ -47,9 +48,42 @@ namespace YL.Models.Services
 
 				return Convert.ToBase64String(byteArray);
 			}
-			catch (Exception e)
+			catch
 			{
 				return "암호화에 실패했습니다.";
+			}
+		}
+
+		public string DecryptAes256(string encryptedText)
+		{
+			try
+			{
+				RijndaelManaged aes = new RijndaelManaged();
+				aes.KeySize = 256;
+				aes.BlockSize = 128;
+				aes.Mode = CipherMode.CBC;
+				aes.Padding = PaddingMode.PKCS7;
+				aes.Key = Encoding.UTF8.GetBytes(this.EncryptKey);
+				aes.IV = Encoding.UTF8.GetBytes(this.EncryptKey.Substring(0, 16));
+
+				ICryptoTransform decrypt = aes.CreateDecryptor();
+				byte[] byteArray = null;
+				using (MemoryStream memoryStream = new MemoryStream())
+				{
+					using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write))
+					{
+						byte[] xXml = Convert.FromBase64String(encryptedText);
+						cryptoStream.Write(xXml, 0, xXml.Length);
+					}
+
+					byteArray = memoryStream.ToArray();
+				}
+
+				return Encoding.UTF8.GetString(byteArray);
+			}
+			catch
+			{
+				return "복호화에 실패했습니다.";
 			}
 		}
 	}

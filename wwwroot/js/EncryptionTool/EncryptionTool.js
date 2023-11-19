@@ -11,7 +11,7 @@ class EncryptionTool {
 	// Private event functions
 	#encryptButton_onClick(e) {
 		if ($('#encryptType').val() == '0') {
-			alert('암호화 타입을 선택하세요');
+			alert('암호화 방식을 선택하세요');
 			return;
 		} else if (!$('#plainText').val()) {
 			alert('평문을 입력하세요.');
@@ -22,7 +22,7 @@ class EncryptionTool {
 			'/Laboratory/EncryptString',
 			{
 				plainText: $('#plainText').val(),
-				encryptType: 'AES256',
+				encryptType: $('#encryptType').val(),
 				encryptKey: $('#encryptKey').val()
 			},
 			(response) => {
@@ -34,7 +34,27 @@ class EncryptionTool {
 	}
 
 	#decryptButton_onClick(e) {
-		console.log('decrypt!');
+		if ($('#encryptType').val() == '0') {
+			alert('암호화 방식을 선택하세요');
+			return;
+		} else if (!$('#encryptedText').val()) {
+			alert('암호문을 입력하세요.');
+			return;
+		}
+
+		webServer.getData(
+			'/Laboratory/DecryptString',
+			{
+				encryptedText: $('#encryptedText').val(),
+				encryptType: $('#encryptType').val(),
+				encryptKey: $('#encryptKey').val()
+			},
+			(response) => {
+				if (response.result) {
+					$('#decryptResult').val(response.result);
+				}
+			}
+		);
 	}
 
 	// Public event functions

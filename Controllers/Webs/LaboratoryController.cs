@@ -24,9 +24,17 @@ namespace YL.Controllers.Webs
 		}
 
 		[HttpPost]
-		public JsonResult EncryptString(string plainText, string encryptType, string encryptKey)
+		public JsonResult EncryptString(string plainText, int encryptType, string encryptKey)
 		{
 			string result = new LaboratoryBll().EncryptString(plainText, encryptType, encryptKey);
+
+			return this.Json(new { result });
+		}
+
+		[HttpPost]
+		public JsonResult DecryptString(string encryptedText, int encryptType, string encryptKey)
+		{
+			string result = new LaboratoryBll().DecryptString(encryptedText, encryptType, encryptKey);
 
 			return this.Json(new { result });
 		}
