@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace YL.Models.Services
 {
@@ -24,7 +23,7 @@ namespace YL.Models.Services
 		{
 			try
 			{
-				RijndaelManaged aes = new RijndaelManaged();
+				Aes aes = Aes.Create();
 				aes.KeySize = 256;
 				aes.BlockSize = 128;
 				aes.Mode = CipherMode.CBC;
@@ -58,7 +57,7 @@ namespace YL.Models.Services
 		{
 			try
 			{
-				RijndaelManaged aes = new RijndaelManaged();
+				Aes aes = Aes.Create();
 				aes.KeySize = 256;
 				aes.BlockSize = 128;
 				aes.Mode = CipherMode.CBC;
