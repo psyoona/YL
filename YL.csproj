@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.05.000</AssemblyVersion>
-    <FileVersion>1.05.000</FileVersion>
+    <AssemblyVersion>1.06.000</AssemblyVersion>
+    <FileVersion>1.06.000</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\js\EncryptionTool\" />
+    <Folder Include="wwwroot\js\Common\" />
     <Folder Include="wwwroot\js\Tetris\" />
   </ItemGroup>
 
