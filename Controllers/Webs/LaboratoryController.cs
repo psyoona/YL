@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using YL.Models.BusinessLogicLayers;
 
 namespace YL.Controllers.Webs
 {
@@ -20,6 +21,14 @@ namespace YL.Controllers.Webs
 			this.Initialize();
 
 			return this.PartialView();
+		}
+
+		[HttpPost]
+		public JsonResult EncryptString(string plainText, string encryptType, string encryptKey)
+		{
+			string result = new LaboratoryBll().EncryptString(plainText, encryptType, encryptKey);
+
+			return this.Json(new { result });
 		}
 	}
 }
