@@ -14,6 +14,10 @@ namespace YL.Models.BusinessLogicLayers
 			{
 				result = new SecurityHelper(encryptKey).EncryptAes256(plainText);
 			}
+			else if(encryptType == 2) 
+			{
+				result = new SecurityHelper().Sha512Hash(plainText);
+			}
 
 			return result;
 		}

@@ -5,6 +5,8 @@ namespace YL.Models.Services
 {
 	public class SecurityHelper
 	{
+		public SecurityHelper() { }
+
 		public SecurityHelper(string encryptKey)
 		{
 			if (string.IsNullOrEmpty(encryptKey))
@@ -84,6 +86,24 @@ namespace YL.Models.Services
 			{
 				return "복호화에 실패했습니다.";
 			}
+		}
+
+		public string Sha512Hash(string plainText)
+		{
+			UTF8Encoding utfEncoding = new UTF8Encoding();
+			byte[] hashValue;
+			byte[] byteValue = utfEncoding.GetBytes(plainText);
+
+			SHA512 sha512 = SHA512.Create();
+			string hex = string.Empty;
+			hashValue = sha512.ComputeHash(byteValue);
+
+			foreach (byte x in hashValue)
+			{
+				hex += $"{x:x2}";
+			}
+
+			return hex;
 		}
 	}
 }
