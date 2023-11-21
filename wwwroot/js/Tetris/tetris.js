@@ -66,8 +66,8 @@ $(document).ready(() => {
 			url: $("#body").data('url') + '/Laboratory/InsertTetrisScore',
 			type: 'Post',
 			data: {
-				name: recorder
-				, score: tetris.score
+				name: recorder,
+				score: tetris.score
 			},
 			success: function (response) {
 				location.reload();
@@ -270,6 +270,10 @@ class Tetris {
 				this.prependNewLine();
 				this.score += 10;
 				this.scoreDisplay.text(this.score);
+
+				if (this.duration > 100) {
+					this.duration = 500 - (this.score*2);
+				}
 			}
 		});
 
