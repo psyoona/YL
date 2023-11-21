@@ -48,7 +48,9 @@
 			<div class="section2 mb-5">
 				<div class="text-center bg-dark bg-gradient text-white">
 					<hr />
-					<h4>암호화</h4>
+					<h4 title="→버튼 클릭 시 암호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip">
+						암호화
+					</h4>
 					<hr />
 				</div>
 				<div class="row">
@@ -56,9 +58,7 @@
 						<textarea id="plainText" class="form-control" rows="8" placeholder="평문을 입력하세요..."></textarea>
 					</div>
 					<div class="col-1 text-center m-auto">
-						<button id="encryptButton" title="클릭 시 평문이 암호화됩니다." class="btn btn-primary"
-								data-bs-toggle="tooltip" data-bs-placement="top"
-								data-bs-custom-class="custom-tooltip">
+						<button id="encryptButton" title="클릭 시 평문이 암호화됩니다." class="btn btn-primary">
 							<i class="fa-solid fa-arrow-right"></i>
 						</button>
 					</div>
@@ -71,7 +71,9 @@
 			<div class="section3 mb-5">
 				<div class="text-center bg-dark bg-gradient text-white">
 					<hr />
-					<h4>복호화</h4>
+					<h4 title="→버튼 클릭 시 복호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip">
+						복호화
+					</h4>
 					<hr />
 				</div>
 				<div class="row">
@@ -79,9 +81,7 @@
 						<textarea id="encryptedText" class="form-control" rows="8" placeholder="암호문을 입력하세요..."></textarea>
 					</div>
 					<div class="col-1 text-center m-auto">
-						<button id="decryptButton" title="클릭 시 암호문이 복호화됩니다." class="btn btn-primary"
-								data-bs-toggle="tooltip" data-bs-placement="top"
-								data-bs-custom-class="custom-tooltip">
+						<button id="decryptButton" title="클릭 시 암호문이 복호화됩니다." class="btn btn-primary">
 							<i class="fa-solid fa-arrow-right"></i>
 						</button>
 					</div>
