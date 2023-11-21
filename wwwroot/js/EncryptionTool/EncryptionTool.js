@@ -9,6 +9,10 @@ class EncryptionTool {
 	// Public variables
 
 	// Private event functions
+	#tetris_onClick() {
+		location.href = '/Laboratory/Tetris';
+	}
+
 	#encryptButton_onClick(e) {
 		if ($('#encryptType').val() == '0') {
 			alert('암호화 방식을 선택하세요');
@@ -61,6 +65,7 @@ class EncryptionTool {
 
 	// Private functions
 	#bindEvent() {
+		$('#tetris').click((e) => { this.#tetris_onClick(e)});
 		$('#encryptButton').click((e) => { this.#encryptButton_onClick(e) });
 		$('#decryptButton').click((e) => { this.#decryptButton_onClick(e) });
 
