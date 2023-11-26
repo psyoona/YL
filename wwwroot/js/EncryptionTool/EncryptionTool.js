@@ -10,7 +10,7 @@ class EncryptionTool {
 
 	// Private event functions
 	#tetris_onClick() {
-		location.href = '/Laboratory/Tetris';
+		window.open('/Laboratory/Tetris', '_blank');
 	}
 
 	#encryptButton_onClick(e) {
