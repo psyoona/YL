@@ -1,4 +1,6 @@
-﻿using YL.Models.Services;
+﻿using System.Security.Cryptography.Xml;
+using YL.Models.Daos;
+using YL.Models.Services;
 
 namespace YL.Models.BusinessLogicLayers
 {
@@ -32,6 +34,25 @@ namespace YL.Models.BusinessLogicLayers
 			}
 
 			return result;
+		}
+
+		public string RequestChatGpt(string usingType, string usingKey, string message)
+		{
+			string apiKey = new ChatGptDao().GetChatGptApiKey(usingKey);
+
+			if (usingType.Equals("1"))
+			{
+				message = $"'{message}'를 영어로 번역해줘";
+			}
+			else if (usingType.Equals("2"))
+			{
+				message = $"'{message}'를 한국어로 번역해줘";
+			}
+
+			string response = new ChatGptService(apiKey).SendMessageGpt(message);
+			new ChatGptDao().InsertChatGptUsingLog(usingType, message, response);
+
+			return response;
 		}
 	}
 }

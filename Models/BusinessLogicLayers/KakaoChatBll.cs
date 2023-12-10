@@ -9,7 +9,7 @@ namespace YL.Models.BusinessLogicLayers
 
 		public string ParsingMessage(string message)
 		{
-			string apiKey = new ChatGptDao().GetChatGptApiKey();
+			string apiKey = new ChatGptDao().GetChatGptApiKey("1234");
 			string result = string.Empty;
 
 			if (message.Equals("안녕"))

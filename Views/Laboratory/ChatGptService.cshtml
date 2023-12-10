@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html class="full-height" lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta property="og:title" content="Chat GPT service!" />
+	<meta property="og:description" content="This is Chat GPT service." />
+	<meta property="og:image" content="~/Images/ChangePathUseful/ChangePathUseful.jpg?v=@ViewBag.Cacheversion" />
+
+	<title>Chat Gpt Service</title>
+	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/css/ChatGptService/chatGptService.css?v=@ViewBag.Cacheversion"/>
+</head>
+<body class="full-height">
+	<div class="row m-0 full-height">
+		<div class="col">
+			<div class="section1 mb-2">
+				<div class="text-center bg-dark bg-gradient text-white">
+					<hr />
+					<h4>질문 타입 및 이용키 입력</h4>
+					<hr />
+				</div>
+				<div class="row">
+					<div class="col-sm-1 text-center m-auto">
+						<span>타입</span>
+					</div>
+					<div class="col-sm-4 me-5">
+						<select id="usingType" class="form-select" aria-label="타입 선택">
+							<option value="1">영어로 번역</option>
+							<option value="2">한국어로 번역</option>
+							<option value="3">질문하기(Question)</option>
+						</select>
+					</div>
+					<div class="col-sm-1"></div>
+					<div class="col-sm-1 text-center m-auto">
+						<span>이용키</span>
+					</div>
+					<div class="col-sm-4 me-5">
+						<input id="usingKey" class="form-control" placeholder="이용키" />
+					</div>
+				</div>
+			</div>
+
+			<div class="section3 mb-3 chat-wrapper">
+				<div class="chat-section">
+					<textarea id="chatArea" class="form-control full-height" readonly></textarea>
+				</div>
+				<div class="input-group mb-3">
+					<input id="message" type="text" class="form-control" placeholder="질문을 입력하세요.">
+					<button id="sendMessage" class="btn btn-outline-secondary" type="button">↑</button>
+				</div>
+			</div>
+
+			<div class="section4 footer-wrapper">
+				<footer>
+					<p class="text-center">
+						<i class="fa-solid fa-beer-mug-empty"></i> "THE BEER-WARE LICENSE"
+						<br />
+						psyoona@naver.com
+					</p>
+				</footer>
+			</div>
+		</div>
+	</div>
+
+	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/security/sha512.min.js?v=@ViewBag.Cacheversion"></script>
+	
+	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
+	
+	<script defer src="~/js/ChatGptService/ChatGptService.js?v=@ViewBag.Cacheversion"></script>
+</body>
+</html>
