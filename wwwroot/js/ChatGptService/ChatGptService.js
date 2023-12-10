@@ -43,6 +43,9 @@ class ChatGptService {
 			(response) => {
 				if (response.result) {
 					$('#chatArea').val($('#chatArea').val() + `\nGPT: ${response.result}`);
+
+					var textarea = $('#chatArea')[0];
+					textarea.scrollTop = textarea.scrollHeight;
 				}
 			}
 		);
