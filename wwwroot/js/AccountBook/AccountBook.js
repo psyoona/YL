@@ -20,20 +20,20 @@ class AccountBook {
 			null,
 			(response) => {
 				if (response.result) {
-					console.log(response.result);
 					$('#accountNo').text(response.result.accountNo);
 					$('#balance').text(format.addThousandComma(response.result.balance));
 					let template = ``;
 
 					for (var i = 0; i < response.result.accountHistoryList.length; i++) {
-						let type = response.result.accountHistoryList[i].delta > 0 ? '입금' : '출금';
+						let type = response.result.accountHistoryList[i].delta > 0 ? '<span class="text-primary">입금</span>' : '<span class="text-danger">출금</span>';
+						let usingDate = response.result.accountHistoryList[i].usingDate;
 
 						template += `<div class="history-unit">
-										<span>${response.result.accountHistoryList[i].usingDate}</span>
-										<hr/>
+										<span>${moment(usingDate).format('YYYY.MM.DD')}</span>
+										<hr class="seperate-bar"/>
 										<div class="position-relative" style="height: 30px;">
 											<div class="position-absolute top-0 start-0">
-												<span>${response.result.accountHistoryList[i].usingDate}</span>
+												<span>${moment(usingDate).format('HH:mm:ss')}</span>
 											</div>
 											<div class="position-absolute top-0 end-0">
 												<span>${type}</span>
