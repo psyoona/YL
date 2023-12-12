@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.Xml;
 using YL.Models.Daos;
+using YL.Models.Dtos.Webs;
 using YL.Models.Services;
 
 namespace YL.Models.BusinessLogicLayers
@@ -53,6 +54,18 @@ namespace YL.Models.BusinessLogicLayers
 			new ChatGptDao().InsertChatGptUsingLog(usingType, message, response);
 
 			return response;
+		}
+
+		public AccountMainData GetAccountMainData()
+		{
+			return new AccountDao().GetAccountMainData();
+		}
+
+		public string GetAccountHistory()
+		{
+			new AccountDao().GetAccountHistory();
+
+			return string.Empty;
 		}
 	}
 }
