@@ -47,6 +47,9 @@ class EncryptionTool {
 		} else if (!$('#encryptedText').val()) {
 			alert('암호문을 입력하세요.');
 			return;
+		} else if (!$('#encryptKey').val()) {
+			alert('암호키를 입력하세요.');
+			return;
 		}
 
 		webServer.getData(
