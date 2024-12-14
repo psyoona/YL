@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html class="full-height" lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta property="og:title" content="청구골프 계좌 관리 페이지" />
+	<meta property="og:description" content="청구골프 계좌 관리 페이지입니다." />
+	<meta property="og:image" content="~/Images/ChangePathUseful/ChangePathUseful.jpg?v=@ViewBag.Cacheversion" />
+
+	<title>청구골프 계좌 관리</title>
+	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/css/AccountBook/accountBook.css?v=@ViewBag.Cacheversion" />
+</head>
+<body class="full-height">
+	<div class="accordion" id="accountStatus">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="accountStatusHeader">
+				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountStatusBody" aria-expanded="true" aria-controls="accountStatusBody">
+					계좌 현황
+				</button>
+			</h2>
+			<div id="accountStatusBody" class="accordion-collapse collapse show" aria-labelledby="accountStatusHeader" data-bs-parent="#accountStatus">
+				<div class="accordion-body">
+					<div>
+						<span>계좌번호: </span><span id="accountNo"></span>
+					</div>
+					<div>
+						<span>잔액: </span><span id="balance"></span>&nbsp;원
+					</div>
+					<hr/>
+					<div>
+						<button class="btn btn-primary">입금</button>
+						<button class="btn btn-primary">출금</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="accordion" id="accountHistory">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="accountHistoryHeader">
+				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accountHistoryBody" aria-expanded="false" aria-controls="accountHistoryBody">
+					계좌 입/출금 내역
+				</button>
+			</h2>
+			<div id="accountHistoryBody" class="accordion-collapse collapse show" aria-labelledby="accountHistoryHeader" data-bs-parent="#accountHistory">
+				<div class="accordion-body">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/security/sha512.min.js?v=@ViewBag.Cacheversion"></script>
+
+	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
+
+	<script defer src="~/js/AccountBook/AccountBook.js?v=@ViewBag.Cacheversion"></script>
+</body>
+</html>

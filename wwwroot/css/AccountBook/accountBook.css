@@ -1,0 +1,15 @@
+﻿.full-height {
+	height: 100%;
+	resize: none;
+}
+
+.history-unit {
+	height: 100%;
+	border: 1px solid #c2c2c2;
+	padding: 10px;
+	border-radius: 5% 30%;
+}
+
+.seperate-bar {
+	margin: 5px 0 5px 0;
+}

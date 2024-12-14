@@ -9,14 +9,7 @@ namespace YL.Models.Services
 
 		public SecurityHelper(string encryptKey)
 		{
-			if (string.IsNullOrEmpty(encryptKey))
-			{
-				this.EncryptKey = "nfactor!planemo!nfactor!planemo!";
-			}
-			else
-			{
-				this.EncryptKey = encryptKey;
-			}
+			this.EncryptKey = encryptKey;
 		}
 
 		public string EncryptKey { get; set; }
