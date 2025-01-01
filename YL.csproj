@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.12.000</AssemblyVersion>
-    <FileVersion>1.12.000</FileVersion>
+    <AssemblyVersion>1.12.001</AssemblyVersion>
+    <FileVersion>1.12.001</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +34,10 @@
     <Folder Include="wwwroot\js\Common\" />
     <Folder Include="wwwroot\js\BaseConversion\" />
     <Folder Include="wwwroot\js\Tetris\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\ads.txt" />
   </ItemGroup>
 
 </Project>
