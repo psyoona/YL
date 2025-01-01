@@ -1,0 +1,72 @@
+﻿<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
+		<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	</head>
+	<body>
+		<div class="container-fluid d-flex">
+			<!-- Left Sidebar for Ads -->
+			<div class="d-none d-lg-block col-lg-2">
+				<div class="google-ad">Google Ad Placeholder</div>
+				<div class="google-ad">Google Ad Placeholder</div>
+			</div>
+
+			<!-- Main Content -->
+			<div class="col-lg-8">
+				<div class="container py-5">
+					<div class="card shadow-lg">
+						<div class="card-header bg-primary text-white text-center">
+							<h2><i class="fas fa-calculator me-2"></i>Base Converter</h2>
+						</div>
+						<div class="card-body">
+							<form>
+								<div class="mb-3">
+									<label for="decimal" class="form-label fw-bold">Decimal (Base 10)</label>
+									<input id="decimal" type="text" class="form-control" placeholder="Enter a decimal number">
+								</div>
+
+								<div class="mb-3">
+									<label for="binary" class="form-label fw-bold">Binary (Base 2)</label>
+									<input id="binary" type="text" class="form-control" placeholder="Enter a binary number">
+								</div>
+
+								<div class="mb-3">
+									<label for="octal" class="form-label fw-bold">Octal (Base 8)</label>
+									<input id="octal" type="text" class="form-control" placeholder="Enter an octal number">
+								</div>
+
+								<div class="mb-3">
+									<label for="hexadecimal" class="form-label fw-bold">Hexadecimal (Base 16)</label>
+									<input id="hexadecimal" type="text" class="form-control" placeholder="Enter a hexadecimal number">
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Right Sidebar for Ads -->
+			<div class="d-none d-lg-block col-lg-2">
+				<div class="google-ad">Google Ad Placeholder</div>
+				<div class="google-ad">Google Ad Placeholder</div>
+			</div>
+		</div>
+
+		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3233977220678426" crossorigin="anonymous"></script>
+
+		<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/lib/security/sha512.min.js?v=@ViewBag.Cacheversion"></script>
+
+		<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
+		<script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
+
+		<script defer src="~/js/BaseConversion/BaseConversion.js?v=@ViewBag.Cacheversion"></script>
+	</body>
+</html>

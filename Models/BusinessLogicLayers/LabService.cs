@@ -5,9 +5,9 @@ using YL.Models.Services;
 
 namespace YL.Models.BusinessLogicLayers
 {
-	public class LaboratoryBll
+	public class LabService
 	{
-		public LaboratoryBll() { }
+		public LabService() { }
 
 		public string EncryptString(string plainText, int encryptType, string encryptKey)
 		{

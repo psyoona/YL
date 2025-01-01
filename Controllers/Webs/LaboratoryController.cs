@@ -41,10 +41,18 @@ namespace YL.Controllers.Webs
 			return this.PartialView();
 		}
 
+		[HttpGet]
+		public ActionResult BaseConversion()
+		{
+			this.Initialize();
+
+			return this.PartialView();
+		}
+
 		[HttpPost]
 		public JsonResult EncryptString(string plainText, int encryptType, string encryptKey)
 		{
-			string result = new LaboratoryBll().EncryptString(plainText, encryptType, encryptKey);
+			string result = new LabService().EncryptString(plainText, encryptType, encryptKey);
 
 			return this.Json(new { result });
 		}
@@ -52,7 +60,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult DecryptString(string encryptedText, int encryptType, string encryptKey)
 		{
-			string result = new LaboratoryBll().DecryptString(encryptedText, encryptType, encryptKey);
+			string result = new LabService().DecryptString(encryptedText, encryptType, encryptKey);
 
 			return this.Json(new { result });
 		}
@@ -60,7 +68,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult RequestChatGpt(string usingType, string usingKey, string message)
 		{
-			string result = new LaboratoryBll().RequestChatGpt(usingType, usingKey, message);
+			string result = new LabService().RequestChatGpt(usingType, usingKey, message);
 
 			return this.Json(new { result });
 		}
@@ -68,7 +76,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult GetAccountMainData()
 		{
-			AccountMainData result = new LaboratoryBll().GetAccountMainData();
+			AccountMainData result = new LabService().GetAccountMainData();
 
 			return this.Json(new { result });
 		}
@@ -76,7 +84,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult GetAccountHistory()
 		{
-			string result = new LaboratoryBll().GetAccountHistory();
+			string result = new LabService().GetAccountHistory();
 
 			return this.Json(new { result });
 		}
