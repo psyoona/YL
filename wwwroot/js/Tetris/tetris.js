@@ -126,6 +126,7 @@ class Tetris {
 	init = () => {
 		$('#navbarNav ul li a').removeClass('active');
 		$('#tetris').addClass('active');
+		$('#selectedMenu').text('Tetris');
 
 		this.score = 0;
 		this.gameEnd = false;

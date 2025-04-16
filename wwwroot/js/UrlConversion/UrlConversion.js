@@ -6,6 +6,7 @@ var UrlConversion = class {
 	init() {
 		$('#navbarNav ul li a').removeClass('active');
 		$('#urlConverter').addClass('active');
+		$('#selectedMenu').text('Url Converter');
 
 		this.bindEvents();
 	}

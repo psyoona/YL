@@ -18,14 +18,13 @@
 	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
 	<script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
 
-	<title>Base Conversion</title>
+	<title>Yoon's LAB</title>
 </head>
 <body>
-	@* Navigation Bar *@
 	<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top navbar-blur">
 		<div class="container">
 			<a class="navbar-brand text-white fw-bold" href="#">
-				<i class="fa-solid fa-microchip me-2"></i>Yoon's Laboratory
+				<span id="selectedMenu"></span>
 			</a>
 			<button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
 					aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,25 +33,43 @@
 
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav me-auto">
-					<li class="nav-item">
-						<a id="baseConverter" class="nav-link text-white" aria-current="page" href="/Laboratory/BaseConverter">
-							<i class="fa-solid fa-code me-1"></i>Base Converter
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fa-solid fa-toolbox me-1"></i>Tools
 						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="/Laboratory/BaseConverter">
+									<i class="fa-solid fa-right-left me-1"></i>&nbsp;Number Base Converter
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="/Laboratory/UrlConversion">
+									<i class="fa-solid fa-link me-1"></i>&nbsp;URL Converter
+								</a>
+							</li>
+						</ul>
 					</li>
-					<li class="nav-item">
-						<a id="urlConverter" class="nav-link text-white" href="/Laboratory/UrlConversion">
-							<i class="fa-solid fa-link me-1"></i>URL Converter
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fa-solid fa-gamepad me-1"></i>&nbsp;Games
 						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="/Laboratory/Tetris">
+									<i class="fa-solid fa-th-large me-1"></i>Tetris
+								</a>
+							</li>
+						</ul>
 					</li>
-					<li class="nav-item">
-						<a id="tetris" class="nav-link text-white" href="/Laboratory/Tetris">
-							<i class="fa-solid fa-table-cells-large me-1"></i>Tetris
-						</a>
-					</li>
+
 				</ul>
 			</div>
 		</div>
 	</nav>
+
 
 
 	<div class="container">
