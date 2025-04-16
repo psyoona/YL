@@ -22,11 +22,10 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 // ==============================================================================
 
-using System;
+using System.Collections;
 using System.Data;
 using System.Xml;
-using System.Data.SqlClient;
-using System.Collections;
+using Microsoft.Data.SqlClient;
 
 namespace YL.Models.Functions
 {

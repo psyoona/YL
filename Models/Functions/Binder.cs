@@ -1,5 +1,5 @@
-﻿using System.Data.SqlClient;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.Data.SqlClient;
 
 namespace YL.Models.Functions
 {

@@ -1,7 +1,7 @@
-﻿using System.Data.SqlClient;
-using System.Data;
-using YL.Models.Functions;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using YL.Models.Dtos.Webs;
+using YL.Models.Functions;
 
 namespace YL.Models.Daos
 {
