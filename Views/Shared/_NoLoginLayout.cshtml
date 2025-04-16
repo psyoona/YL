@@ -61,17 +61,21 @@
 		</main>
 	</div>
 
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3233977220678426" crossorigin="anonymous"></script>
+	@if (!Context.Request.Path.Value.Contains("/Tetris"))
+	{
+		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3233977220678426" crossorigin="anonymous"></script>
 
-	@* 수직형광고1 *@
-	<ins class="adsbygoogle"
-		 style="display:block"
-		 data-ad-client="ca-pub-3233977220678426"
-		 data-ad-slot="8072160232"
-		 data-ad-format="auto"
-		 data-full-width-responsive="true"></ins>
-	<script>
-		(adsbygoogle = window.adsbygoogle || []).push({});
-	</script>
+		@* 수직형광고1 *@
+		<ins class="adsbygoogle"
+			 style="display:block"
+			 data-ad-client="ca-pub-3233977220678426"
+			 data-ad-slot="8072160232"
+			 data-ad-format="auto"
+			 data-full-width-responsive="true"></ins>
+		<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	}
+
 </body>
 </html>

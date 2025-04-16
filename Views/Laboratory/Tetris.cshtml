@@ -1,78 +1,39 @@
-﻿<!DOCTYPE html>
-<html class="full-height">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-	<meta property="og:title" content="Tetris" />
-	<meta property="og:description" content="Let's enjoy Tetris together!" />
-	<meta property="og:image" content="~/Images/ChangePathUseful/ChangePathUseful.jpg?v=@ViewBag.Cacheversion" />
+﻿@{
+	Layout = "~/Views/Shared/_NoLoginLayout.cshtml";
+}
 
-	<title>Tetris Game</title>
-	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
-	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
-	<link rel="stylesheet" href="~/css/Tetris/tetris.css?v=@ViewBag.Cacheversion" />
-</head>
-<body id="body" data-url="@ViewBag.RequestUrl">
-	@* Navigation Bar *@
-	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-		<div class="container-fluid">
-			<a class="navbar-brand" href="#">Tetris</a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-					aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link" href="/Laboratory/BaseConverter">Base Converter</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/Laboratory/UrlConversion">URL Converter</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/Laboratory/Tetris">Tetris</a>
-					</li>
-				</ul>
-			</div>
+<div class="wrapper">
+	<div id="gameText" class="game-text">
+		<span>Game Over</span>
+		@*<input class="form-control recorder" id="recorder" placeholder="이름을 입력하세요." />*@
+		<div class="row">
+			<button class="btn btn-danger mr-2" id="restart">Restart</button>
+			@*<button class="btn btn-success" id="record">Record</button>*@
 		</div>
-	</nav>
-
-	<div class="wrapper">
-		<div id="gameText" class="game-text">
-			<span>Game Over</span>
-			@*<input class="form-control recorder" id="recorder" placeholder="이름을 입력하세요." />*@
-			<div class="row">
-				<button class="btn btn-danger mr-2" id="restart">Restart</button>
-				@*<button class="btn btn-success" id="record">Record</button>*@
-			</div>
-		</div>
-		<div class="score">
-			<span>Score: </span>
-			<span id="score">0</span>
-		</div>
-		<div id="playground" class="playground">
-			<ul></ul>
-		</div>
-		<div id="arrowButtons" class="start no-display">
-			<div>
-				<button id="left" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></button>
-				<button id="up" class="btn btn-primary"><i class="fa-solid fa-arrow-up"></i></button>
-				<button id="down" class="btn btn-primary"><i class="fa-solid fa-arrow-down"></i></button>
-				<button id="right" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i></button>
-				<button id="space" class="btn btn-primary"><i class="fa-solid fa-arrows-down-to-line"></i></button>
-			</div>
-		</div>
-		
-		<div class="start">
-			<button class="btn btn-primary" id="start">Start</button>
+	</div>
+	<div class="score">
+		<span>Score: </span>
+		<span id="score">0</span>
+	</div>
+	<div id="playground" class="playground">
+		<ul></ul>
+	</div>
+	<div id="arrowButtons" class="start no-display">
+		<div>
+			<button id="left" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></button>
+			<button id="up" class="btn btn-primary"><i class="fa-solid fa-arrow-up"></i></button>
+			<button id="down" class="btn btn-primary"><i class="fa-solid fa-arrow-down"></i></button>
+			<button id="right" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i></button>
+			<button id="space" class="btn btn-primary"><i class="fa-solid fa-arrows-down-to-line"></i></button>
 		</div>
 	</div>
 
-	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/js/Tetris/blocks.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/js/Tetris/tetris.js?v=@ViewBag.Cacheversion" type="module"></script>
-</body>
-</html>
+	<div class="start">
+		<button class="btn btn-primary" id="start">Start</button>
+	</div>
+</div>
+
+<link rel="stylesheet" href="~/css/Tetris/tetris.css?v=@ViewBag.Cacheversion" />
+
+<script defer src="~/js/Tetris/blocks.js?v=@ViewBag.Cacheversion"></script>
+<script defer src="~/js/Tetris/tetris.js?v=@ViewBag.Cacheversion" type="module"></script>

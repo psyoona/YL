@@ -3,22 +3,22 @@ $(document).ready(() => {
 	tetris.init();
 
 	// Event handling
-	$(document).keydown(e => {
+	$(document).on('keydown', e => {
 		if (tetris.gameText.attr('style') != 'display: flex;' && tetris.movable) {
-			switch (e.keyCode) {
-				case 39:
+			switch (e.key) {
+				case "ArrowRight":
 					tetris.moveBlock('left', 1);
 					break;
-				case 37:
+				case "ArrowLeft":
 					tetris.moveBlock('left', -1);
 					break;
-				case 40:
+				case "ArrowDown":
 					tetris.moveBlock('top', 1);
 					break;
-				case 38:
+				case "ArrowUp":
 					tetris.changeDirection();
 					break;
-				case 32:
+				case " ":
 					tetris.dropBlock();
 					break;
 				default:
@@ -27,37 +27,37 @@ $(document).ready(() => {
 		}
 	});
 
-	tetris.restart.bind('click', (e) => {
+	tetris.restart.on('click', (e) => {
 		location.reload();
 	});
 
-	tetris.left.bind('click', (e) => {
+	tetris.left.on('click', (e) => {
 		tetris.moveBlock('left', -1);
 	});
 
-	tetris.up.bind('click', (e) => {
+	tetris.up.on('click', (e) => {
 		tetris.changeDirection();
 	});
 
-	tetris.down.bind('click', (e) => {
+	tetris.down.on('click', (e) => {
 		tetris.moveBlock('top', 1);
 	});
 
-	tetris.right.bind('click', (e) => {
+	tetris.right.on('click', (e) => {
 		tetris.moveBlock('left', 1);
 	});
 
-	tetris.space.bind('click', (e) => {
+	tetris.space.on('click', (e) => {
 		tetris.dropBlock();
 	});
 
-	tetris.record.bind('click', (e) => {
+	tetris.record.on('click', (e) => {
 		let recorder = $('#recorder').val();
 
 		if (!recorder) {
 			console.log('이름을 입력하세요.');
 
-			$('#recorder').focus();
+			$('#recorder').on('focus');
 
 			return;
 		}
@@ -80,7 +80,7 @@ $(document).ready(() => {
 		});
 	});
 
-	$('#start').bind('click', (e) => {
+	$('#start').on('click', (e) => {
 		tetris.generateNewBlock();
 		$(e.target).attr('disabled', 'disabled');
 		$('#arrowButtons').removeClass('no-display');
@@ -124,6 +124,9 @@ class Tetris {
 
 	// functions
 	init = () => {
+		$('#navbarNav ul li a').removeClass('active');
+		$('#tetris').addClass('active');
+
 		this.score = 0;
 		this.gameEnd = false;
 		this.scoreDisplay.text(this.score);
