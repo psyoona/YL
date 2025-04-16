@@ -50,6 +50,14 @@ namespace YL.Controllers.Webs
 		}
 
 		[HttpGet]
+		public ActionResult ReactionTimeGame()
+		{
+			this.Initialize();
+
+			return this.PartialView();
+		}
+
+		[HttpGet]
 		public ActionResult UrlConversion()
 		{
 			this.Initialize();

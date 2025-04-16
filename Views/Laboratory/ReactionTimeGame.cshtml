@@ -1,0 +1,32 @@
+﻿@{
+	Layout = "~/Views/Shared/_NoLoginLayout.cshtml";
+}
+
+<style>
+	#gameArea {
+		width: 100%;
+		height: 300px;
+		background-color: #f8f9fa;
+		text-align: center;
+		padding-top: 100px;
+		font-size: 2rem;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+		#gameArea.ready {
+			background-color: #ffc107;
+		}
+
+		#gameArea.go {
+			background-color: #198754;
+			color: white;
+		}
+</style>
+
+<div id="gameArea" class="waiting">
+	<h2 id="message">클릭해서 시작!</h2>
+</div>
+<p id="result"></p>
+
+<script defer src="~/js/Games/ReactionTimeGame.js"></script>
