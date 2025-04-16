@@ -9,7 +9,7 @@ var BaseConversion = class {
 	}
 
 	init() {
-		this.addEventListeners();
+		this.bindEvents();
 	}
 
 	updateValues(fromBase, inputValue) {
@@ -66,7 +66,7 @@ var BaseConversion = class {
 		});
 	}
 
-	addEventListeners() {
+	bindEvents() {
 		this.addKeydownEvent(this.decimalInput, 10);
 		this.addKeydownEvent(this.binaryInput, 2);
 		this.addKeydownEvent(this.octalInput, 8);
