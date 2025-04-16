@@ -9,8 +9,6 @@ var BaseConverter = class {
 	}
 
 	init() {
-		$('#navbarNav ul li a').removeClass('active');
-		$('#baseConverter').addClass('active');
 		$('#selectedMenu').text('Number Base Converter');
 
 		this.bindEvents();

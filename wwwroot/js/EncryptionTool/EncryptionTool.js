@@ -1,6 +1,8 @@
 class EncryptionTool {
 	// Constructor
 	constructor() {
+		$('#selectedMenu').text('Security Tool');
+
 		this.#bindEvent();
 	}
 

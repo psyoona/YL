@@ -49,6 +49,11 @@
 									<i class="fa-solid fa-link me-1"></i>&nbsp;URL Converter
 								</a>
 							</li>
+							<li>
+								<a class="dropdown-item" href="/Laboratory/EncryptionTool">
+									<i class="fa-solid fa-arrows-rotate"></i>&nbsp;Security Tool
+								</a>
+							</li>
 						</ul>
 					</li>
 
@@ -70,15 +75,20 @@
 		</div>
 	</nav>
 
-
-
 	<div class="container">
 		<main role="main" class="pb-3">
 			@RenderBody()
 		</main>
 	</div>
 
-	@if (!Context.Request.Path.Value.Contains("/Tetris"))
+	@{
+		var excludedPaths = new[] { "/tetris", "/encryptiontool" };
+		var currentPath = Context.Request.Path.Value ?? string.Empty;
+
+		bool isExcluded = excludedPaths.Any(x => currentPath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0);
+	}
+
+	@if (!isExcluded)
 	{
 		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3233977220678426" crossorigin="anonymous"></script>
 

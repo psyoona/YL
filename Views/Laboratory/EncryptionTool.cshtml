@@ -1,124 +1,77 @@
-﻿<!DOCTYPE html>
-<html class="full-height" lang="ko">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-	<meta property="og:title" content="Encrypts!" />
-	<meta property="og:description" content="This is encryption tool." />
-	<meta property="og:image" content="~/Images/ChangePathUseful/ChangePathUseful.jpg?v=@ViewBag.Cacheversion" />
+﻿@{
+	Layout = "~/Views/Shared/_NoLoginLayout.cshtml";
+}
 
-	<title>Encryption Tool</title>
-	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
-	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
-</head>
-<body>
-	<div class="row m-0">
-		<div class="col-2">
-			
+<div class="container py-4">
+	<div class="card shadow-sm mb-4 border-0">
+		<div class="card-header bg-primary bg-gradient text-white text-center">
+			<h5 class="mb-0">암호화 방식 선택 및 키 입력</h5>
 		</div>
-		<div class="col-8">
-			<div class="section0">
-				<button id="tetris" class="btn btn-primary bg-dark bg-gradient text-white btn-outline-dark">Tetris</button>
-			</div>
-			<div class="section1 mb-5">
-				<div class="text-center bg-dark bg-gradient text-white">
-					<hr />
-					<h4>암호화 방식 선택 및 키 입력</h4>
-					<hr />
+		<div class="card-body">
+			<div class="row g-3 align-items-center">
+				<div class="col-md-2 text-end fw-semibold">방식</div>
+				<div class="col-md-4">
+					<select id="encryptType" class="form-select">
+						<option value="1">AES256</option>
+						<option value="2">SHA512</option>
+						<option value="3">TDES256</option>
+					</select>
 				</div>
-				<div class="row">
-					<div class="col-1 text-center m-auto">
-						<span>방식</span>
-					</div>
-					<div class="col-4 me-5">
-						<select id="encryptType" class="form-select" aria-label="암호화 방식 선택">
-							<option value="1">AES256</option>
-							<option value="2">SHA512</option>
-							<option value="3">TDES256</option>
-						</select>
-					</div>
-					<div class="col-1"></div>
-					<div class="col-1 text-center m-auto">
-						<span>암호키</span>
-					</div>
-					<div class="col-4 me-5">
-						<input id="encryptKey" class="form-control" placeholder="암호키 입력" />
-					</div>
+				<div class="col-md-2 text-end fw-semibold">암호키</div>
+				<div class="col-md-4">
+					<input id="encryptKey" class="form-control" placeholder="암호키 입력" />
 				</div>
 			</div>
-
-			<div class="section2 mb-5">
-				<div class="text-center bg-dark bg-gradient text-white">
-					<hr />
-					<h4 title="→버튼 클릭 시 암호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip">
-						암호화
-					</h4>
-					<hr />
-				</div>
-				<div class="row">
-					<div class="col">
-						<textarea id="plainText" class="form-control" rows="8" placeholder="평문을 입력하세요..."></textarea>
-					</div>
-					<div class="col-1 text-center m-auto">
-						<button id="encryptButton" title="클릭 시 평문이 암호화됩니다." class="btn btn-primary">
-							<i class="fa-solid fa-arrow-right"></i>
-						</button>
-					</div>
-					<div class="col">
-						<textarea id="encryptResult" class="form-control" rows="8" readonly></textarea>
-					</div>
-				</div>
-			</div>
-
-			<div class="section3 mb-3">
-				<div class="text-center bg-dark bg-gradient text-white">
-					<hr />
-					<h4 title="→버튼 클릭 시 복호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip">
-						복호화
-					</h4>
-					<hr />
-				</div>
-				<div class="row">
-					<div class="col">
-						<textarea id="encryptedText" class="form-control" rows="8" placeholder="암호문을 입력하세요..."></textarea>
-					</div>
-					<div class="col-1 text-center m-auto">
-						<button id="decryptButton" title="클릭 시 암호문이 복호화됩니다." class="btn btn-primary">
-							<i class="fa-solid fa-arrow-right"></i>
-						</button>
-					</div>
-					<div class="col">
-						<textarea id="decryptResult" class="form-control" rows="8" readonly></textarea>
-					</div>
-				</div>
-			</div>
-
-			<div class="section4">
-				<footer>
-					<p class="text-center">
-						<i class="fa-solid fa-beer-mug-empty"></i> "THE BEER-WARE LICENSE"
-						<br />
-						psyoona@naver.com
-					</p>
-				</footer>
-			</div>
-		</div>
-		<div class="col-2">
-			
 		</div>
 	</div>
 
-	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/lib/security/sha512.min.js?v=@ViewBag.Cacheversion"></script>
-	
-	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
-	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
-	
-	<script defer src="~/js/EncryptionTool/EncryptionTool.js?v=@ViewBag.Cacheversion"></script>
-</body>
-</html>
+	<div class="card shadow-sm mb-4 border-0">
+		<div class="card-header bg-dark text-white text-center">
+			<h5 class="mb-0" title="→ 버튼 클릭 시 암호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top">
+				암호화
+			</h5>
+		</div>
+		<div class="card-body">
+			<div class="row g-3">
+				<div class="col-md-5">
+					<textarea id="plainText" class="form-control" rows="6" placeholder="평문을 입력하세요..."></textarea>
+				</div>
+				<div class="col-md-2 d-flex justify-content-center align-items-center">
+					<button id="encryptButton" class="btn btn-outline-primary btn-lg" title="클릭 시 평문이 암호화됩니다.">
+						<i class="fa-solid fa-arrow-right"></i>
+					</button>
+				</div>
+				<div class="col-md-5">
+					<textarea id="encryptResult" class="form-control" rows="6" readonly placeholder="암호문 출력 영역"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card shadow-sm border-0">
+		<div class="card-header bg-dark text-white text-center">
+			<h5 class="mb-0" title="→ 버튼 클릭 시 복호화됩니다." data-bs-toggle="tooltip" data-bs-placement="top">
+				복호화
+			</h5>
+		</div>
+		<div class="card-body">
+			<div class="row g-3">
+				<div class="col-md-5">
+					<textarea id="encryptedText" class="form-control" rows="6" placeholder="암호문을 입력하세요..."></textarea>
+				</div>
+				<div class="col-md-2 d-flex justify-content-center align-items-center">
+					<button id="decryptButton" class="btn btn-outline-primary btn-lg" title="클릭 시 암호문이 복호화됩니다.">
+						<i class="fa-solid fa-arrow-right"></i>
+					</button>
+				</div>
+				<div class="col-md-5">
+					<textarea id="decryptResult" class="form-control" rows="6" readonly placeholder="복호문 출력 영역"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<script defer src="~/js/EncryptionTool/EncryptionTool.js?v=@ViewBag.Cacheversion"></script>
