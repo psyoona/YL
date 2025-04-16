@@ -1,4 +1,4 @@
-var BaseConversion = class {
+var BaseConverter = class {
 	constructor() {
 		this.decimalInput = $('#decimal');
 		this.binaryInput = $('#binary');
@@ -10,7 +10,7 @@ var BaseConversion = class {
 
 	init() {
 		$('#navbarNav ul li a').removeClass('active');
-		$('#baseConversion').addClass('active');
+		$('#baseConverter').addClass('active');
 
 		this.bindEvents();
 	}
@@ -84,4 +84,4 @@ var BaseConversion = class {
 	}
 }
 
-var baseConversion = new BaseConversion;
+var baseConverter = new BaseConverter;

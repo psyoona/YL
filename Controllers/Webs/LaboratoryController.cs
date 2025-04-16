@@ -42,7 +42,7 @@ namespace YL.Controllers.Webs
 		}
 
 		[HttpGet]
-		public ActionResult BaseConversion()
+		public ActionResult BaseConverter()
 		{
 			this.Initialize();
 

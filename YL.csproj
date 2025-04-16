@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.13.003</AssemblyVersion>
+    <AssemblyVersion>1.13.004</AssemblyVersion>
     <FileVersion></FileVersion>
   </PropertyGroup>
 
@@ -32,7 +32,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\js\EncryptionTool\" />
     <Folder Include="wwwroot\js\Common\" />
-    <Folder Include="wwwroot\js\BaseConversion\" />
     <Folder Include="wwwroot\js\Tetris\" />
   </ItemGroup>
 

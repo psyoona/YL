@@ -20,6 +20,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Laboratory}/{action=BaseConversion}/{id?}");
+	pattern: "{controller=Laboratory}/{action=BaseConverter}/{id?}");
 
 app.Run();
