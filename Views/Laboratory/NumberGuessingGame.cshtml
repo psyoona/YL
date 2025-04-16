@@ -1,0 +1,63 @@
+﻿@{
+	Layout = "~/Views/Shared/_NoLoginLayout.cshtml";
+}
+
+<style>
+	#gameArea {
+		text-align: center;
+		margin-top: 50px;
+	}
+
+	input {
+		width: 150px;
+		margin-bottom: 10px;
+	}
+
+	button {
+		margin-bottom: 10px;
+	}
+
+	#message {
+		font-size: 1.2rem;
+		color: green;
+	}
+
+	#bestScore {
+		font-size: 1rem;
+		margin-top: 20px;
+	}
+
+	#timer {
+		font-size: 1.2rem;
+		color: red;
+		font-weight: bold;
+		margin-top: 10px;
+	}
+
+
+</style>
+
+<div id="gameArea" class="game-area">
+	<h2>숫자 추측 게임&nbsp;</h2>
+
+	<p>난이도 선택</p>
+	<select id="difficultySelect" class="form-select">
+		<option value="50">쉬움 (1-50)</option>
+		<option value="100">중간 (1-100)</option>
+		<option value="200">어려움 (1-200)</option>
+	</select>
+
+	<p>숫자를 추측해보세요!</p>
+	<input type="number" id="guessInput" class="form-control" placeholder="숫자를 입력하세요." />
+
+	<button id="guessButton" class="btn btn-primary">추측하기</button>
+
+	<p id="result"></p>
+
+	<p id="bestScore">Best Score: <span id="bestScoreValue">0</span> 회</p>
+</div>
+
+
+
+
+<script defer src="~/js/Games/NumberGuessingGame.js"></script>
