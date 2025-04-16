@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/css/commonLayout.css?v=@ViewBag.Cacheversion" />
+
+	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/security/sha512.min.js?v=@ViewBag.Cacheversion"></script>
+
+	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
+
+	<title>Base Conversion</title>
+</head>
+<body>
+	@* Navigation Bar *@
+	<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top navbar-blur">
+		<div class="container">
+			<a class="navbar-brand text-white fw-bold" href="#">
+				<i class="bi bi-cpu me-2"></i>Yoon's Laboratory
+			</a>
+			<button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+					aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a id="baseConversion" class="nav-link text-white" aria-current="page" href="/Laboratory/BaseConversion">
+							<i class="bi bi-code-slash me-1"></i>Base Conversion
+						</a>
+					</li>
+					<li class="nav-item">
+						<a id="urlConverter" class="nav-link text-white" href="/Laboratory/UrlConversion">
+							<i class="bi bi-link-45deg me-1"></i>URL Converter
+						</a>
+					</li>
+					<li class="nav-item">
+						<a id="tetris" class="nav-link text-white" href="/Laboratory/Tetris">
+							<i class="bi bi-grid-3x3-gap-fill me-1"></i>Tetris
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
+
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3233977220678426" crossorigin="anonymous"></script>
+
+	@* 수직형광고1 *@
+	<ins class="adsbygoogle"
+		 style="display:block"
+		 data-ad-client="ca-pub-3233977220678426"
+		 data-ad-slot="8072160232"
+		 data-ad-format="auto"
+		 data-full-width-responsive="true"></ins>
+	<script>
+		(adsbygoogle = window.adsbygoogle || []).push({});
+	</script>
+</body>
+</html>

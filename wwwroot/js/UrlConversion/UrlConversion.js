@@ -4,6 +4,9 @@ var UrlConversion = class {
 	}
 
 	init() {
+		$('#navbarNav ul li a').removeClass('active');
+		$('#urlConverter').addClass('active');
+
 		this.bindEvents();
 	}
 

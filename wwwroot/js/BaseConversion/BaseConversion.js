@@ -9,6 +9,9 @@ var BaseConversion = class {
 	}
 
 	init() {
+		$('#navbarNav ul li a').removeClass('active');
+		$('#baseConversion').addClass('active');
+
 		this.bindEvents();
 	}
 

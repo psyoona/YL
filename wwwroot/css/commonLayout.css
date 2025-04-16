@@ -1,0 +1,24 @@
+﻿.navbar-blur {
+	backdrop-filter: blur(8px);
+	background-color: rgba(13, 110, 253, 0.85);
+}
+
+.nav-link {
+	position: relative;
+	transition: color 0.3s ease;
+}
+
+	.nav-link::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: 4px;
+		width: 0;
+		height: 2px;
+		background-color: #fff;
+		transition: width 0.3s ease;
+	}
+
+	.nav-link.active::after {
+		width: 100%;
+	}
