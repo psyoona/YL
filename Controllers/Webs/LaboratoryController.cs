@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using YL.Models.Dtos.Webs;
-using YL.Models.Services;
+using YL.Services;
 
 namespace YL.Controllers.Webs
 {

@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using YL.Models.Functions;
+using YL.Functions;
 
 namespace YL.Models.Daos
 {
-	public class ChatGptDao : BaseCommonDao
+    public class ChatGptDao : BaseCommonDao
 	{
 		public ChatGptDao() 
 		{

@@ -1,8 +1,7 @@
-﻿using System.Security.Cryptography.Xml;
-using YL.Models.Daos;
+﻿using YL.Models.Daos;
 using YL.Models.Dtos.Webs;
 
-namespace YL.Models.Services
+namespace YL.Services
 {
 	public class LabService
 	{

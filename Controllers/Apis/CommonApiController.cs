@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using YL.Models.Functions;
+using YL.Functions;
 
 namespace YL.Controllers.Apis
 {
-	[ApiController]
+    [ApiController]
 	public class CommonApiController : BaseApiController
 	{
 		public CommonApiController(IConfiguration configuration) : base(configuration) { }

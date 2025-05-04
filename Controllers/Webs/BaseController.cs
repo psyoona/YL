@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using YL.Models.Functions;
+using YL.Functions;
 
 namespace YL.Controllers.Webs
 {
-	public class BaseController : Controller
+    public class BaseController : Controller
 	{
 		public BaseController(IConfiguration configuration) 
 		{

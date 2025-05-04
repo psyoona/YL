@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using YL.Models.Dtos.Apis;
-using YL.Models.Services;
+using YL.Services;
 
 namespace YL.Controllers.Apis
 {
@@ -22,7 +22,7 @@ namespace YL.Controllers.Apis
 			KakaoModel kakaoModel = JsonConvert.DeserializeObject<KakaoModel>(value.ToString());
 			string message = kakaoModel.UserRequest.Utterance;
 
-			string result = new KakaoChatBll().ParsingMessage(message);
+			string result = new KakaoChatService().ParsingMessage(message);
 
 			return this.Json(new { answer = new { status = "normal", sentence = result, dialog = "finish" } });
 		}

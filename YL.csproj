@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.13.011</AssemblyVersion>
+    <AssemblyVersion>1.13.012</AssemblyVersion>
     <FileVersion></FileVersion>
   </PropertyGroup>
 
@@ -17,10 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Database\**" />
-    <Content Remove="Models\Database\**" />
-    <EmbeddedResource Remove="Models\Database\**" />
-    <None Remove="Models\Database\**" />
+    <Compile Remove="Database\**" />
+    <Content Remove="Database\**" />
+    <EmbeddedResource Remove="Database\**" />
+    <None Remove="Database\**" />
   </ItemGroup>
 
   <ItemGroup>

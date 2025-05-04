@@ -1,9 +1,9 @@
-﻿using YL.Models.Contants;
-using YL.Models.Functions;
+﻿using YL.Contants;
+using YL.Functions;
 
 namespace YL.Models.Daos
 {
-	public class BaseCommonDao
+    public class BaseCommonDao
 	{
 		protected string ConnectionString { get; set; }
 

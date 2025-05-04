@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using YL.Models.Functions;
+using YL.Functions;
 
 namespace YL.Controllers.Apis
 {

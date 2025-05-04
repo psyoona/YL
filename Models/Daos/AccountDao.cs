@@ -1,11 +1,11 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
+using YL.Functions;
 using YL.Models.Dtos.Webs;
-using YL.Models.Functions;
 
 namespace YL.Models.Daos
 {
-	public class AccountDao : BaseCommonDao
+    public class AccountDao : BaseCommonDao
 	{
 		public AccountDao()
 		{
