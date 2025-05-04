@@ -1,7 +1,6 @@
 ﻿using YL.Models.Daos;
-using YL.Models.Services;
 
-namespace YL.Models.BusinessLogicLayers
+namespace YL.Models.Services
 {
 	public class KakaoChatBll
 	{

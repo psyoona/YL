@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using YL.Models.BusinessLogicLayers;
 using YL.Models.Dtos.Apis;
+using YL.Models.Services;
 
 namespace YL.Controllers.Apis
 {

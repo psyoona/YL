@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using YL.Models.BusinessLogicLayers;
 using YL.Models.Dtos.Apis;
 
 namespace YL.Controllers.Apis
@@ -19,8 +17,6 @@ namespace YL.Controllers.Apis
 		[Route("GetTeamsMessage")]
 		public JsonResult GetTeamsMessage()
 		{
-			
-
 			return this.Json(new { test = "zxcvb" });
 		}
 	}

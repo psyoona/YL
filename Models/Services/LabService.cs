@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography.Xml;
 using YL.Models.Daos;
 using YL.Models.Dtos.Webs;
-using YL.Models.Services;
 
-namespace YL.Models.BusinessLogicLayers
+namespace YL.Models.Services
 {
 	public class LabService
 	{
@@ -17,7 +16,7 @@ namespace YL.Models.BusinessLogicLayers
 			{
 				result = new SecurityHelper(encryptKey).EncryptAes256(plainText);
 			}
-			else if(encryptType == 2) 
+			else if (encryptType == 2)
 			{
 				result = new SecurityHelper().Sha512Hash(plainText);
 			}
