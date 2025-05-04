@@ -4,7 +4,7 @@ using YL.Functions;
 
 namespace YL.Models.Daos
 {
-    public class FortuneDao : BaseCommonDao
+	public class FortuneDao : BaseCommonDao
 	{
 		public FortuneDao()
 		{

@@ -5,7 +5,7 @@ using YL.Models.Dtos.Webs;
 
 namespace YL.Models.Daos
 {
-    public class AccountDao : BaseCommonDao
+	public class AccountDao : BaseCommonDao
 	{
 		public AccountDao()
 		{

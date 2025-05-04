@@ -1,15 +1,15 @@
-﻿using YL.Contants;
-using YL.Functions;
+﻿using YL.Configs;
+using YL.Contants;
 
 namespace YL.Models.Daos
 {
-    public class BaseCommonDao
+	public class BaseCommonDao
 	{
 		protected string ConnectionString { get; set; }
 
 		protected string GetConnectionString()
 		{
-			return CustomConfig.AppSettings.GetConnectionString(ConstKey.CONNECTION_STRING);
+			return ConfigManager.AppSettings.GetConnectionString(ConstKey.CONNECTION_STRING);
 		}
 	}
 }

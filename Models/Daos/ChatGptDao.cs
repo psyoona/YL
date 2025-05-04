@@ -4,7 +4,7 @@ using YL.Functions;
 
 namespace YL.Models.Daos
 {
-    public class ChatGptDao : BaseCommonDao
+	public class ChatGptDao : BaseCommonDao
 	{
 		public ChatGptDao() 
 		{

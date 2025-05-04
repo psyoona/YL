@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using YL.Configs;
 using YL.Functions;
 
 namespace YL.Controllers.Webs
 {
-    public class BaseController : Controller
+	public class BaseController : Controller
 	{
 		public BaseController(IConfiguration configuration) 
 		{
-			if (CustomConfig.AppSettings == null)
+			if (ConfigManager.AppSettings == null)
 			{
-				CustomConfig.AppSettings = configuration;
+				ConfigManager.AppSettings = configuration;
 			}
 		}
 
@@ -17,9 +18,9 @@ namespace YL.Controllers.Webs
 		{
 			ViewBag.Title = "Yoon's lab";
 			ViewBag.CacheVersion = VersionHelper.GetApplicationVersion();
-			ViewBag.IsDebugEnabled = Global.IsDebugMode;
+			ViewBag.IsDebugEnabled = ConfigManager.IsDebugMode;
 
-			if (Global.IsDebugMode)
+			if (ConfigManager.IsDebugMode)
 			{
 				ViewBag.ScriptMin = string.Empty;
 			}

@@ -2,13 +2,13 @@
 
 namespace YL.Functions
 {
-    public class VersionHelper
-    {
-        public static string GetApplicationVersion()
-        {
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+	public class VersionHelper
+	{
+		public static string GetApplicationVersion()
+		{
+			Version version = Assembly.GetExecutingAssembly().GetName().Version;
 
-            return $"{version.Major}.{version.Minor:D2}.{version.Build:D3}";
-        }
-    }
+			return $"{version.Major}.{version.Minor:D2}.{version.Build:D3}";
+		}
+	}
 }
