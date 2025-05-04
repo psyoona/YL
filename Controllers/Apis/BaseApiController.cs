@@ -1,16 +1,14 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using YL.Configs;
 using YL.Functions;
 
 namespace YL.Controllers.Apis
 {
 	public class BaseApiController : Controller
 	{
-		public BaseApiController(IConfiguration configuration)
+		public BaseApiController()
 		{
-			ConfigManager.AppSettings ??= configuration;
 		}
 
 		public JsonSerializerOptions JsonSerializerOptions

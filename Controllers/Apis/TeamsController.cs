@@ -8,7 +8,7 @@ namespace YL.Controllers.Apis
 	{
 		private ILogger Logger { get; }
 
-		public TeamsController(IConfiguration configuration, ILogger<KakaoUserRequest> logger) : base(configuration)
+		public TeamsController(IConfiguration configuration, ILogger<KakaoUserRequest> logger)
 		{
 			this.Logger = logger;
 		}

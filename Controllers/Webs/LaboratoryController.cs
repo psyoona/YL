@@ -6,7 +6,7 @@ namespace YL.Controllers.Webs
 {
 	public class LaboratoryController : BaseController
 	{
-		public LaboratoryController(IConfiguration configuration) : base(configuration) { }
+		public LaboratoryController() { }
 
 		[HttpGet]
 		public ActionResult Tetris()

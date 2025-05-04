@@ -9,7 +9,7 @@ namespace YL.Models.Daos
 
 		protected string GetConnectionString()
 		{
-			return ConfigManager.AppSettings.GetConnectionString(ConstKey.CONNECTION_STRING);
+			return ConfigManager.Settings.ConnectionString;
 		}
 	}
 }

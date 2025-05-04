@@ -6,12 +6,8 @@ namespace YL.Controllers.Webs
 {
 	public class BaseController : Controller
 	{
-		public BaseController(IConfiguration configuration) 
+		public BaseController() 
 		{
-			if (ConfigManager.AppSettings == null)
-			{
-				ConfigManager.AppSettings = configuration;
-			}
 		}
 
 		protected void Initialize()

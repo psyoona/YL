@@ -6,7 +6,7 @@ namespace YL.Controllers.Apis
 	[ApiController]
 	public class CommonApiController : BaseApiController
 	{
-		public CommonApiController(IConfiguration configuration) : base(configuration) { }
+		public CommonApiController() { }
 
 		[HttpGet]
 		[Route("Version")]

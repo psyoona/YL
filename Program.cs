@@ -1,9 +1,9 @@
+using YL.Configs;
 using YL.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+ConfigManager.Initialize(builder.Configuration);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
