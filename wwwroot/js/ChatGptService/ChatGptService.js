@@ -61,9 +61,9 @@ class ChatGptService {
 
 	// Private functions
 	#bindEvent() {
-		$('#sendMessage').click((e) => { this.#sendMessage_onClick(e) });
+		$('#sendMessage').on('click', (e) => { this.#sendMessage_onClick(e) });
 
-		$('#message').keyup((e) => { this.#message_onKeyup(e) });
+		$('#message').on('keyup', (e) => { this.#message_onKeyup(e) });
 	}
 
 	// Public functions

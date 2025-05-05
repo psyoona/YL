@@ -73,9 +73,9 @@ class StringConverter {
 
 	// Private functions
 	#bindEvent() {
-		$('#tetris').click((e) => { this.#tetris_onClick(e)});
-		$('#encryptButton').click((e) => { this.#encryptButton_onClick(e) });
-		$('#decryptButton').click((e) => { this.#decryptButton_onClick(e) });
+		$('#tetris').on('click', (e) => { this.#tetris_onClick(e)});
+		$('#encryptButton').on('click', (e) => { this.#encryptButton_onClick(e) });
+		$('#decryptButton').on('click', (e) => { this.#decryptButton_onClick(e) });
 
 		const tooltipTriggerList = $('[data-bs-toggle="tooltip"]');
 		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
