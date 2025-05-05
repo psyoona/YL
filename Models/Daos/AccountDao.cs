@@ -24,7 +24,6 @@ namespace YL.Models.Daos
 
 			SqlHelper.CloseSqlDataReader(sqlDataReader);
 
-			
 		}
 
 		public AccountMainData GetAccountMainData()

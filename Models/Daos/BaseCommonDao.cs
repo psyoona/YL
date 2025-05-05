@@ -1,5 +1,4 @@
 ﻿using YL.Configs;
-using YL.Contants;
 
 namespace YL.Models.Daos
 {
