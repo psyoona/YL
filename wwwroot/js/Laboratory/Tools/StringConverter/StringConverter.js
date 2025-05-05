@@ -1,7 +1,7 @@
 class StringConverter {
 	// Constructor
 	constructor() {
-		$('#selectedMenu').text('Security Tool');
+		$('#selectedMenu').text('String Converter');
 
 		this.#bindEvent();
 	}
