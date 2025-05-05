@@ -17,7 +17,7 @@ namespace YL.Controllers.Webs
 		}
 
 		[HttpGet]
-		public ActionResult EncryptionTool()
+		public ActionResult StringConverter()
 		{
 			this.Initialize();
 
@@ -71,6 +71,7 @@ namespace YL.Controllers.Webs
 
 			return this.PartialView();
 		}
+
 
 		[HttpPost]
 		public JsonResult EncryptString(string plainText, int encryptType, string encryptKey)

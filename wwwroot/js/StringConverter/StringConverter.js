@@ -1,4 +1,4 @@
-class EncryptionTool {
+class StringConverter {
 	// Constructor
 	constructor() {
 		$('#selectedMenu').text('Security Tool');
@@ -84,4 +84,4 @@ class EncryptionTool {
 	// Public functions
 }
 
-let encryption = new EncryptionTool();
+let stringConverter = new StringConverter();
