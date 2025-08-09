@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: app
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+    expose:
+      - "8080"
+    volumes:
+      - "D:\\AppDatas\\YL\\logs\\app:/app/logs"
+
+  nginx:
+    image: nginx:1.27
+    container_name: nginx
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - "D:\\AppDatas\\YL\\logs\\nginx:/var/log/nginx"
+      # - ./certs:/etc/nginx/certs:ro
+    # access.log 이 비어있으면 IIS W3C 스타일 헤더를 1회 출력한 뒤 Nginx 실행
+    command: >
+      sh -c 'LOG="/var/log/nginx/access.log";
+             if [ ! -s "$$LOG" ]; then
+               {
+                 echo "#Software: nginx";
+                 echo "#Version: 1.0";
+                 date -u +"#Date: %Y-%m-%d %H:%M:%S";
+                 echo "#Fields: date time s-ip cs-method cs-host cs-uri-stem cs-uri-query c-ip cs(User-Agent) sc-status sc-bytes cs-bytes time-taken upstream-time";
+               } > "$$LOG";
+             fi;
+             exec nginx -g "daemon off;"'
+    restart: unless-stopped
