@@ -1,44 +1,55 @@
-version: "3.9"
+version: "3.9"  # Docker Compose 파일 버전 (3.9는 최신 v3 시리즈 중 하나)
 
 services:
+  # -------------------------
+  # ASP.NET Core 애플리케이션 컨테이너
+  # -------------------------
   app:
-    build: .
-    container_name: app
+    build: .                          # 현재 디렉토리의 Dockerfile로 이미지 빌드
+    container_name: app               # 컨테이너 이름(app) 고정
     environment:
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=http://+:8080 # Kestrel이 모든 IP에서 8080 포트 수신
     expose:
-      - "8080"
+      - "8080"                        # 외부 노출 없이 내부 컨테이너 간 통신용 포트
     volumes:
-      - "D:\\AppDatas\\YL\\logs\\app:/app/logs"
+      - "D:\\AppDatas\\YL\\logs\\app:/app/logs"  # 호스트 로그 디렉토리를 컨테이너에 마운트
     networks:
-      - edge_proxy
+      - edge_proxy                    # edge_proxy 네트워크에 연결 (Edge Nginx와 통신)
 
+  # -------------------------
+  # 서비스 전용 Nginx 컨테이너
+  # -------------------------
   docker-nginx:
-    image: nginx:1.27
-    container_name: docker-nginx
+    image: nginx:1.27                  # Nginx 1.27 버전 사용
+    container_name: docker-nginx       # 컨테이너 이름(docker-nginx) 고정
     depends_on:
-      - app
+      - app                            # app 서비스가 먼저 시작되어야 함
     expose:
-      - "8080"
+      - "8080"                         # Edge Nginx가 접속할 내부 포트
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - "D:\\AppDatas\\YL\\logs\\nginx:/var/log/nginx"
-    command: >
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # 메인 nginx.conf (읽기 전용)
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro          # 가상 호스트 설정 디렉토리
+      - "D:\\AppDatas\\YL\\logs\\nginx:/var/log/nginx"  # Nginx 로그 디렉토리 마운트
+    command: >                         # 컨테이너 시작 시 실행할 명령
       sh -c 'LOG="/var/log/nginx/access.log";
              if [ ! -s "$$LOG" ]; then
                {
+                 # 최초 실행 시 IIS W3C 스타일 헤더 작성
                  echo "#Software: nginx";
                  echo "#Version: 1.0";
                  date -u +"#Date: %Y-%m-%d %H:%M:%S";
                  echo "#Fields: date time s-ip cs-method cs-host cs-uri-stem cs-uri-query c-ip cs(User-Agent) sc-status sc-bytes cs-bytes time-taken upstream-time";
                } > "$$LOG";
              fi;
-             exec nginx -g "daemon off;"'
-    restart: unless-stopped
+             exec nginx -g "daemon off;"'  # Nginx를 포그라운드 모드로 실행
+    restart: unless-stopped              # 중지되지 않는 한 자동 재시작
     networks:
-      - edge_proxy
+      - edge_proxy                       # Edge Nginx와 같은 네트워크에서 동작
 
+# -------------------------
+# 외부 네트워크 설정
+# -------------------------
 networks:
   edge_proxy:
-    external: true
+    external: true  # 이미 만들어진 외부 네트워크(edge_proxy)를 사용
+                    # docker network create edge_proxy 명령으로 사전 생성 필요
