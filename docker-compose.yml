@@ -10,21 +10,20 @@ services:
       - "8080"
     volumes:
       - "D:\\AppDatas\\YL\\logs\\app:/app/logs"
+    networks:
+      - edge_proxy
 
-  nginx:
+  docker-nginx:
     image: nginx:1.27
-    container_name: nginx
+    container_name: docker-nginx
     depends_on:
       - app
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "8080"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - "D:\\AppDatas\\YL\\logs\\nginx:/var/log/nginx"
-      # - ./certs:/etc/nginx/certs:ro
-    # access.log 이 비어있으면 IIS W3C 스타일 헤더를 1회 출력한 뒤 Nginx 실행
     command: >
       sh -c 'LOG="/var/log/nginx/access.log";
              if [ ! -s "$$LOG" ]; then
@@ -37,3 +36,9 @@ services:
              fi;
              exec nginx -g "daemon off;"'
     restart: unless-stopped
+    networks:
+      - edge_proxy
+
+networks:
+  edge_proxy:
+    external: true
