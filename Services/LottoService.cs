@@ -421,5 +421,166 @@ namespace YL.Services
 
 			return result;
 		}
+
+		// 홀짝 비율 분석
+		public Dictionary<string, object> GetOddEvenAnalysis()
+		{
+			Dictionary<string, object> result = new Dictionary<string, object>();
+			List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+
+			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
+			{
+				string query = @"
+					SELECT TOP 100
+						Turn,
+						(CASE WHEN Number1 % 2 = 1 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 % 2 = 1 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 % 2 = 1 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 % 2 = 1 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 % 2 = 1 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 % 2 = 1 THEN 1 ELSE 0 END) AS OddCount
+					FROM HWSY.dbo.Lotto_Information
+					ORDER BY Turn DESC";
+
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, null))
+				{
+					while (reader.Read())
+					{
+						Dictionary<string, object> item = new Dictionary<string, object>();
+						item["TURN"] = reader["Turn"];
+						item["ODD_COUNT"] = reader["OddCount"];
+						item["EVEN_COUNT"] = 6 - Convert.ToInt32(reader["OddCount"]);
+						data.Add(item);
+					}
+				}
+			}
+
+			result["DATA"] = data;
+			return result;
+		}
+
+		// 구간별 분포 분석
+		public Dictionary<string, object> GetRangeDistribution()
+		{
+			Dictionary<string, object> result = new Dictionary<string, object>();
+			List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+
+			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
+			{
+				string query = @"
+					SELECT TOP 100
+						Turn,
+						(CASE WHEN Number1 BETWEEN 1 AND 10 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 BETWEEN 1 AND 10 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 BETWEEN 1 AND 10 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 BETWEEN 1 AND 10 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 BETWEEN 1 AND 10 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 BETWEEN 1 AND 10 THEN 1 ELSE 0 END) AS Range1,
+						(CASE WHEN Number1 BETWEEN 11 AND 20 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 BETWEEN 11 AND 20 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 BETWEEN 11 AND 20 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 BETWEEN 11 AND 20 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 BETWEEN 11 AND 20 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 BETWEEN 11 AND 20 THEN 1 ELSE 0 END) AS Range2,
+						(CASE WHEN Number1 BETWEEN 21 AND 30 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 BETWEEN 21 AND 30 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 BETWEEN 21 AND 30 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 BETWEEN 21 AND 30 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 BETWEEN 21 AND 30 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 BETWEEN 21 AND 30 THEN 1 ELSE 0 END) AS Range3,
+						(CASE WHEN Number1 BETWEEN 31 AND 40 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 BETWEEN 31 AND 40 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 BETWEEN 31 AND 40 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 BETWEEN 31 AND 40 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 BETWEEN 31 AND 40 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 BETWEEN 31 AND 40 THEN 1 ELSE 0 END) AS Range4,
+						(CASE WHEN Number1 BETWEEN 41 AND 45 THEN 1 ELSE 0 END +
+						 CASE WHEN Number2 BETWEEN 41 AND 45 THEN 1 ELSE 0 END +
+						 CASE WHEN Number3 BETWEEN 41 AND 45 THEN 1 ELSE 0 END +
+						 CASE WHEN Number4 BETWEEN 41 AND 45 THEN 1 ELSE 0 END +
+						 CASE WHEN Number5 BETWEEN 41 AND 45 THEN 1 ELSE 0 END +
+						 CASE WHEN Number6 BETWEEN 41 AND 45 THEN 1 ELSE 0 END) AS Range5
+					FROM HWSY.dbo.Lotto_Information
+					ORDER BY Turn DESC";
+
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, null))
+				{
+					while (reader.Read())
+					{
+						Dictionary<string, object> item = new Dictionary<string, object>();
+						item["TURN"] = reader["Turn"];
+						item["RANGE_1_10"] = reader["Range1"];
+						item["RANGE_11_20"] = reader["Range2"];
+						item["RANGE_21_30"] = reader["Range3"];
+						item["RANGE_31_40"] = reader["Range4"];
+						item["RANGE_41_45"] = reader["Range5"];
+						data.Add(item);
+					}
+				}
+			}
+
+			result["DATA"] = data;
+			return result;
+		}
+
+		// 번호 합계 분포 분석
+		public Dictionary<string, object> GetSumDistribution()
+		{
+			Dictionary<string, object> result = new Dictionary<string, object>();
+			List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+
+			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
+			{
+				string query = @"
+					SELECT TOP 100
+						Turn,
+						(Number1 + Number2 + Number3 + Number4 + Number5 + Number6) AS Total
+					FROM HWSY.dbo.Lotto_Information
+					ORDER BY Turn DESC";
+
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, null))
+				{
+					while (reader.Read())
+					{
+						Dictionary<string, object> item = new Dictionary<string, object>();
+						item["TURN"] = reader["Turn"];
+						item["SUM"] = reader["Total"];
+						data.Add(item);
+					}
+				}
+			}
+
+			result["DATA"] = data;
+			return result;
+		}
+
+		// 평균 당첨금 조회
+		public Dictionary<string, object> GetAverageRewards()
+		{
+			Dictionary<string, object> result = new Dictionary<string, object>();
+
+			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
+			{
+				string query = @"
+					SELECT 
+						AVG(CAST(Reward1 AS BIGINT)) AS AvgReward1,
+						AVG(CAST(Reward2 AS BIGINT)) AS AvgReward2,
+						AVG(CAST(Reward3 AS BIGINT)) AS AvgReward3
+					FROM HWSY.dbo.Lotto_Information
+					WHERE Reward1 IS NOT NULL";
+
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, null))
+				{
+					if (reader.Read())
+					{
+						result["AVG_REWARD_1"] = reader["AvgReward1"];
+						result["AVG_REWARD_2"] = reader["AvgReward2"];
+						result["AVG_REWARD_3"] = reader["AvgReward3"];
+					}
+				}
+			}
+
+			return result;
+		}
 	}
 }

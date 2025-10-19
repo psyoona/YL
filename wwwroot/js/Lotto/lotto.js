@@ -12,6 +12,7 @@ class LottoPage {
 	initialize() {
 		this.bindEvents();
 		this.loadLottoList(1);
+		this.chart = null; // Chart.js instance
 	}
 
 	bindEvents() {
@@ -23,7 +24,20 @@ class LottoPage {
 		$('#searchFilterToggle').on('click', () => this.toggleSearchFilter());
 		
 		// Menu items
-		$('.menu-item').on('click', (e) => this.switchMenu($(e.currentTarget)));
+		$('.menu-item').on('click', (e) => {
+			const $item = $(e.currentTarget);
+			if ($item.hasClass('has-submenu')) {
+				this.toggleSubmenu($item);
+			} else {
+				this.switchMenu($item);
+			}
+		});
+		
+		// Submenu items
+		$('.submenu-item').on('click', (e) => {
+			e.stopPropagation();
+			this.switchMenu($(e.currentTarget));
+		});
 		
 		// Search functionality
 		$('#searchButton').on('click', () => this.search());
@@ -38,12 +52,36 @@ class LottoPage {
 		// Generate numbers
 		$('#generateButton').on('click', () => this.generateNumbers());
 		
+		// Strategy change
+		$('#generateStrategy').on('change', (e) => this.onStrategyChange($(e.target).val()));
+		
+		// Calculator
+		$('#calculateButton').on('click', () => this.calculateReward());
+		
+		// Chart type change
+		$('#chartType').on('change', (e) => this.renderChart($(e.target).val()));
+		
 		// Enter key on search inputs
 		$('.search-section input').on('keypress', (e) => {
 			if (e.which === 13) {
 				this.search();
 			}
 		});
+	}
+
+	toggleSubmenu($item) {
+		const $submenu = $item.next('.submenu');
+		const isOpen = $item.hasClass('open');
+		
+		// Close all submenus
+		$('.menu-item.has-submenu').removeClass('open');
+		$('.submenu').removeClass('open');
+		
+		// Toggle current submenu
+		if (!isOpen) {
+			$item.addClass('open');
+			$submenu.addClass('open');
+		}
 	}
 
 	toggleSidebar() {
@@ -82,16 +120,32 @@ class LottoPage {
 		
 		// Update active menu
 		$('.menu-item').removeClass('active');
-		$menuItem.addClass('active');
+		$('.submenu-item').removeClass('active');
+		
+		if ($menuItem.hasClass('submenu-item')) {
+			$menuItem.addClass('active');
+		} else {
+			$menuItem.addClass('active');
+		}
 		
 		// Update page title
 		const title = $menuItem.find('span').text();
-		const icon = $menuItem.find('i').attr('class');
+		const icon = $menuItem.find('i').first().attr('class');
 		$('.page-main-title').html(`<i class="${icon}"></i> ${title}`);
 		
 		// Show/hide pages
 		$('.page-content').removeClass('active');
 		$(`#${menuType}Page`).addClass('active');
+		
+		// Load chart if statistics page is shown
+		if (menuType === 'statistics') {
+			setTimeout(() => {
+				const chartType = $('#chartType').val();
+				if (chartType) {
+					this.renderChart(chartType);
+				}
+			}, 300);
+		}
 		
 		// Close sidebar on mobile
 		if (window.innerWidth < 768) {
@@ -328,11 +382,12 @@ class LottoPage {
 
 	async generateNumbers() {
 		const count = parseInt($('#generateCount').val());
+		const strategy = $('#generateStrategy').val();
 		const allSets = [];
 		
-		// Generate all number sets
+		// Generate all number sets based on strategy
 		for (let i = 0; i < count; i++) {
-			const numbers = this.generateRandomNumbers();
+			const numbers = await this.generateNumbersByStrategy(strategy);
 			allSets.push({ index: i + 1, numbers: numbers });
 		}
 		
@@ -341,7 +396,7 @@ class LottoPage {
 		for (const set of allSets) {
 			html += `
 				<div class="number-set" data-set-index="${set.index}">
-					<div class="number-set-header">세트 ${set.index}</div>
+					<div class="number-set-header">세트 ${set.index} <span class="strategy-badge">${this.getStrategyName(strategy)}</span></div>
 					<div class="number-set-balls">
 						${set.numbers.map(num => this.createNumberBall(num)).join('')}
 					</div>
@@ -356,6 +411,129 @@ class LottoPage {
 		// Load history for each number set
 		for (const set of allSets) {
 			await this.checkNumberCombination(set.index, set.numbers);
+		}
+	}
+
+	async generateNumbersByStrategy(strategy) {
+		switch(strategy) {
+			case 'hot':
+				return await this.generateHotNumbers();
+			case 'cold':
+				return await this.generateColdNumbers();
+			case 'balanced':
+				return this.generateBalancedNumbers();
+			case 'exclude':
+				return this.generateWithExclusion();
+			default:
+				return this.generateRandomNumbers();
+		}
+	}
+
+	async generateHotNumbers() {
+		// Get frequency data
+		const response = await $.ajax({
+			url: '/GetNumberFrequency',
+			method: 'GET',
+			dataType: 'json'
+		});
+		
+		const frequency = response.DATA || [];
+		const topNumbers = frequency.slice(0, 20).map(item => item.NUMBER);
+		
+		// Select 6 random numbers from top 20
+		const numbers = [];
+		while (numbers.length < 6) {
+			const num = topNumbers[Math.floor(Math.random() * topNumbers.length)];
+			if (!numbers.includes(num)) {
+				numbers.push(num);
+			}
+		}
+		return numbers.sort((a, b) => a - b);
+	}
+
+	async generateColdNumbers() {
+		// Get frequency data
+		const response = await $.ajax({
+			url: '/GetNumberFrequency',
+			method: 'GET',
+			dataType: 'json'
+		});
+		
+		const frequency = response.DATA || [];
+		const allNumbers = Array.from({length: 45}, (_, i) => i + 1);
+		const hotNumbers = frequency.slice(0, 20).map(item => item.NUMBER);
+		const coldNumbers = allNumbers.filter(num => !hotNumbers.includes(num));
+		
+		// Select 6 random numbers from cold numbers
+		const numbers = [];
+		while (numbers.length < 6) {
+			const num = coldNumbers[Math.floor(Math.random() * coldNumbers.length)];
+			if (!numbers.includes(num)) {
+				numbers.push(num);
+			}
+		}
+		return numbers.sort((a, b) => a - b);
+	}
+
+	generateBalancedNumbers() {
+		const numbers = [];
+		// Ensure balanced odd/even (3:3)
+		const oddNumbers = Array.from({length: 23}, (_, i) => i * 2 + 1).filter(n => n <= 45);
+		const evenNumbers = Array.from({length: 22}, (_, i) => (i + 1) * 2).filter(n => n <= 45);
+		
+		// Pick 3 odd, 3 even
+		while (numbers.length < 3) {
+			const num = oddNumbers[Math.floor(Math.random() * oddNumbers.length)];
+			if (!numbers.includes(num)) {
+				numbers.push(num);
+			}
+		}
+		
+		while (numbers.length < 6) {
+			const num = evenNumbers[Math.floor(Math.random() * evenNumbers.length)];
+			if (!numbers.includes(num)) {
+				numbers.push(num);
+			}
+		}
+		
+		return numbers.sort((a, b) => a - b);
+	}
+
+	generateWithExclusion() {
+		const excludeInput = $('#excludeNumbers').val();
+		const excludeNumbers = excludeInput ? 
+			excludeInput.split(',').map(n => parseInt(n.trim())).filter(n => n >= 1 && n <= 45) : 
+			[];
+		
+		const availableNumbers = Array.from({length: 45}, (_, i) => i + 1)
+			.filter(n => !excludeNumbers.includes(n));
+		
+		const numbers = [];
+		while (numbers.length < 6 && availableNumbers.length > 0) {
+			const index = Math.floor(Math.random() * availableNumbers.length);
+			numbers.push(availableNumbers[index]);
+			availableNumbers.splice(index, 1);
+		}
+		
+		return numbers.sort((a, b) => a - b);
+	}
+
+	getStrategyName(strategy) {
+		const names = {
+			'random': '랜덤',
+			'hot': '인기번호',
+			'cold': '비인기번호',
+			'balanced': '균형',
+			'exclude': '제외'
+		};
+		return names[strategy] || '랜덤';
+	}
+
+	onStrategyChange(strategy) {
+		if (strategy === 'exclude') {
+			$('#excludeNumbersDiv').show();
+		} else {
+			$('#excludeNumbersDiv').hide();
 		}
 	}
 
@@ -456,6 +634,310 @@ class LottoPage {
 
 	formatCurrency(amount) {
 		return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
+	}
+
+	// 당첨금 계산기
+	async calculateReward() {
+		const gameCount = parseInt($('#calcGameCount').val());
+		const pricePerGame = parseInt($('#calcPricePerGame').val());
+		const matchCount = $('#calcMatchCount').val();
+		
+		const totalInvestment = gameCount * pricePerGame;
+		
+		// Get average rewards
+		const response = await $.ajax({
+			url: '/GetAverageRewards',
+			method: 'GET',
+			dataType: 'json'
+		});
+		
+		const avgRewards = response.DATA;
+		let avgReward = 0;
+		let rankName = '';
+		let probability = 0;
+		
+		switch(matchCount) {
+			case '6':
+				avgReward = avgRewards.AVG_REWARD_1;
+				rankName = '1등';
+				probability = 1 / 8145060;
+				break;
+			case '5b':
+				avgReward = avgRewards.AVG_REWARD_2;
+				rankName = '2등';
+				probability = 6 / 8145060;
+				break;
+			case '5':
+				avgReward = avgRewards.AVG_REWARD_3;
+				rankName = '3등';
+				probability = 210 / 8145060;
+				break;
+			case '4':
+				avgReward = 50000;
+				rankName = '4등';
+				probability = 9765 / 8145060;
+				break;
+			case '3':
+				avgReward = 5000;
+				rankName = '5등';
+				probability = 142100 / 8145060;
+				break;
+		}
+		
+		const expectedValue = avgReward * probability * gameCount;
+		const roi = ((expectedValue - totalInvestment) / totalInvestment * 100).toFixed(2);
+		const winProbability = (probability * 100 * gameCount).toFixed(8);
+		
+		let html = `
+			<div class="calculator-summary">
+				<div class="calc-row">
+					<span class="calc-label">총 투자금액:</span>
+					<span class="calc-value">${this.formatNumber(totalInvestment)}</span>
+				</div>
+				<div class="calc-row">
+					<span class="calc-label">선택 등수:</span>
+					<span class="calc-value highlight-rank">${rankName}</span>
+				</div>
+				<div class="calc-row">
+					<span class="calc-label">평균 당첨금:</span>
+					<span class="calc-value">${this.formatNumber(Math.round(avgReward))}</span>
+				</div>
+				<div class="calc-row">
+					<span class="calc-label">당첨 확률:</span>
+					<span class="calc-value">1 / ${(1/probability).toLocaleString('ko-KR', {maximumFractionDigits: 0})}</span>
+				</div>
+				<div class="calc-row">
+					<span class="calc-label">${gameCount}게임 당첨 확률:</span>
+					<span class="calc-value">${winProbability}%</span>
+				</div>
+				<div class="calc-row">
+					<span class="calc-label">기대값:</span>
+					<span class="calc-value">${this.formatNumber(Math.round(expectedValue))}</span>
+				</div>
+				<div class="calc-row highlight">
+					<span class="calc-label">예상 수익률 (ROI):</span>
+					<span class="calc-value ${roi >= 0 ? 'positive' : 'negative'}">${roi}%</span>
+				</div>
+			</div>
+			<div class="calc-notice">
+				<i class="fas fa-info-circle"></i> 이 계산은 통계적 기대값이며, 실제 당첨을 보장하지 않습니다.
+			</div>
+		`;
+		
+		$('#calculatorResult').html(html).slideDown(300);
+	}
+
+	// 차트 렌더링
+	async renderChart(chartType) {
+		let data = null;
+		
+		switch(chartType) {
+			case 'oddEven':
+				data = await this.getOddEvenData();
+				this.renderOddEvenChart(data);
+				break;
+			case 'range':
+				data = await this.getRangeData();
+				this.renderRangeChart(data);
+				break;
+			case 'sum':
+				data = await this.getSumData();
+				this.renderSumChart(data);
+				break;
+		}
+	}
+
+	async getOddEvenData() {
+		const response = await $.ajax({
+			url: '/GetOddEvenAnalysis',
+			method: 'GET',
+			dataType: 'json'
+		});
+		return response.DATA.DATA;
+	}
+
+	async getRangeData() {
+		const response = await $.ajax({
+			url: '/GetRangeDistribution',
+			method: 'GET',
+			dataType: 'json'
+		});
+		return response.DATA.DATA;
+	}
+
+	async getSumData() {
+		const response = await $.ajax({
+			url: '/GetSumDistribution',
+			method: 'GET',
+			dataType: 'json'
+		});
+		return response.DATA.DATA;
+	}
+
+	renderOddEvenChart(data) {
+		const ctx = document.getElementById('statisticsChart');
+		if (this.chart) {
+			this.chart.destroy();
+		}
+		
+		const labels = data.map(d => d.TURN + '회').reverse();
+		const oddData = data.map(d => d.ODD_COUNT).reverse();
+		const evenData = data.map(d => d.EVEN_COUNT).reverse();
+		
+		this.chart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: '홀수',
+						data: oddData,
+						borderColor: 'rgb(255, 99, 132)',
+						backgroundColor: 'rgba(255, 99, 132, 0.2)',
+						tension: 0.1
+					},
+					{
+						label: '짝수',
+						data: evenData,
+						borderColor: 'rgb(54, 162, 235)',
+						backgroundColor: 'rgba(54, 162, 235, 0.2)',
+						tension: 0.1
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					title: {
+						display: true,
+						text: '홀짝 비율 분석 (최근 100회)'
+					},
+					legend: {
+						position: 'top',
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 6,
+						ticks: {
+							stepSize: 1
+						}
+					}
+				}
+			}
+		});
+	}
+
+	renderRangeChart(data) {
+		const ctx = document.getElementById('statisticsChart');
+		if (this.chart) {
+			this.chart.destroy();
+		}
+		
+		const labels = data.map(d => d.TURN + '회').reverse();
+		
+		this.chart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: '1-10',
+						data: data.map(d => d.RANGE_1_10).reverse(),
+						backgroundColor: 'rgba(255, 206, 86, 0.7)'
+					},
+					{
+						label: '11-20',
+						data: data.map(d => d.RANGE_11_20).reverse(),
+						backgroundColor: 'rgba(54, 162, 235, 0.7)'
+					},
+					{
+						label: '21-30',
+						data: data.map(d => d.RANGE_21_30).reverse(),
+						backgroundColor: 'rgba(255, 99, 132, 0.7)'
+					},
+					{
+						label: '31-40',
+						data: data.map(d => d.RANGE_31_40).reverse(),
+						backgroundColor: 'rgba(153, 102, 255, 0.7)'
+					},
+					{
+						label: '41-45',
+						data: data.map(d => d.RANGE_41_45).reverse(),
+						backgroundColor: 'rgba(75, 192, 192, 0.7)'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					title: {
+						display: true,
+						text: '구간별 번호 분포 (최근 100회)'
+					},
+					legend: {
+						position: 'top',
+					}
+				},
+				scales: {
+					x: {
+						stacked: true,
+					},
+					y: {
+						stacked: true,
+						beginAtZero: true,
+						max: 6
+					}
+				}
+			}
+		});
+	}
+
+	renderSumChart(data) {
+		const ctx = document.getElementById('statisticsChart');
+		if (this.chart) {
+			this.chart.destroy();
+		}
+		
+		const labels = data.map(d => d.TURN + '회').reverse();
+		const sums = data.map(d => d.SUM).reverse();
+		
+		this.chart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: labels,
+				datasets: [{
+					label: '번호 합계',
+					data: sums,
+					borderColor: 'rgb(102, 126, 234)',
+					backgroundColor: 'rgba(102, 126, 234, 0.2)',
+					tension: 0.1
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					title: {
+						display: true,
+						text: '당첨 번호 합계 분포 (최근 100회)'
+					},
+					legend: {
+						position: 'top',
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: false,
+						min: 21,
+						max: 255
+					}
+				}
+			}
+		});
 	}
 }
 

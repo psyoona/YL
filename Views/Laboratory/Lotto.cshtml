@@ -31,6 +31,21 @@
 				<i class="fas fa-random"></i>
 				<span>로또 번호 생성</span>
 			</li>
+			<li class="menu-item has-submenu">
+				<i class="fas fa-chart-bar"></i>
+				<span>로또 번호 분석</span>
+				<i class="fas fa-chevron-down submenu-arrow"></i>
+			</li>
+			<ul class="submenu">
+				<li class="submenu-item" data-menu="calculator">
+					<i class="fas fa-calculator"></i>
+					<span>당첨금 계산기</span>
+				</li>
+				<li class="submenu-item" data-menu="statistics">
+					<i class="fas fa-chart-pie"></i>
+					<span>통계 차트</span>
+				</li>
+			</ul>
 		</ul>
 	</div>
 
@@ -287,14 +302,29 @@
 			</div>
 			
 			<div class="generate-container">
+				<!-- 번호 생성 설정 -->
 				<div class="card">
 					<div class="card-header">
 						<h5 class="mb-0"><i class="fas fa-magic"></i> 번호 생성 설정</h5>
 					</div>
 					<div class="card-body">
-						<div class="row mb-4">
+						<div class="row mb-3">
 							<div class="col-auto">
-								<label class="form-label">생성할 번호 개수</label>
+								<label class="form-label">생성 전략</label>
+								<select id="generateStrategy" class="form-select" style="width: 180px;">
+									<option value="random">랜덤 생성</option>
+									<option value="hot">자주 나온 번호 중심</option>
+									<option value="cold">안 나온 번호 중심</option>
+									<option value="balanced">균형잡힌 번호</option>
+									<option value="exclude">특정 번호 제외</option>
+								</select>
+							</div>
+							<div class="col-auto" id="excludeNumbersDiv" style="display: none;">
+								<label class="form-label">제외할 번호 (쉼표로 구분)</label>
+								<input type="text" id="excludeNumbers" class="form-control" placeholder="예: 1,2,3,4,5" style="width: 200px;">
+							</div>
+							<div class="col-auto">
+								<label class="form-label">생성 개수</label>
 								<select id="generateCount" class="form-select" style="width: 120px;">
 									<option value="1">1개</option>
 									<option value="5" selected>5개</option>
@@ -316,6 +346,95 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- 당첨금 계산기 페이지 -->
+		<div id="calculatorPage" class="page-content">
+			<!-- 페이지 타이틀 -->
+			<div class="page-header">
+				<div class="d-flex align-items-center gap-3">
+					<button class="btn-toggle-white">
+						<i class="fas fa-bars"></i>
+					</button>
+					<h2 class="page-main-title mb-0"><i class="fas fa-calculator"></i> 당첨금 계산기</h2>
+				</div>
+			</div>
+
+			<div class="generate-container">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0"><i class="fas fa-calculator"></i> 당첨금 및 수익률 계산</h5>
+					</div>
+					<div class="card-body">
+						<div class="row mb-3">
+							<div class="col-md-4">
+								<label class="form-label">구매 게임 수</label>
+								<input type="number" id="calcGameCount" class="form-control" value="5" min="1">
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">게임당 가격</label>
+								<input type="number" id="calcPricePerGame" class="form-control" value="1000" readonly>
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">매칭 번호 개수</label>
+								<select id="calcMatchCount" class="form-select">
+									<option value="6">6개 (1등)</option>
+									<option value="5b">5개 + 보너스 (2등)</option>
+									<option value="5">5개 (3등)</option>
+									<option value="4">4개 (4등)</option>
+									<option value="3">3개 (5등)</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<button id="calculateButton" class="btn btn-success">
+									<i class="fas fa-coins"></i> 계산하기
+								</button>
+							</div>
+						</div>
+						<div id="calculatorResult" class="calculator-result mt-3" style="display: none;">
+							<!-- Result will be shown here -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 통계 차트 페이지 -->
+		<div id="statisticsPage" class="page-content">
+			<!-- 페이지 타이틀 -->
+			<div class="page-header">
+				<div class="d-flex align-items-center gap-3">
+					<button class="btn-toggle-white">
+						<i class="fas fa-bars"></i>
+					</button>
+					<h2 class="page-main-title mb-0"><i class="fas fa-chart-pie"></i> 통계 차트</h2>
+				</div>
+			</div>
+
+			<div class="generate-container">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0"><i class="fas fa-chart-line"></i> 로또 번호 통계 분석</h5>
+					</div>
+					<div class="card-body">
+						<div class="row mb-3">
+							<div class="col-12">
+								<label class="form-label">차트 유형</label>
+								<select id="chartType" class="form-select" style="width: 200px;">
+									<option value="oddEven">홀짝 비율 분석</option>
+									<option value="range">구간별 분포</option>
+									<option value="sum">번호 합계 분포</option>
+								</select>
+							</div>
+						</div>
+						<div class="chart-container">
+							<canvas id="statisticsChart"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
@@ -323,6 +442,7 @@
 	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
 	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
 	<script defer src="~/lib/filesaver/FileSaver.min.js?v=@ViewBag.Cacheversion"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
 	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>

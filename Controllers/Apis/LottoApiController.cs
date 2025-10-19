@@ -87,5 +87,45 @@ namespace YL.Controllers.Apis
 
 			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
 		}
+
+		[HttpGet]
+		[Route("GetOddEvenAnalysis")]
+		public JsonResult GetOddEvenAnalysis()
+		{
+			LottoService lottoService = new LottoService();
+			var result = lottoService.GetOddEvenAnalysis();
+
+			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetRangeDistribution")]
+		public JsonResult GetRangeDistribution()
+		{
+			LottoService lottoService = new LottoService();
+			var result = lottoService.GetRangeDistribution();
+
+			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetSumDistribution")]
+		public JsonResult GetSumDistribution()
+		{
+			LottoService lottoService = new LottoService();
+			var result = lottoService.GetSumDistribution();
+
+			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetAverageRewards")]
+		public JsonResult GetAverageRewards()
+		{
+			LottoService lottoService = new LottoService();
+			var result = lottoService.GetAverageRewards();
+
+			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
+		}
 	}
 }
