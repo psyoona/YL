@@ -692,43 +692,124 @@ class LottoPage {
 				break;
 		}
 		
-		const expectedValue = avgReward * probability * gameCount;
-		const roi = ((expectedValue - totalInvestment) / totalInvestment * 100).toFixed(2);
-		const winProbability = (probability * 100 * gameCount).toFixed(8);
+		// 게임당 기대값
+		const expectedValuePerGame = avgReward * probability;
+		// 총 기대값
+		const totalExpectedValue = expectedValuePerGame * gameCount;
+		// 통계적 수익률 (기대값 기준)
+		const statisticalROI = ((totalExpectedValue - totalInvestment) / totalInvestment * 100).toFixed(2);
+		// N게임 중 최소 1회 당첨 확률 (1 - (1-p)^n)
+		const atLeastOneWinProbability = (1 - Math.pow(1 - probability, gameCount)) * 100;
+		// 당첨 안 될 확률
+		const noWinProbability = (Math.pow(1 - probability, gameCount) * 100).toFixed(8);
+		// 단일 게임 당첨 확률 백분율
+		const singleGameProbability = (probability * 100).toFixed(10);
+		
+		// 현실적 손익 (당첨 안 될 확률 기반)
+		const realisticLoss = -totalInvestment;
+		const realisticROI = -100;
 		
 		let html = `
 			<div class="calculator-summary">
-				<div class="calc-row">
-					<span class="calc-label">총 투자금액:</span>
-					<span class="calc-value">${this.formatNumber(totalInvestment)}</span>
+				<div class="calc-section">
+					<div class="calc-section-title">투자 정보</div>
+					<div class="calc-row">
+						<span class="calc-label">총 투자금액:</span>
+						<span class="calc-value">${this.formatNumber(totalInvestment)}</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">구매 게임 수:</span>
+						<span class="calc-value">${gameCount}게임</span>
+					</div>
 				</div>
-				<div class="calc-row">
-					<span class="calc-label">선택 등수:</span>
-					<span class="calc-value highlight-rank">${rankName}</span>
+
+				<div class="calc-section">
+					<div class="calc-section-title">당첨 정보</div>
+					<div class="calc-row">
+						<span class="calc-label">선택 등수:</span>
+						<span class="calc-value highlight-rank">${rankName}</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">평균 당첨금:</span>
+						<span class="calc-value">${this.formatNumber(Math.round(avgReward))}</span>
+					</div>
 				</div>
-				<div class="calc-row">
-					<span class="calc-label">평균 당첨금:</span>
-					<span class="calc-value">${this.formatNumber(Math.round(avgReward))}</span>
+
+				<div class="calc-section">
+					<div class="calc-section-title">확률 분석</div>
+					<div class="calc-row">
+						<span class="calc-label">게임당 당첨 확률:</span>
+						<span class="calc-value">1 / ${(1/probability).toLocaleString('ko-KR', {maximumFractionDigits: 0})}</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">확률 (백분율):</span>
+						<span class="calc-value">${singleGameProbability}%</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">${gameCount}게임 중 최소 1회 당첨:</span>
+						<span class="calc-value">${atLeastOneWinProbability.toFixed(8)}%</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">${gameCount}게임 모두 낙첨:</span>
+						<span class="calc-value highlight-probability">${noWinProbability}%</span>
+					</div>
 				</div>
-				<div class="calc-row">
-					<span class="calc-label">당첨 확률:</span>
-					<span class="calc-value">1 / ${(1/probability).toLocaleString('ko-KR', {maximumFractionDigits: 0})}</span>
+
+				<div class="calc-section reality-section">
+					<div class="calc-section-title">
+						<i class="fas fa-exclamation-triangle"></i> 현실적 분석
+					</div>
+					<div class="calc-description">
+						${gameCount}게임으로 ${rankName} 당첨될 확률은 <strong>${atLeastOneWinProbability.toFixed(8)}%</strong>입니다.<br>
+						즉, <strong>${noWinProbability}%의 확률로 모두 낙첨</strong>됩니다.
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">현실적 예상 손익:</span>
+						<span class="calc-value negative">${this.formatNumber(realisticLoss)}</span>
+					</div>
+					<div class="calc-row highlight reality-highlight">
+						<span class="calc-label">현실적 수익률 (ROI):</span>
+						<span class="calc-value">${realisticROI}%</span>
+					</div>
 				</div>
-				<div class="calc-row">
-					<span class="calc-label">${gameCount}게임 당첨 확률:</span>
-					<span class="calc-value">${winProbability}%</span>
-				</div>
-				<div class="calc-row">
-					<span class="calc-label">기대값:</span>
-					<span class="calc-value">${this.formatNumber(Math.round(expectedValue))}</span>
-				</div>
-				<div class="calc-row highlight">
-					<span class="calc-label">예상 수익률 (ROI):</span>
-					<span class="calc-value ${roi >= 0 ? 'positive' : 'negative'}">${roi}%</span>
+
+				<div class="calc-section statistical-section">
+					<div class="calc-section-title">
+						<i class="fas fa-chart-line"></i> 통계적 분석 (이론값)
+					</div>
+					<div class="calc-description">
+						수백만 명이 동일하게 구매할 때 평균적으로 돌려받는 금액입니다.<br>
+						<strong>개인이 실제로 받을 금액이 아닙니다.</strong>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">게임당 기대값:</span>
+						<span class="calc-value">${this.formatNumber(Math.round(expectedValuePerGame))}</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">총 기대값 (${gameCount}게임):</span>
+						<span class="calc-value">${this.formatNumber(Math.round(totalExpectedValue))}</span>
+					</div>
+					<div class="calc-row">
+						<span class="calc-label">통계적 예상 손익:</span>
+						<span class="calc-value ${totalExpectedValue >= totalInvestment ? 'positive' : 'negative'}">
+							${this.formatNumber(Math.round(totalExpectedValue - totalInvestment))}
+						</span>
+					</div>
+					<div class="calc-row highlight">
+						<span class="calc-label">통계적 수익률 (ROI):</span>
+						<span class="calc-value">${statisticalROI}%</span>
+					</div>
 				</div>
 			</div>
 			<div class="calc-notice">
-				<i class="fas fa-info-circle"></i> 이 계산은 통계적 기대값이며, 실제 당첨을 보장하지 않습니다.
+				<i class="fas fa-lightbulb"></i> 
+				<strong>현실 vs 통계</strong><br>
+				• <strong>현실:</strong> 당신이 실제로 겪을 결과 → 거의 확실하게 -100% 손실<br>
+				• <strong>통계:</strong> 800만 명이 같은 구매를 했을 때 평균 → ${statisticalROI}% 손실<br>
+				<br>
+				<i class="fas fa-info-circle"></i> 
+				<strong>참고:</strong> 1~5등을 모두 고려하면 1,000원당 평균 약 450원 회수 (약 -55% ROI)입니다.<br>
+				하지만 개인에게는 대부분 낙첨이므로 실제 손실은 -100%에 가깝습니다.
 			</div>
 		`;
 		
