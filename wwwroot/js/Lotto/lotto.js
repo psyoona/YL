@@ -326,23 +326,116 @@ class LottoPage {
         }
     }
 
-    generateNumbers() {
+    async generateNumbers() {
         const count = parseInt($('#generateCount').val());
-        let html = '';
+        const allSets = [];
         
+        // Generate all number sets
         for (let i = 0; i < count; i++) {
             const numbers = this.generateRandomNumbers();
+            allSets.push({ index: i + 1, numbers: numbers });
+        }
+        
+        // Display immediately with loading state
+        let html = '';
+        for (const set of allSets) {
             html += `
-                <div class="number-set">
-                    <div class="number-set-header">세트 ${i + 1}</div>
+                <div class="number-set" data-set-index="${set.index}">
+                    <div class="number-set-header">세트 ${set.index}</div>
                     <div class="number-set-balls">
-                        ${numbers.map(num => this.createNumberBall(num)).join('')}
+                        ${set.numbers.map(num => this.createNumberBall(num)).join('')}
+                    </div>
+                    <div class="number-history">
+                        <i class="fas fa-spinner fa-spin"></i> 당첨 내역 확인 중...
                     </div>
                 </div>
             `;
         }
-        
         $('#generatedNumbers').html(html);
+        
+        // Load history for each number set
+        for (const set of allSets) {
+            await this.checkNumberCombination(set.index, set.numbers);
+        }
+    }
+
+    async checkNumberCombination(setIndex, numbers) {
+        const $historyDiv = $(`.number-set[data-set-index="${setIndex}"] .number-history`);
+        
+        try {
+            const result = await this.getCombinationHistory(numbers);
+            
+            if (result.HAS_MATCH) {
+                // Found match!
+                const matches = result.MATCHED_TURNS;
+                const highestRank = result.RANK;
+                
+                // Get rank icon and color
+                const rankInfo = this.getRankInfo(highestRank);
+                
+                let historyHtml = `<div class="match-found rank-${rankInfo.class}">`;
+                historyHtml += `<div class="match-header">
+                    <i class="${rankInfo.icon}"></i> 
+                    <span>이 번호 조합은 <strong>${highestRank}</strong>에 당첨된 적이 있습니다!</span>
+                </div>`;
+                
+                matches.forEach(match => {
+                    const matchRankInfo = this.getRankInfo(match.RANK);
+                    historyHtml += `
+                        <div class="match-item">
+                            <span class="match-rank rank-badge-${matchRankInfo.class}">${match.RANK}</span>
+                            <span class="match-turn">${match.TURN}회</span>
+                            <span class="match-date">(${match.DATE})</span>
+                            <span class="match-reward">${this.formatNumber(match.REWARD)}</span>
+                        </div>
+                    `;
+                });
+                historyHtml += '</div>';
+                $historyDiv.html(historyHtml);
+            } else {
+                // No match found
+                $historyDiv.html(`
+                    <div class="no-history">
+                        <i class="fas fa-info-circle"></i> 이전에 당첨된 적 없는 번호 조합입니다.
+                    </div>
+                `);
+            }
+        } catch (error) {
+            console.error('당첨 내역 조회 실패:', error);
+            $historyDiv.html(`
+                <div class="history-error">
+                    <i class="fas fa-exclamation-triangle"></i> 당첨 내역을 불러올 수 없습니다.
+                </div>
+            `);
+        }
+    }
+
+    getRankInfo(rank) {
+        const rankMap = {
+            '1등': { icon: 'fas fa-crown', class: 'first' },
+            '2등': { icon: 'fas fa-medal', class: 'second' },
+            '3등': { icon: 'fas fa-trophy', class: 'third' }
+        };
+        return rankMap[rank] || { icon: 'fas fa-trophy', class: 'default' };
+    }
+
+    getCombinationHistory(numbers) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/CheckNumberCombination',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(numbers),
+                dataType: 'json',
+                success: (response) => {
+                    resolve(response.DATA || { HAS_MATCH: false, MATCHED_TURNS: [] });
+                },
+                error: (error) => {
+                    console.error('번호 조합 조회 실패:', error);
+                    reject(error);
+                }
+            });
+        });
     }
 
     generateRandomNumbers() {

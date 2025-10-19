@@ -322,5 +322,105 @@ namespace YL.Services
 
 			return positions;
 		}
+
+		public Dictionary<string, object> CheckNumberCombination(List<int> numbers)
+		{
+			Dictionary<string, object> result = new Dictionary<string, object>();
+			result["HAS_MATCH"] = false;
+			result["RANK"] = null;
+			result["MATCHED_TURNS"] = new List<Dictionary<string, object>>();
+
+			if (numbers == null || numbers.Count != 6)
+			{
+				return result;
+			}
+
+			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
+			{
+				// Get all lotto data
+				string query = @"
+					SELECT Turn, Date, Number1, Number2, Number3, Number4, Number5, Number6, NumberBonus, 
+						   Reward1, Reward2, Reward3
+					FROM HWSY.dbo.Lotto_Information
+					ORDER BY Turn DESC";
+
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, null))
+				{
+					List<Dictionary<string, object>> matches = new List<Dictionary<string, object>>();
+					
+					while (reader.Read())
+					{
+						// Get winning numbers
+						List<int> winningNumbers = new List<int>
+						{
+							Convert.ToInt32(reader["Number1"]),
+							Convert.ToInt32(reader["Number2"]),
+							Convert.ToInt32(reader["Number3"]),
+							Convert.ToInt32(reader["Number4"]),
+							Convert.ToInt32(reader["Number5"]),
+							Convert.ToInt32(reader["Number6"])
+						};
+						
+						int bonusNumber = Convert.ToInt32(reader["NumberBonus"]);
+
+						// Count matching numbers
+						int matchCount = numbers.Count(n => winningNumbers.Contains(n));
+						bool bonusMatch = numbers.Contains(bonusNumber);
+
+						string rank = null;
+						object reward = null;
+
+						// 1등: 6개 숫자 모두 일치
+						if (matchCount == 6)
+						{
+							rank = "1등";
+							reward = reader["Reward1"];
+						}
+						// 2등: 5개 숫자 + 보너스 번호 일치
+						else if (matchCount == 5 && bonusMatch)
+						{
+							rank = "2등";
+							reward = reader["Reward2"];
+						}
+						// 3등: 5개 숫자 일치
+						else if (matchCount == 5)
+						{
+							rank = "3등";
+							reward = reader["Reward3"];
+						}
+
+						// If there's a match, add to results
+						if (rank != null)
+						{
+							Dictionary<string, object> match = new Dictionary<string, object>();
+							match["TURN"] = reader["Turn"];
+							match["DATE"] = reader["Date"];
+							match["RANK"] = rank;
+							match["REWARD"] = reward;
+							match["MATCH_COUNT"] = matchCount;
+							match["BONUS_MATCH"] = bonusMatch;
+							matches.Add(match);
+
+							// Store highest rank
+							if (result["RANK"] == null || 
+								(rank == "1등") ||
+								(rank == "2등" && result["RANK"].ToString() != "1등") ||
+								(rank == "3등" && result["RANK"].ToString() != "1등" && result["RANK"].ToString() != "2등"))
+							{
+								result["RANK"] = rank;
+							}
+						}
+					}
+
+					if (matches.Count > 0)
+					{
+						result["HAS_MATCH"] = true;
+						result["MATCHED_TURNS"] = matches;
+					}
+				}
+			}
+
+			return result;
+		}
 	}
 }

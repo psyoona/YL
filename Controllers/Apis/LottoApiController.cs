@@ -77,5 +77,15 @@ namespace YL.Controllers.Apis
 
 			return this.Json(new { DATA = positions }, this.JsonSerializerOptions);
 		}
+
+		[HttpPost]
+		[Route("CheckNumberCombination")]
+		public JsonResult CheckNumberCombination([FromBody] List<int> numbers)
+		{
+			LottoService lottoService = new LottoService();
+			var result = lottoService.CheckNumberCombination(numbers);
+
+			return this.Json(new { DATA = result }, this.JsonSerializerOptions);
+		}
 	}
 }
