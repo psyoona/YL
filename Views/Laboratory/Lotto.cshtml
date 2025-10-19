@@ -37,59 +37,64 @@
     <div id="mainContent" class="main-content">
         <!-- 로또 번호 조회 페이지 -->
         <div id="searchPage" class="page-content active">
+            <!-- 페이지 타이틀 -->
+            <div class="page-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button id="sidebarToggle" class="btn-toggle-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-main-title mb-0"><i class="fas fa-search"></i> 로또 번호 조회</h2>
+                </div>
+            </div>
+            
             <!-- 검색 영역 -->
             <div class="search-section">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-3">
-                            <button id="sidebarToggle" class="btn-toggle">
-                                <i class="fas fa-bars"></i>
-                            </button>
+                    <div class="card-header" style="cursor: pointer;" id="searchFilterToggle">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fas fa-filter"></i> 검색 조건</h5>
+                            <i class="fas fa-chevron-up toggle-icon"></i>
                         </div>
-                        <h6 class="mb-0 page-title"><i class="fas fa-search"></i> 로또 번호 조회</h6>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-2">
+                    <div class="card-body" id="searchFilterBody">
+                        <div class="row g-2">
+                            <div class="col-md-2 col-sm-4">
                                 <label class="form-label">회차</label>
-                                <input type="number" id="searchTurn" class="form-control" placeholder="회차 입력">
+                                <input type="number" id="searchTurn" class="form-control form-control-sm" placeholder="회차 입력">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 1</label>
-                                <input type="number" id="searchNumber1" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber1" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 2</label>
-                                <input type="number" id="searchNumber2" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber2" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 3</label>
-                                <input type="number" id="searchNumber3" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber3" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 4</label>
-                                <input type="number" id="searchNumber4" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber4" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 5</label>
-                                <input type="number" id="searchNumber5" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber5" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1 col-sm-4">
                                 <label class="form-label">번호 6</label>
-                                <input type="number" id="searchNumber6" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchNumber6" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2 col-sm-4">
                                 <label class="form-label">보너스 번호</label>
-                                <input type="number" id="searchBonus" class="form-control" placeholder="1-45" min="1" max="45">
+                                <input type="number" id="searchBonus" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
                             </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <button id="searchButton" class="btn btn-primary me-2">
+                            <div class="col-md-2 col-sm-12 d-flex align-items-end">
+                                <button id="searchButton" class="btn btn-primary btn-sm me-2">
                                     <i class="fas fa-search"></i> 검색
                                 </button>
-                                <button id="resetButton" class="btn btn-secondary">
+                                <button id="resetButton" class="btn btn-secondary btn-sm">
                                     <i class="fas fa-redo"></i> 초기화
                                 </button>
                             </div>
@@ -103,9 +108,20 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5><i class="fas fa-table"></i> 로또 당첨번호 목록 (총 <span id="totalCount">0</span>건)</h5>
-                        <button id="excelExportBtn" class="btn btn-success btn-sm">
-                            <i class="fas fa-file-excel"></i> Excel 다운로드
-                        </button>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="pageSizeSelect" class="mb-0" style="white-space: nowrap;">표시 개수:</label>
+                                <select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="10">10개</option>
+                                    <option value="20" selected>20개</option>
+                                    <option value="50">50개</option>
+                                    <option value="100">100개</option>
+                                </select>
+                            </div>
+                            <button id="excelExportBtn" class="btn btn-success btn-sm">
+                                <i class="fas fa-file-excel"></i> Excel 다운로드
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -140,15 +156,20 @@
 
         <!-- 로또 번호 생성 페이지 -->
         <div id="generatePage" class="page-content">
+            <!-- 페이지 타이틀 -->
+            <div class="page-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button id="sidebarToggle2" class="btn-toggle-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-main-title mb-0"><i class="fas fa-random"></i> 로또 번호 생성</h2>
+                </div>
+            </div>
+            
             <div class="generate-container">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-3">
-                            <button id="sidebarToggle2" class="btn-toggle">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                            <h5 class="mb-0"><i class="fas fa-random"></i> 로또 번호 생성</h5>
-                        </div>
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-magic"></i> 번호 생성 설정</h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-4">

@@ -16,8 +16,11 @@ class LottoPage {
 
     bindEvents() {
         // Sidebar toggle
-        $('#sidebarToggle, #sidebarToggle2, .btn-toggle').on('click', () => this.toggleSidebar());
+        $('#sidebarToggle, #sidebarToggle2, .btn-toggle, .btn-toggle-white').on('click', () => this.toggleSidebar());
         $('#sidebarOverlay').on('click', () => this.toggleSidebar());
+        
+        // Search filter toggle
+        $('#searchFilterToggle').on('click', () => this.toggleSearchFilter());
         
         // Menu items
         $('.menu-item').on('click', (e) => this.switchMenu($(e.currentTarget)));
@@ -25,6 +28,9 @@ class LottoPage {
         // Search functionality
         $('#searchButton').on('click', () => this.search());
         $('#resetButton').on('click', () => this.resetSearch());
+        
+        // Page size change
+        $('#pageSizeSelect').on('change', (e) => this.changePageSize(parseInt($(e.target).val())));
         
         // Excel export
         $('#excelExportBtn').on('click', () => this.exportToExcel());
@@ -58,6 +64,19 @@ class LottoPage {
         }
     }
 
+    toggleSearchFilter() {
+        const $body = $('#searchFilterBody');
+        const $icon = $('.toggle-icon');
+        
+        if ($body.is(':visible')) {
+            $body.slideUp(300);
+            $icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        } else {
+            $body.slideDown(300);
+            $icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        }
+    }
+
     switchMenu($menuItem) {
         const menuType = $menuItem.data('menu');
         
@@ -67,7 +86,8 @@ class LottoPage {
         
         // Update page title
         const title = $menuItem.find('span').text();
-        $('.page-title').html(`<i class="${$menuItem.find('i').attr('class')}"></i> ${title}`);
+        const icon = $menuItem.find('i').attr('class');
+        $('.page-main-title').html(`<i class="${icon}"></i> ${title}`);
         
         // Show/hide pages
         $('.page-content').removeClass('active');
@@ -107,6 +127,11 @@ class LottoPage {
         
         this.searchCriteria = {};
         this.loadLottoList(1);
+    }
+
+    changePageSize(newSize) {
+        this.pageSize = newSize;
+        this.loadLottoList(1); // Reset to first page
     }
 
     loadLottoList(pageNumber) {
@@ -266,12 +291,18 @@ class LottoPage {
             return;
         }
 
-        // Create CSV content
+        // Create CSV content with proper comma delimiter
         let csvContent = '\uFEFF'; // UTF-8 BOM
         csvContent += '회차,추첨일,번호1,번호2,번호3,번호4,번호5,번호6,보너스,1등상금,2등상금,3등상금\n';
         
         this.currentData.forEach(lotto => {
-            csvContent += `${lotto.TURN},${lotto.DATE || ''},${lotto.NUMBER1},${lotto.NUMBER2},${lotto.NUMBER3},${lotto.NUMBER4},${lotto.NUMBER5},${lotto.NUMBER6},${lotto.NUMBERBONUS},${lotto.REWARD1},${lotto.REWARD2},${lotto.REWARD3}\n`;
+            // Wrap large numbers in quotes to keep them as text in Excel
+            const reward1 = lotto.REWARD1 ? `"${lotto.REWARD1}"` : '""';
+            const reward2 = lotto.REWARD2 ? `"${lotto.REWARD2}"` : '""';
+            const reward3 = lotto.REWARD3 ? `"${lotto.REWARD3}"` : '""';
+            const date = lotto.DATE ? `"${lotto.DATE}"` : '""';
+            
+            csvContent += `${lotto.TURN},${date},${lotto.NUMBER1},${lotto.NUMBER2},${lotto.NUMBER3},${lotto.NUMBER4},${lotto.NUMBER5},${lotto.NUMBER6},${lotto.NUMBERBONUS},${reward1},${reward2},${reward3}\n`;
         });
 
         // Create blob and download
@@ -327,7 +358,7 @@ class LottoPage {
 
     formatNumber(num) {
         if (!num) return '-';
-        return num.toLocaleString('ko-KR') + '원';
+        return num.toLocaleString('ko-KR') + ' 원';
     }
 
     formatCurrency(amount) {
