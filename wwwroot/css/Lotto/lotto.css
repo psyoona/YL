@@ -19,7 +19,7 @@ body {
 	background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
 	color: white;
 	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-	z-index: 1000;
+	z-index: 999;
 	box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
 	backdrop-filter: blur(10px);
 }
@@ -167,9 +167,10 @@ body {
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 999;
+	z-index: 998;
 	display: none;
 	pointer-events: none;
+	backdrop-filter: blur(2px);
 }
 
 .sidebar-overlay.active {
@@ -216,6 +217,10 @@ body {
 	cursor: pointer;
 	outline: none;
 	box-shadow: none;
+	position: relative;
+	z-index: 1001;
+	-webkit-tap-highlight-color: transparent;
+	user-select: none;
 }
 
 .btn-toggle-white {
@@ -232,11 +237,16 @@ body {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	position: relative;
+	z-index: 1001;
+	-webkit-tap-highlight-color: transparent;
+	user-select: none;
 }
 
 .btn-toggle-white i {
 	color: white;
 	font-size: 1.3rem;
+	pointer-events: none;
 }
 
 .btn-toggle:hover,
@@ -261,8 +271,17 @@ body {
 .btn-toggle-white:focus,
 .btn-toggle-white:active {
 	outline: none !important;
-	box-shadow: none !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 	border: none !important;
+}
+
+/* 모바일 터치 피드백 */
+@media (max-width: 768px) {
+	.btn-toggle:active,
+	.btn-toggle-white:active {
+		transform: scale(0.95);
+		background: rgba(255, 255, 255, 0.4) !important;
+	}
 }
 
 .page-title {
@@ -296,6 +315,8 @@ body {
 	border-bottom: none;
 	flex-shrink: 0;
 	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+	position: relative;
+	z-index: 10;
 }
 
 .page-main-title {
@@ -944,6 +965,19 @@ body {
 	#statisticsChart {
 		max-height: 300px;
 	}
+	
+	/* 모바일에서 통계 카드들 고정 해제 */
+	.stat-card {
+		margin-bottom: 10px;
+	}
+	
+	.stat-info h3 {
+		font-size: 1.3rem;
+	}
+	
+	.stat-info p {
+		font-size: 0.85rem;
+	}
 }
 
 .history-details {
@@ -1096,12 +1130,18 @@ body {
 		transform: translateX(-260px);
 	}
 	
-	.sidebar.active {
+	.sidebar:not(.collapsed) {
 		transform: translateX(0);
 	}
 	
 	.main-content {
 		margin-left: 0;
+	}
+	
+	.btn-toggle,
+	.btn-toggle-white {
+		z-index: 10;
+		position: relative;
 	}
 	
 	.content-header {
@@ -1124,6 +1164,21 @@ body {
 	
 	.card-header {
 		padding: 15px 18px;
+	}
+	
+	/* 모바일에서 통계 카드 고정 해제 */
+	.stats-section {
+		position: relative !important;
+		top: auto !important;
+		z-index: 1 !important;
+	}
+	
+	.page-header {
+		padding: 10px 15px;
+	}
+	
+	.page-main-title {
+		font-size: 1.3rem;
 	}
 }
 

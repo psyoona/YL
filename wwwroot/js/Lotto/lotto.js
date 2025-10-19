@@ -13,6 +13,12 @@ class LottoPage {
 		this.bindEvents();
 		this.loadLottoList(1);
 		this.chart = null; // Chart.js instance
+		
+		// 모바일에서 초기 사이드바 상태 설정
+		if (window.innerWidth <= 768) {
+			$('#sidebar').addClass('collapsed');
+			$('#mainContent').addClass('expanded');
+		}
 	}
 
 	bindEvents() {
