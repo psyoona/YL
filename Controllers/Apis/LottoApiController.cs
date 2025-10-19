@@ -37,5 +37,45 @@ namespace YL.Controllers.Apis
 
 			return this.Json(new { DATA = lotto }, this.JsonSerializerOptions);
 		}
+
+		[HttpGet]
+		[Route("GetDashboardStats")]
+		public JsonResult GetDashboardStats()
+		{
+			LottoService lottoService = new LottoService();
+			var stats = lottoService.GetDashboardStats();
+
+			return this.Json(new { DATA = stats }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetNumberFrequency")]
+		public JsonResult GetNumberFrequency()
+		{
+			LottoService lottoService = new LottoService();
+			var frequency = lottoService.GetNumberFrequency();
+
+			return this.Json(new { DATA = frequency }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetRecentWinners")]
+		public JsonResult GetRecentWinners(int count = 10)
+		{
+			LottoService lottoService = new LottoService();
+			var recent = lottoService.GetRecentWinners(count);
+
+			return this.Json(new { DATA = recent }, this.JsonSerializerOptions);
+		}
+
+		[HttpGet]
+		[Route("GetPositionFrequency")]
+		public JsonResult GetPositionFrequency()
+		{
+			LottoService lottoService = new LottoService();
+			var positions = lottoService.GetPositionFrequency();
+
+			return this.Json(new { DATA = positions }, this.JsonSerializerOptions);
+		}
 	}
 }

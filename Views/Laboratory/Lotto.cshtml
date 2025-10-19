@@ -19,7 +19,11 @@
             <h4><i class="fas fa-dice"></i> 로또 시스템</h4>
         </div>
         <ul class="sidebar-menu">
-            <li class="menu-item active" data-menu="search">
+            <li class="menu-item active" data-menu="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>대시보드</span>
+            </li>
+            <li class="menu-item" data-menu="search">
                 <i class="fas fa-search"></i>
                 <span>로또 번호 조회</span>
             </li>
@@ -35,8 +39,124 @@
 
     <!-- Main Content -->
     <div id="mainContent" class="main-content">
+        <!-- 대시보드 페이지 -->
+        <div id="dashboardPage" class="page-content active">
+            <!-- 페이지 타이틀 -->
+            <div class="page-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn-toggle-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-main-title mb-0"><i class="fas fa-chart-line"></i> 대시보드</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- 통계 카드 -->
+                <div class="stats-section">
+                    <div class="row g-3">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="totalTurns">0</h3>
+                                    <p>총 회차</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="maxReward">0원</h3>
+                                    <p id="maxRewardLabel">최고 1등 상금</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="avgReward">0원</h3>
+                                    <p>평균 1등 상금</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="latestDate">-</h3>
+                                    <p>최근 추첨일</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 번호별 출현 빈도 -->
+                <div class="chart-section">
+                    <div class="card">
+                        <div class="card-header" style="cursor: pointer;" onclick="$('#numberFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> 번호별 출현 빈도 (TOP 20)</h5>
+                                <i class="fas fa-chevron-up toggle-icon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body" id="numberFrequencyBody">
+                            <div id="numberFrequency" class="number-frequency-grid">
+                                <!-- 번호 빈도가 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 자리별 출현 빈도 -->
+                <div class="position-section">
+                    <div class="card">
+                        <div class="card-header" style="cursor: pointer;" onclick="$('#positionFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-sort-numeric-down"></i> 자리별 출현 빈도 (TOP 5)</h5>
+                                <i class="fas fa-chevron-up toggle-icon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body" id="positionFrequencyBody">
+                            <div id="positionFrequency" class="position-frequency-grid">
+                                <!-- 자리별 빈도가 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 최근 당첨번호 -->
+                <div class="recent-section">
+                    <div class="card">
+                        <div class="card-header" style="cursor: pointer;" onclick="$('#recentWinnersBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-history"></i> 최근 10회차 당첨번호</h5>
+                                <i class="fas fa-chevron-up toggle-icon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body" id="recentWinnersBody">
+                            <div id="recentWinners" class="recent-winners-grid">
+                                <!-- 최근 당첨번호가 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 로또 번호 조회 페이지 -->
-        <div id="searchPage" class="page-content active">
+        <div id="searchPage" class="page-content">
             <!-- 페이지 타이틀 -->
             <div class="page-header">
                 <div class="d-flex align-items-center gap-3">
@@ -209,6 +329,7 @@
     <script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
     <script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
 
+    <script defer src="~/js/Lotto/dashboard.js?v=@ViewBag.Cacheversion"></script>
     <script defer src="~/js/Lotto/lotto.js?v=@ViewBag.Cacheversion"></script>
 </body>
 </html>
