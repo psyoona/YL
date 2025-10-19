@@ -137,12 +137,20 @@ class LottoPage {
 		$('.page-content').removeClass('active');
 		$(`#${menuType}Page`).addClass('active');
 		
-		// Load chart if statistics page is shown
+		// Load data based on page type
 		if (menuType === 'statistics') {
 			setTimeout(() => {
 				const chartType = $('#chartType').val();
 				if (chartType) {
 					this.renderChart(chartType);
+				}
+			}, 300);
+		} else if (menuType === 'frequency') {
+			// Load frequency data
+			setTimeout(() => {
+				if (typeof window.lottoDashboard !== 'undefined') {
+					window.lottoDashboard.loadNumberFrequency();
+					window.lottoDashboard.loadPositionFrequency();
 				}
 			}, 300);
 		}
