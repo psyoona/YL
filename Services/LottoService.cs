@@ -84,8 +84,7 @@ namespace YL.Services
 					WHERE RowNum BETWEEN ((@PageNumber - 1) * @PageSize + 1) AND (@PageNumber * @PageSize)
 					ORDER BY Turn DESC";
 
-				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text,
-					query, parameters.ToArray()))
+				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text, query, parameters.ToArray()))
 				{
 					lottoList = Binder.BindToList<LottoInformation>(reader);
 				}

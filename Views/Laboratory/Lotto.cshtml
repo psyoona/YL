@@ -1,335 +1,335 @@
 <!DOCTYPE html>
 <html class="full-height" lang="ko">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <meta property="og:title" content="로또 시스템" />
-    <meta property="og:description" content="로또 당첨번호 조회 및 번호 생성 페이지입니다." />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta property="og:title" content="로또 시스템" />
+	<meta property="og:description" content="로또 당첨번호 조회 및 번호 생성 페이지입니다." />
 
-    <title>로또 시스템</title>
-    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
-    <link rel="stylesheet" href="~/css/Lotto/lotto.css?v=@ViewBag.Cacheversion" />
+	<title>로또 시스템</title>
+	<link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css?v=@ViewBag.Cacheversion" />
+	<link rel="stylesheet" href="~/css/Lotto/lotto.css?v=@ViewBag.Cacheversion" />
 </head>
 <body>
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h4><i class="fas fa-dice"></i> 로또 시스템</h4>
-        </div>
-        <ul class="sidebar-menu">
-            <li class="menu-item active" data-menu="dashboard">
-                <i class="fas fa-chart-line"></i>
-                <span>대시보드</span>
-            </li>
-            <li class="menu-item" data-menu="search">
-                <i class="fas fa-search"></i>
-                <span>로또 번호 조회</span>
-            </li>
-            <li class="menu-item" data-menu="generate">
-                <i class="fas fa-random"></i>
-                <span>로또 번호 생성</span>
-            </li>
-        </ul>
-    </div>
+	<!-- Sidebar -->
+	<div id="sidebar" class="sidebar">
+		<div class="sidebar-header">
+			<h4><i class="fas fa-dice"></i> 로또 시스템</h4>
+		</div>
+		<ul class="sidebar-menu">
+			<li class="menu-item active" data-menu="dashboard">
+				<i class="fas fa-chart-line"></i>
+				<span>대시보드</span>
+			</li>
+			<li class="menu-item" data-menu="search">
+				<i class="fas fa-search"></i>
+				<span>로또 번호 조회</span>
+			</li>
+			<li class="menu-item" data-menu="generate">
+				<i class="fas fa-random"></i>
+				<span>로또 번호 생성</span>
+			</li>
+		</ul>
+	</div>
 
-    <!-- Overlay for mobile -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+	<!-- Overlay for mobile -->
+	<div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Main Content -->
-    <div id="mainContent" class="main-content">
-        <!-- 대시보드 페이지 -->
-        <div id="dashboardPage" class="page-content active">
-            <!-- 페이지 타이틀 -->
-            <div class="page-header">
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn-toggle-white">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2 class="page-main-title mb-0"><i class="fas fa-chart-line"></i> 대시보드</h2>
-                </div>
-            </div>
+	<!-- Main Content -->
+	<div id="mainContent" class="main-content">
+		<!-- 대시보드 페이지 -->
+		<div id="dashboardPage" class="page-content active">
+			<!-- 페이지 타이틀 -->
+			<div class="page-header">
+				<div class="d-flex align-items-center gap-3">
+					<button class="btn-toggle-white">
+						<i class="fas fa-bars"></i>
+					</button>
+					<h2 class="page-main-title mb-0"><i class="fas fa-chart-line"></i> 대시보드</h2>
+				</div>
+			</div>
 
-            <div class="dashboard-content">
-                <!-- 통계 카드 -->
-                <div class="stats-section">
-                    <div class="row g-3">
-                        <div class="col-md-3 col-sm-6">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                    <i class="fas fa-database"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3 id="totalTurns">0</h3>
-                                    <p>총 회차</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                    <i class="fas fa-trophy"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3 id="maxReward">0원</h3>
-                                    <p id="maxRewardLabel">최고 1등 상금</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                    <i class="fas fa-coins"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3 id="avgReward">0원</h3>
-                                    <p>평균 1등 상금</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3 id="latestDate">-</h3>
-                                    <p>최근 추첨일</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+			<div class="dashboard-content">
+				<!-- 통계 카드 -->
+				<div class="stats-section">
+					<div class="row g-3">
+						<div class="col-md-3 col-sm-6">
+							<div class="stat-card">
+								<div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+									<i class="fas fa-database"></i>
+								</div>
+								<div class="stat-info">
+									<h3 id="totalTurns">0</h3>
+									<p>총 회차</p>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-6">
+							<div class="stat-card">
+								<div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+									<i class="fas fa-trophy"></i>
+								</div>
+								<div class="stat-info">
+									<h3 id="maxReward">0원</h3>
+									<p id="maxRewardLabel">최고 1등 상금</p>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-6">
+							<div class="stat-card">
+								<div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+									<i class="fas fa-coins"></i>
+								</div>
+								<div class="stat-info">
+									<h3 id="avgReward">0원</h3>
+									<p>평균 1등 상금</p>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-6">
+							<div class="stat-card">
+								<div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+									<i class="fas fa-calendar-alt"></i>
+								</div>
+								<div class="stat-info">
+									<h3 id="latestDate">-</h3>
+									<p>최근 추첨일</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <!-- 번호별 출현 빈도 -->
-                <div class="chart-section">
-                    <div class="card">
-                        <div class="card-header" style="cursor: pointer;" onclick="$('#numberFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> 번호별 출현 빈도 (TOP 20)</h5>
-                                <i class="fas fa-chevron-up toggle-icon"></i>
-                            </div>
-                        </div>
-                        <div class="card-body" id="numberFrequencyBody">
-                            <div id="numberFrequency" class="number-frequency-grid">
-                                <!-- 번호 빈도가 여기에 표시됩니다 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				<!-- 번호별 출현 빈도 -->
+				<div class="chart-section">
+					<div class="card">
+						<div class="card-header" style="cursor: pointer;" onclick="$('#numberFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+							<div class="d-flex justify-content-between align-items-center">
+								<h5 class="mb-0"><i class="fas fa-chart-bar"></i> 번호별 출현 빈도 (TOP 20)</h5>
+								<i class="fas fa-chevron-up toggle-icon"></i>
+							</div>
+						</div>
+						<div class="card-body" id="numberFrequencyBody">
+							<div id="numberFrequency" class="number-frequency-grid">
+								<!-- 번호 빈도가 여기에 표시됩니다 -->
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <!-- 자리별 출현 빈도 -->
-                <div class="position-section">
-                    <div class="card">
-                        <div class="card-header" style="cursor: pointer;" onclick="$('#positionFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-sort-numeric-down"></i> 자리별 출현 빈도 (TOP 5)</h5>
-                                <i class="fas fa-chevron-up toggle-icon"></i>
-                            </div>
-                        </div>
-                        <div class="card-body" id="positionFrequencyBody">
-                            <div id="positionFrequency" class="position-frequency-grid">
-                                <!-- 자리별 빈도가 여기에 표시됩니다 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				<!-- 자리별 출현 빈도 -->
+				<div class="position-section">
+					<div class="card">
+						<div class="card-header" style="cursor: pointer;" onclick="$('#positionFrequencyBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+							<div class="d-flex justify-content-between align-items-center">
+								<h5 class="mb-0"><i class="fas fa-sort-numeric-down"></i> 자리별 출현 빈도 (TOP 5)</h5>
+								<i class="fas fa-chevron-up toggle-icon"></i>
+							</div>
+						</div>
+						<div class="card-body" id="positionFrequencyBody">
+							<div id="positionFrequency" class="position-frequency-grid">
+								<!-- 자리별 빈도가 여기에 표시됩니다 -->
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <!-- 최근 당첨번호 -->
-                <div class="recent-section">
-                    <div class="card">
-                        <div class="card-header" style="cursor: pointer;" onclick="$('#recentWinnersBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-history"></i> 최근 10회차 당첨번호</h5>
-                                <i class="fas fa-chevron-up toggle-icon"></i>
-                            </div>
-                        </div>
-                        <div class="card-body" id="recentWinnersBody">
-                            <div id="recentWinners" class="recent-winners-grid">
-                                <!-- 최근 당첨번호가 여기에 표시됩니다 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+				<!-- 최근 당첨번호 -->
+				<div class="recent-section">
+					<div class="card">
+						<div class="card-header" style="cursor: pointer;" onclick="$('#recentWinnersBody').slideToggle(300); $(this).find('.toggle-icon').toggleClass('fa-chevron-up fa-chevron-down');">
+							<div class="d-flex justify-content-between align-items-center">
+								<h5 class="mb-0"><i class="fas fa-history"></i> 최근 10회차 당첨번호</h5>
+								<i class="fas fa-chevron-up toggle-icon"></i>
+							</div>
+						</div>
+						<div class="card-body" id="recentWinnersBody">
+							<div id="recentWinners" class="recent-winners-grid">
+								<!-- 최근 당첨번호가 여기에 표시됩니다 -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- 로또 번호 조회 페이지 -->
-        <div id="searchPage" class="page-content">
-            <!-- 페이지 타이틀 -->
-            <div class="page-header">
-                <div class="d-flex align-items-center gap-3">
-                    <button id="sidebarToggle" class="btn-toggle-white">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2 class="page-main-title mb-0"><i class="fas fa-search"></i> 로또 번호 조회</h2>
-                </div>
-            </div>
-            
-            <!-- 검색 영역 -->
-            <div class="search-section">
-                <div class="card">
-                    <div class="card-header" style="cursor: pointer;" id="searchFilterToggle">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="fas fa-filter"></i> 검색 조건</h5>
-                            <i class="fas fa-chevron-up toggle-icon"></i>
-                        </div>
-                    </div>
-                    <div class="card-body" id="searchFilterBody">
-                        <div class="row g-2">
-                            <div class="col-md-2 col-sm-4">
-                                <label class="form-label">회차</label>
-                                <input type="number" id="searchTurn" class="form-control form-control-sm" placeholder="회차 입력">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 1</label>
-                                <input type="number" id="searchNumber1" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 2</label>
-                                <input type="number" id="searchNumber2" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 3</label>
-                                <input type="number" id="searchNumber3" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 4</label>
-                                <input type="number" id="searchNumber4" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 5</label>
-                                <input type="number" id="searchNumber5" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-1 col-sm-4">
-                                <label class="form-label">번호 6</label>
-                                <input type="number" id="searchNumber6" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-2 col-sm-4">
-                                <label class="form-label">보너스 번호</label>
-                                <input type="number" id="searchBonus" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
-                            </div>
-                            <div class="col-md-2 col-sm-12 d-flex align-items-end">
-                                <button id="searchButton" class="btn btn-primary btn-sm me-2">
-                                    <i class="fas fa-search"></i> 검색
-                                </button>
-                                <button id="resetButton" class="btn btn-secondary btn-sm">
-                                    <i class="fas fa-redo"></i> 초기화
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+		<!-- 로또 번호 조회 페이지 -->
+		<div id="searchPage" class="page-content">
+			<!-- 페이지 타이틀 -->
+			<div class="page-header">
+				<div class="d-flex align-items-center gap-3">
+					<button id="sidebarToggle" class="btn-toggle-white">
+						<i class="fas fa-bars"></i>
+					</button>
+					<h2 class="page-main-title mb-0"><i class="fas fa-search"></i> 로또 번호 조회</h2>
+				</div>
+			</div>
+			
+			<!-- 검색 영역 -->
+			<div class="search-section">
+				<div class="card">
+					<div class="card-header" style="cursor: pointer;" id="searchFilterToggle">
+						<div class="d-flex justify-content-between align-items-center">
+							<h5 class="mb-0"><i class="fas fa-filter"></i> 검색 조건</h5>
+							<i class="fas fa-chevron-up toggle-icon"></i>
+						</div>
+					</div>
+					<div class="card-body" id="searchFilterBody">
+						<div class="row g-2">
+							<div class="col-md-2 col-sm-4">
+								<label class="form-label">회차</label>
+								<input type="number" id="searchTurn" class="form-control form-control-sm" placeholder="회차 입력">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 1</label>
+								<input type="number" id="searchNumber1" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 2</label>
+								<input type="number" id="searchNumber2" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 3</label>
+								<input type="number" id="searchNumber3" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 4</label>
+								<input type="number" id="searchNumber4" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 5</label>
+								<input type="number" id="searchNumber5" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-1 col-sm-4">
+								<label class="form-label">번호 6</label>
+								<input type="number" id="searchNumber6" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-2 col-sm-4">
+								<label class="form-label">보너스 번호</label>
+								<input type="number" id="searchBonus" class="form-control form-control-sm" placeholder="1-45" min="1" max="45">
+							</div>
+							<div class="col-md-2 col-sm-12 d-flex align-items-end">
+								<button id="searchButton" class="btn btn-primary btn-sm me-2">
+									<i class="fas fa-search"></i> 검색
+								</button>
+								<button id="resetButton" class="btn btn-secondary btn-sm">
+									<i class="fas fa-redo"></i> 초기화
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <!-- 그리드 영역 -->
-            <div class="grid-section">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-table"></i> 로또 당첨번호 목록 (총 <span id="totalCount">0</span>건)</h5>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <label for="pageSizeSelect" class="mb-0" style="white-space: nowrap;">표시 개수:</label>
-                                <select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-                                    <option value="10">10개</option>
-                                    <option value="20" selected>20개</option>
-                                    <option value="50">50개</option>
-                                    <option value="100">100개</option>
-                                </select>
-                            </div>
-                            <button id="excelExportBtn" class="btn btn-success btn-sm">
-                                <i class="fas fa-file-excel"></i> Excel 다운로드
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered" id="lottoTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="text-center">회차</th>
-                                        <th class="text-center">추첨일</th>
-                                        <th class="text-center" colspan="6">당첨번호</th>
-                                        <th class="text-center">보너스</th>
-                                        <th class="text-center">1등 상금</th>
-                                        <th class="text-center">2등 상금</th>
-                                        <th class="text-center">3등 상금</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="lottoTableBody">
-                                    <!-- Data will be inserted here -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Pagination -->
-                        <nav class="mt-3">
-                            <ul id="pagination" class="pagination justify-content-center">
-                                <!-- Pagination will be inserted here -->
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
+			<!-- 그리드 영역 -->
+			<div class="grid-section">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h5><i class="fas fa-table"></i> 로또 당첨번호 목록 (총 <span id="totalCount">0</span>건)</h5>
+						<div class="d-flex align-items-center gap-3">
+							<div class="d-flex align-items-center gap-2">
+								<label for="pageSizeSelect" class="mb-0" style="white-space: nowrap;">표시 개수:</label>
+								<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+									<option value="10">10개</option>
+									<option value="20" selected>20개</option>
+									<option value="50">50개</option>
+									<option value="100">100개</option>
+								</select>
+							</div>
+							<button id="excelExportBtn" class="btn btn-success btn-sm">
+								<i class="fas fa-file-excel"></i> Excel 다운로드
+							</button>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-hover table-bordered" id="lottoTable">
+								<thead class="table-light">
+									<tr>
+										<th class="text-center">회차</th>
+										<th class="text-center">추첨일</th>
+										<th class="text-center" colspan="6">당첨번호</th>
+										<th class="text-center">보너스</th>
+										<th class="text-center">1등 상금</th>
+										<th class="text-center">2등 상금</th>
+										<th class="text-center">3등 상금</th>
+									</tr>
+								</thead>
+								<tbody id="lottoTableBody">
+									<!-- Data will be inserted here -->
+								</tbody>
+							</table>
+						</div>
+						
+						<!-- Pagination -->
+						<nav class="mt-3">
+							<ul id="pagination" class="pagination justify-content-center">
+								<!-- Pagination will be inserted here -->
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- 로또 번호 생성 페이지 -->
-        <div id="generatePage" class="page-content">
-            <!-- 페이지 타이틀 -->
-            <div class="page-header">
-                <div class="d-flex align-items-center gap-3">
-                    <button id="sidebarToggle2" class="btn-toggle-white">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2 class="page-main-title mb-0"><i class="fas fa-random"></i> 로또 번호 생성</h2>
-                </div>
-            </div>
-            
-            <div class="generate-container">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-magic"></i> 번호 생성 설정</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-auto">
-                                <label class="form-label">생성할 번호 개수</label>
-                                <select id="generateCount" class="form-select" style="width: 120px;">
-                                    <option value="1">1개</option>
-                                    <option value="5" selected>5개</option>
-                                    <option value="10">10개</option>
-                                    <option value="20">20개</option>
-                                </select>
-                            </div>
-                            <div class="col-auto d-flex align-items-end">
-                                <button id="generateButton" class="btn btn-primary">
-                                    <i class="fas fa-magic"></i> 번호 생성
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="generatedNumbers" class="generated-numbers">
-                            <!-- Generated numbers will be inserted here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+		<!-- 로또 번호 생성 페이지 -->
+		<div id="generatePage" class="page-content">
+			<!-- 페이지 타이틀 -->
+			<div class="page-header">
+				<div class="d-flex align-items-center gap-3">
+					<button id="sidebarToggle2" class="btn-toggle-white">
+						<i class="fas fa-bars"></i>
+					</button>
+					<h2 class="page-main-title mb-0"><i class="fas fa-random"></i> 로또 번호 생성</h2>
+				</div>
+			</div>
+			
+			<div class="generate-container">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0"><i class="fas fa-magic"></i> 번호 생성 설정</h5>
+					</div>
+					<div class="card-body">
+						<div class="row mb-4">
+							<div class="col-auto">
+								<label class="form-label">생성할 번호 개수</label>
+								<select id="generateCount" class="form-select" style="width: 120px;">
+									<option value="1">1개</option>
+									<option value="5" selected>5개</option>
+									<option value="10">10개</option>
+									<option value="20">20개</option>
+								</select>
+							</div>
+							<div class="col-auto d-flex align-items-end">
+								<button id="generateButton" class="btn btn-primary">
+									<i class="fas fa-magic"></i> 번호 생성
+								</button>
+							</div>
+						</div>
+						
+						<div id="generatedNumbers" class="generated-numbers">
+							<!-- Generated numbers will be inserted here -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/lib/filesaver/FileSaver.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/fontawesome/js/all.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/jquery/dist/jquery.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/moment/moment.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/lib/filesaver/FileSaver.min.js?v=@ViewBag.Cacheversion"></script>
 
-    <script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/screenUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Common/format.js?v=@ViewBag.Cacheversion"></script>
 
-    <script defer src="~/js/Lotto/dashboard.js?v=@ViewBag.Cacheversion"></script>
-    <script defer src="~/js/Lotto/lotto.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Lotto/dashboard.js?v=@ViewBag.Cacheversion"></script>
+	<script defer src="~/js/Lotto/lotto.js?v=@ViewBag.Cacheversion"></script>
 </body>
 </html>
