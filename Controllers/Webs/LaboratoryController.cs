@@ -72,6 +72,14 @@ namespace YL.Controllers.Webs
 			return this.PartialView();
 		}
 
+		[HttpGet]
+		public ActionResult Lotto()
+		{
+			this.Initialize();
+
+			return this.PartialView();
+		}
+
 
 		[HttpPost]
 		public JsonResult EncryptString(string plainText, int encryptType, string encryptKey)

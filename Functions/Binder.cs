@@ -16,8 +16,8 @@ namespace YL.Functions
 
 				for (int i = 0; i < sqlDataReader.FieldCount; i++)
 				{
-					string camelString = StringUtility.ConvertCamelCase(sqlDataReader.GetName(i));
-					PropertyInfo prop = obj.GetType().GetProperty(camelString);
+					string columnName = sqlDataReader.GetName(i);
+					PropertyInfo prop = obj.GetType().GetProperty(columnName);
 
 					if (Equals(sqlDataReader[i], DBNull.Value))
 					{
