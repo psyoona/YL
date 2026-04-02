@@ -20,16 +20,13 @@ namespace YL.Services
 			ICryptoTransform encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
 			byte[] byteArray = null;
 
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypt, CryptoStreamMode.Write))
-				{
-					byte[] xXml = Encoding.UTF8.GetBytes(plainText);
-					cryptoStream.Write(xXml, 0, xXml.Length);
-				}
+			using MemoryStream memoryStream = new MemoryStream();
+			using CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypt, CryptoStreamMode.Write);
 
-				byteArray = memoryStream.ToArray();
-			}
+			byte[] xXml = Encoding.UTF8.GetBytes(plainText);
+			cryptoStream.Write(xXml, 0, xXml.Length);
+
+			byteArray = memoryStream.ToArray();
 
 			return Convert.ToBase64String(byteArray);
 		}
@@ -46,16 +43,13 @@ namespace YL.Services
 
 			ICryptoTransform decrypt = aes.CreateDecryptor();
 			byte[] byteArray = null;
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write))
-				{
-					byte[] xXml = Convert.FromBase64String(encryptedText);
-					cryptoStream.Write(xXml, 0, xXml.Length);
-				}
 
-				byteArray = memoryStream.ToArray();
-			}
+			using MemoryStream memoryStream = new MemoryStream();
+			using CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write);
+
+			byte[] xXml = Convert.FromBase64String(encryptedText);
+			cryptoStream.Write(xXml, 0, xXml.Length);
+			byteArray = memoryStream.ToArray();
 
 			return Encoding.UTF8.GetString(byteArray);
 		}

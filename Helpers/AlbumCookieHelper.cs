@@ -16,8 +16,9 @@ namespace YL.Helpers
 
 			string json = JsonSerializer.Serialize(session);
 			string encrypted = new SecurityHelper().EncryptAes256(json, ConfigManager.Settings.AlbumEncryptionKey);
+			string urlSafe = Uri.EscapeDataString(encrypted);
 
-			response.Cookies.Append(CookieName, encrypted, new CookieOptions
+			response.Cookies.Append(CookieName, urlSafe, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
@@ -28,11 +29,12 @@ namespace YL.Helpers
 
 		public static AlbumSession? GetSession(HttpRequest request)
 		{
-			if (!request.Cookies.TryGetValue(CookieName, out string? encrypted) || string.IsNullOrEmpty(encrypted))
+			if (!request.Cookies.TryGetValue(CookieName, out string? urlSafe) || string.IsNullOrEmpty(urlSafe))
 			{
 				return null;
 			}
 
+			string encrypted = Uri.UnescapeDataString(urlSafe);
 			string json = new SecurityHelper().DecryptAes256(encrypted, ConfigManager.Settings.AlbumEncryptionKey);
 			var session = JsonSerializer.Deserialize<AlbumSession>(json);
 

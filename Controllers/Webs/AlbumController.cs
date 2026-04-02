@@ -11,10 +11,6 @@ namespace YL.Controllers.Webs
 	{
 		public AlbumController() { }
 
-		// ============================================
-		// 인증
-		// ============================================
-
 		[HttpGet]
 		public ActionResult Login()
 		{
@@ -63,10 +59,6 @@ namespace YL.Controllers.Webs
 
 			return this.RedirectToAction("Login");
 		}
-
-		// ============================================
-		// 메인 페이지
-		// ============================================
 
 		[HttpGet]
 		public ActionResult Index()
