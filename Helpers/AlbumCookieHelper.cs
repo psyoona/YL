@@ -22,7 +22,7 @@ namespace YL.Helpers
 				HttpOnly = true,
 				Secure = true,
 				SameSite = SameSiteMode.Lax,
-				Expires = DateTimeOffset.UtcNow.AddHours(ExpirationHours)
+				MaxAge = TimeSpan.FromHours(ExpirationHours)
 			});
 		}
 
