@@ -7,13 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 ConfigManager.Initialize(builder.Configuration);
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-	options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-	options.KnownNetworks.Clear();
-	options.KnownProxies.Clear();
-});
-
 builder.Services.AddHttpLogging(o =>
 {
 	o.LoggingFields =

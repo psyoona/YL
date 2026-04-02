@@ -9,7 +9,7 @@ namespace YL.Services
 
 		public string EncryptAes256(string plainText, string encryptKey)
 		{
-			Aes aes = Aes.Create();
+			using Aes aes = Aes.Create();
 			aes.KeySize = 256;
 			aes.BlockSize = 128;
 			aes.Mode = CipherMode.CBC;
@@ -18,22 +18,21 @@ namespace YL.Services
 			aes.IV = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 16));
 
 			ICryptoTransform encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
-			byte[] byteArray = null;
 
 			using MemoryStream memoryStream = new MemoryStream();
-			using CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypt, CryptoStreamMode.Write);
+			using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypt, CryptoStreamMode.Write))
+			{
+				byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+				cryptoStream.Write(plainBytes, 0, plainBytes.Length);
+				cryptoStream.FlushFinalBlock();
+			}
 
-			byte[] xXml = Encoding.UTF8.GetBytes(plainText);
-			cryptoStream.Write(xXml, 0, xXml.Length);
-
-			byteArray = memoryStream.ToArray();
-
-			return Convert.ToBase64String(byteArray);
+			return Convert.ToBase64String(memoryStream.ToArray());
 		}
 
 		public string DecryptAes256(string encryptedText, string encryptKey)
 		{
-			Aes aes = Aes.Create();
+			using Aes aes = Aes.Create();
 			aes.KeySize = 256;
 			aes.BlockSize = 128;
 			aes.Mode = CipherMode.CBC;
@@ -42,16 +41,16 @@ namespace YL.Services
 			aes.IV = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 16));
 
 			ICryptoTransform decrypt = aes.CreateDecryptor();
-			byte[] byteArray = null;
 
 			using MemoryStream memoryStream = new MemoryStream();
-			using CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write);
+			using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write))
+			{
+				byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+				cryptoStream.Write(encryptedBytes, 0, encryptedBytes.Length);
+				cryptoStream.FlushFinalBlock();
+			}
 
-			byte[] xXml = Convert.FromBase64String(encryptedText);
-			cryptoStream.Write(xXml, 0, xXml.Length);
-			byteArray = memoryStream.ToArray();
-
-			return Encoding.UTF8.GetString(byteArray);
+			return Encoding.UTF8.GetString(memoryStream.ToArray());
 		}
 
 		public string Sha512Hash(string plainText)
