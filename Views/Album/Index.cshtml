@@ -1,0 +1,177 @@
+@{
+	Layout = "~/Views/Shared/_AlbumLayout.cshtml";
+	ViewBag.PageTitle = "웹 앨범";
+}
+
+<!-- 모바일 사이드바 오버레이 -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="album-wrapper">
+	<!-- 사이드바 -->
+	<aside class="sidebar" id="sidebar">
+		<div class="sidebar-header">
+			<div class="sidebar-logo">
+				<i class="fas fa-images"></i>
+				<span>웹 앨범</span>
+			</div>
+			<button class="sidebar-close" id="sidebarClose">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+
+		<div class="sidebar-user">
+			<div class="user-avatar">
+				<i class="fas fa-user"></i>
+			</div>
+			<div class="user-info">
+				<span class="user-name">@ViewBag.UserName</span>
+				<span class="user-status">접속 중</span>
+			</div>
+		</div>
+
+		<nav class="sidebar-nav">
+			<div class="nav-section-title">
+				<i class="fas fa-images me-2"></i>앨범 목록
+				@if (ViewBag.IsSystemMaster == true)
+				{
+					<button class="btn-add-album" id="btnAddAlbum" title="앨범 추가">
+						<i class="fas fa-plus"></i>
+					</button>
+				}
+			</div>
+			<ul class="album-list" id="albumList">
+			</ul>
+		</nav>
+
+		<div class="sidebar-footer">
+			@if (ViewBag.IsSystemMaster == true)
+			{
+				<a href="/Album/Admin" class="btn-admin">
+					<i class="fas fa-cog me-2"></i>관리
+				</a>
+			}
+			<a href="#" id="btnLogout" class="btn-logout">
+				<i class="fas fa-sign-out-alt me-2"></i>로그아웃
+			</a>
+		</div>
+	</aside>
+
+	<!-- 메인 콘텐츠 -->
+	<main class="main-content" id="mainContent">
+		<!-- 상단 바 -->
+		<header class="top-bar">
+			<button class="menu-toggle" id="menuToggle">
+				<i class="fas fa-bars"></i>
+			</button>
+			<h2 class="current-album-title" id="currentAlbumTitle">앨범을 선택해주세요</h2>
+
+			<div class="top-bar-actions" id="topBarActions" style="display: none;">
+				<button class="btn-action btn-sync" id="btnSync" title="디스크 사진 동기화">
+					<i class="fas fa-sync-alt"></i>
+				</button>
+				<button class="btn-action btn-upload" id="btnUpload" title="사진 업로드">
+					<i class="fas fa-upload"></i>
+				</button>
+				<button class="btn-action btn-delete-mode" id="btnDeleteMode" title="삭제 모드">
+					<i class="fas fa-trash-alt"></i>
+				</button>
+			</div>
+
+			<div class="photo-count" id="photoCount"></div>
+		</header>
+
+		<!-- 업로드 진행 바 -->
+		<div class="upload-progress" id="uploadProgress" style="display: none;">
+			<div class="upload-progress-bar" id="uploadProgressBar"></div>
+			<span class="upload-progress-text" id="uploadProgressText">업로드 중...</span>
+		</div>
+
+		<!-- 사진 갤러리 -->
+		<div class="gallery-container" id="galleryContainer">
+			<div class="empty-state" id="emptyState">
+				<i class="fas fa-camera-retro"></i>
+				<h3>앨범을 선택해주세요</h3>
+				<p>좌측 메뉴에서 앨범을 선택하면<br>사진들이 여기에 표시됩니다</p>
+			</div>
+
+			<div class="photo-grid" id="photoGrid" style="display: none;"></div>
+
+			<div class="loading-spinner" id="loadingSpinner" style="display: none;">
+				<div class="spinner"></div>
+				<p>사진을 불러오는 중...</p>
+			</div>
+		</div>
+	</main>
+</div>
+
+<!-- 사진 뷰어 모달 -->
+<div class="photo-viewer" id="photoViewer" style="display: none;">
+	<div class="viewer-header">
+		<span class="viewer-title" id="viewerTitle"></span>
+		<div class="viewer-controls">
+			<span class="viewer-counter" id="viewerCounter"></span>
+			<button class="viewer-btn" id="viewerClose">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="viewer-body">
+		<button class="viewer-nav viewer-prev" id="viewerPrev">
+			<i class="fas fa-chevron-left"></i>
+		</button>
+		<div class="viewer-image-container">
+			<img id="viewerImage" src="" alt="" />
+		</div>
+		<button class="viewer-nav viewer-next" id="viewerNext">
+			<i class="fas fa-chevron-right"></i>
+		</button>
+	</div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="delete-confirm-modal" id="deleteConfirmModal" style="display: none;">
+	<div class="delete-confirm-box">
+		<i class="fas fa-exclamation-triangle"></i>
+		<p>이 사진을 삭제하시겠습니까?</p>
+		<div class="delete-confirm-actions">
+			<button class="btn-confirm-cancel" id="btnDeleteCancel">취소</button>
+			<button class="btn-confirm-delete" id="btnDeleteConfirm">삭제</button>
+		</div>
+	</div>
+</div>
+
+<!-- 앨범 생성 모달 -->
+<div class="album-modal" id="createAlbumModal" style="display: none;">
+	<div class="album-modal-box">
+		<h3><i class="fas fa-folder-plus me-2"></i>앨범 추가</h3>
+		<div class="album-modal-input">
+			<label>앨범 폴더명</label>
+			<input type="text" id="newAlbumName" placeholder="영문, 숫자, 언더스코어만 사용" maxlength="100" />
+		</div>
+		<div class="album-modal-actions">
+			<button class="btn-modal-cancel" id="btnCreateAlbumCancel">취소</button>
+			<button class="btn-modal-confirm" id="btnCreateAlbumConfirm">생성</button>
+		</div>
+	</div>
+</div>
+
+<!-- 앨범 삭제 확인 모달 -->
+<div class="album-modal" id="deleteAlbumModal" style="display: none;">
+	<div class="album-modal-box">
+		<i class="fas fa-exclamation-triangle warning-icon"></i>
+		<p>앨범 '<span id="deleteAlbumName"></span>'을(를) 삭제하시겠습니까?</p>
+		<p class="modal-subtext">앨범 내 사진은 휴지통으로 이동됩니다.</p>
+		<div class="album-modal-actions">
+			<button class="btn-modal-cancel" id="btnDeleteAlbumCancel">취소</button>
+			<button class="btn-modal-delete" id="btnDeleteAlbumConfirm">삭제</button>
+		</div>
+	</div>
+</div>
+
+<!-- 파일 입력 -->
+<input type="file" id="fileInput" multiple accept="image/*" style="display: none" />
+
+<script>
+	var isSystemMaster = @(ViewBag.IsSystemMaster == true ? "true" : "false");
+</script>
+<script defer src="~/js/Album/album.js?v=@ViewBag.Cacheversion"></script>

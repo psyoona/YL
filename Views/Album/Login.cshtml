@@ -1,0 +1,57 @@
+@{
+	Layout = "~/Views/Shared/_AlbumLayout.cshtml";
+	ViewBag.PageTitle = "웹 앨범 - 로그인";
+}
+
+<div class="login-wrapper">
+	<div class="login-container">
+		<!-- 헤더 영역 -->
+		<div class="login-header">
+			<div class="login-icon">
+				<i class="fas fa-baby"></i>
+			</div>
+			<h1 class="login-title">웹 앨범</h1>
+			<p class="login-subtitle">소중한 순간을 함께 나눠요</p>
+		</div>
+
+		<!-- 로그인 폼 -->
+		<div class="login-form">
+			<div class="input-group-custom">
+				<label for="phoneNumber">
+					<i class="fas fa-mobile-alt"></i> 핸드폰 번호
+				</label>
+				<input
+					id="phoneNumber"
+					type="tel"
+					class="form-input"
+					placeholder="01012345678"
+					maxlength="11"
+					autocomplete="tel"
+					inputmode="numeric"
+				/>
+			</div>
+
+			<div class="input-group-custom">
+				<label for="password">
+					<i class="fas fa-lock"></i> 비밀번호
+				</label>
+				<input
+					id="password"
+					type="password"
+					class="form-input"
+					placeholder="비밀번호를 입력하세요"
+					maxlength="20"
+					autocomplete="current-password"
+				/>
+			</div>
+
+			<button id="btnLogin" class="btn-login" type="button">
+				<i class="fas fa-sign-in-alt me-2"></i>로그인
+			</button>
+
+			<div id="loginMessage" class="login-message" style="display: none;"></div>
+		</div>
+	</div>
+</div>
+
+<script defer src="~/js/Album/login.js?v=@ViewBag.Cacheversion"></script>

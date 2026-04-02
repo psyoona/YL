@@ -10,11 +10,13 @@
 		{
 			var connectionString = configuration.GetConnectionString("ConnectionString") ?? string.Empty;
 			var ipList = configuration.GetSection("Whitelist:IPList").Get<List<string>>() ?? new();
+			var serviceBasePath = configuration.GetValue<string>("ServiceBasePath") ?? string.Empty;
 
 			Settings = new AppSettings
 			{
 				ConnectionString = connectionString,
-				IPWhitelist = ipList
+				IPWhitelist = ipList,
+				ServiceBasePath = serviceBasePath
 			};
 		}
 	}

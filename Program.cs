@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 ConfigManager.Initialize(builder.Configuration);
 
-// 1) HttpLogging (¿äÃ»/ÀÀ´ä ¸ÞÅ¸)
+// 1) HttpLogging (ï¿½ï¿½Ã»/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸)
 builder.Services.AddHttpLogging(o =>
 {
 	o.LoggingFields =
@@ -14,13 +14,22 @@ builder.Services.AddHttpLogging(o =>
 		HttpLoggingFields.ResponsePropertiesAndHeaders |
 		HttpLoggingFields.Duration;
 
-	// ¹Î°¨Á¤º¸ º¸È£: ¹Ùµð ·Î±ëÀº ±âº» ºñÈ°¼º
+	// ï¿½Î°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£: ï¿½Ùµï¿½ ï¿½Î±ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½È°ï¿½ï¿½
 	o.RequestBodyLogLimit = 0;
 	o.ResponseBodyLogLimit = 0;
 });
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Session ì„¤ì • (ì•¨ë²” ë¡œê·¸ì¸ ìš©)
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+	options.IdleTimeout = TimeSpan.FromHours(24);
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -30,6 +39,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(

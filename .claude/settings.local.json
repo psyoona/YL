@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat /d/Github/YL/Database/Tables/*.sql)",
+      "Bash(cat /d/Github/YL/Database/StoredProcedures/*.sql)",
+      "Bash(dotnet build:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(dotnet add:*)",
+      "Bash(taskkill //F //PID 35640)",
+      "Bash(taskkill //F //PID 25516)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5100/Album/Login)",
+      "Bash(taskkill //F //IM YL.exe)"
+    ]
+  }
+}
