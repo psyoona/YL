@@ -21,7 +21,7 @@ namespace YL.Helpers
 			response.Cookies.Append(CookieName, urlSafe, new CookieOptions
 			{
 				HttpOnly = true,
-				//Secure = true,
+				Secure = true,
 				SameSite = SameSiteMode.Lax,
 				Expires = DateTimeOffset.UtcNow.AddHours(ExpirationHours)
 			});
