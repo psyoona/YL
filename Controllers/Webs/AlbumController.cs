@@ -8,35 +8,6 @@ namespace YL.Controllers.Webs
 	{
 		public AlbumController() { }
 
-		private bool IsLoggedIn()
-		{
-			return HttpContext.Session.GetString("AlbumUserPhone") != null;
-		}
-
-		private bool IsSystemMaster()
-		{
-			return HttpContext.Session.GetString("AlbumIsSystemMaster") == "true";
-		}
-
-		private List<string> GetSessionRoleNames()
-		{
-			string roles = HttpContext.Session.GetString("AlbumUserRoles") ?? "";
-			return roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-		}
-
-		private List<int> GetSessionRoleIds()
-		{
-			string ids = HttpContext.Session.GetString("AlbumUserRoleIds") ?? "";
-			return ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
-				.Select(s => int.TryParse(s, out int id) ? id : 0)
-				.Where(id => id > 0)
-				.ToList();
-		}
-
-		// ============================================
-		// 인증
-		// ============================================
-
 		[HttpGet]
 		public ActionResult Login()
 		{
@@ -86,10 +57,6 @@ namespace YL.Controllers.Webs
 			return RedirectToAction("Login");
 		}
 
-		// ============================================
-		// 메인 페이지
-		// ============================================
-
 		[HttpGet]
 		public ActionResult Index()
 		{
@@ -105,10 +72,6 @@ namespace YL.Controllers.Webs
 
 			return this.View();
 		}
-
-		// ============================================
-		// 앨범 목록 (접근 권한 필터링)
-		// ============================================
 
 		[HttpPost]
 		public JsonResult GetAlbumList()
@@ -126,10 +89,6 @@ namespace YL.Controllers.Webs
 
 			return this.Json(new { albums });
 		}
-
-		// ============================================
-		// 사진 관련
-		// ============================================
 
 		[HttpPost]
 		public JsonResult GetPhotoList(string albumName)
@@ -153,48 +112,48 @@ namespace YL.Controllers.Webs
 		[ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
 		public ActionResult GetPhoto(string albumName, string fileName)
 		{
-			if (!IsLoggedIn())
+			if (!this.IsLoggedIn())
 			{
-				return Unauthorized();
+				return this.Unauthorized();
 			}
 
-			if (!HasAccess(albumName))
+			if (!this.HasAccess(albumName))
 			{
-				return Forbid();
+				return this.Forbid();
 			}
 
 			var result = new AlbumService().GetPhoto(albumName, fileName);
 
 			if (result == null)
 			{
-				return NotFound();
+				return this.NotFound();
 			}
 
-			return File(result.Value.data, result.Value.contentType);
+			return this.File(result.Value.data, result.Value.contentType);
 		}
 
 		[HttpGet]
 		[ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
 		public ActionResult GetThumbnail(string albumName, string fileName)
 		{
-			if (!IsLoggedIn())
+			if (!this.IsLoggedIn())
 			{
-				return Unauthorized();
+				return this.Unauthorized();
 			}
 
-			if (!HasAccess(albumName))
+			if (!this.HasAccess(albumName))
 			{
-				return Forbid();
+				return this.Forbid();
 			}
 
 			var result = new AlbumService().GetThumbnail(albumName, fileName);
 
 			if (result == null)
 			{
-				return NotFound();
+				return this.NotFound();
 			}
 
-			return File(result.Value.data, result.Value.contentType);
+			return this.File(result.Value.data, result.Value.contentType);
 		}
 
 		[HttpPost]
@@ -229,12 +188,12 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult DeletePhoto(string albumName, string fileName, int photoId)
 		{
-			if (!IsLoggedIn())
+			if (!this.IsLoggedIn())
 			{
 				return this.Json(new { message = "로그인이 필요합니다." });
 			}
 
-			if (!HasAccess(albumName))
+			if (!this.HasAccess(albumName))
 			{
 				return this.Json(new { success = false, error = "접근 권한이 없습니다." });
 			}
@@ -251,7 +210,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult CreateAlbum(string albumName, string displayName)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -264,7 +223,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult UpdateAlbum(string albumName, string displayName)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -277,7 +236,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult DeleteAlbum(string albumName)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -287,23 +246,19 @@ namespace YL.Controllers.Webs
 			return this.Json(new { success = result, error = result ? "" : "앨범 삭제에 실패했습니다." });
 		}
 
-		// ============================================
-		// 관리자 페이지 (시스템 마스터 전용)
-		// ============================================
-
 		[HttpGet]
 		public ActionResult Admin()
 		{
 			this.Initialize();
 
-			if (!IsLoggedIn())
+			if (!this.IsLoggedIn())
 			{
-				return RedirectToAction("Login");
+				return this.RedirectToAction("Login");
 			}
 
-			if (!IsSystemMaster())
+			if (!this.IsSystemMaster())
 			{
-				return RedirectToAction("Index");
+				return this.RedirectToAction("Index");
 			}
 
 			ViewBag.UserName = HttpContext.Session.GetString("AlbumUserName");
@@ -314,7 +269,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult GetRoles()
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -326,7 +281,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult AddRole(string roleName)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -338,7 +293,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult DeleteRole(int roleId)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -350,7 +305,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult GetUsers()
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -364,7 +319,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult AssignUserRole(string phoneNumber, int roleId)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -376,7 +331,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult RemoveUserRole(int userRoleId)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -388,7 +343,7 @@ namespace YL.Controllers.Webs
 		[HttpPost]
 		public JsonResult GetAlbumAccess()
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
@@ -397,44 +352,69 @@ namespace YL.Controllers.Webs
 			var accessList = service.GetAllAlbumAccess();
 			var albums = service.GetAlbumList();
 			var roles = service.GetAllRoles();
+
 			return this.Json(new { success = true, accessList, albums, roles });
 		}
 
 		[HttpPost]
 		public JsonResult AddAlbumAccess(string albumName, int roleId)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
 
 			bool result = new AlbumService().AddAlbumAccess(albumName, roleId);
+
 			return this.Json(new { success = result, error = result ? "" : "이미 설정된 접근 권한입니다." });
 		}
 
 		[HttpPost]
 		public JsonResult RemoveAlbumAccess(int accessId)
 		{
-			if (!IsLoggedIn() || !IsSystemMaster())
+			if (!this.IsLoggedIn() || !this.IsSystemMaster())
 			{
 				return this.Json(new { success = false, error = "권한이 없습니다." });
 			}
 
 			bool result = new AlbumService().RemoveAlbumAccess(accessId);
+
 			return this.Json(new { success = result });
 		}
-
-		// ============================================
-		// 헬퍼
-		// ============================================
 
 		private bool HasAccess(string albumName)
 		{
 			var service = new AlbumService();
-			var roleNames = GetSessionRoleNames();
-			var roleIds = GetSessionRoleIds();
+			var roleNames = this.GetSessionRoleNames();
+			var roleIds = this.GetSessionRoleIds();
 
 			return service.HasAlbumAccess(albumName, roleNames, roleIds);
+		}
+
+		private bool IsLoggedIn()
+		{
+			return HttpContext.Session.GetString("AlbumUserPhone") != null;
+		}
+
+		private bool IsSystemMaster()
+		{
+			return HttpContext.Session.GetString("AlbumIsSystemMaster") == "true";
+		}
+
+		private List<string> GetSessionRoleNames()
+		{
+			string roles = HttpContext.Session.GetString("AlbumUserRoles") ?? "";
+			return roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+		}
+
+		private List<int> GetSessionRoleIds()
+		{
+			string ids = HttpContext.Session.GetString("AlbumUserRoleIds") ?? string.Empty;
+
+			return ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
+				.Select(s => int.TryParse(s, out int id) ? id : 0)
+				.Where(id => id > 0)
+				.ToList();
 		}
 	}
 }
