@@ -585,8 +585,20 @@ $(document).ready(function () {
 	// ============================================
 	$('#btnLogout').on('click', function (e) {
 		e.preventDefault();
-		if (confirm('로그아웃 하시겠습니까?')) {
-			window.location.href = '/Album/Logout';
+		$('#logoutConfirmModal').fadeIn(200);
+	});
+
+	$('#btnLogoutCancel').on('click', function () {
+		$('#logoutConfirmModal').fadeOut(200);
+	});
+
+	$('#btnLogoutConfirm').on('click', function () {
+		window.location.href = '/Album/Logout';
+	});
+
+	$('#logoutConfirmModal').on('click', function (e) {
+		if (e.target === this) {
+			$('#logoutConfirmModal').fadeOut(200);
 		}
 	});
 

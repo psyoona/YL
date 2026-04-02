@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 using SkiaSharp;
 using YL.Configs;
 using YL.Models.Daos;
@@ -12,9 +11,9 @@ namespace YL.Services
 	{
 		private readonly string _albumBasePath;
 		private readonly string _thumbnailCachePath;
-		private const int ThumbnailMaxWidth = 800;
-		private const int ThumbnailMaxHeight = 600;
-		private const int ThumbnailQuality = 85;
+		private const int ThumbnailMaxWidth = 1200;
+		private const int ThumbnailMaxHeight = 900;
+		private const int ThumbnailQuality = 95;
 
 		private static readonly string[] ImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
 
@@ -24,6 +23,11 @@ namespace YL.Services
 		{
 			_albumBasePath = Path.Combine(ConfigManager.Settings.ServiceBasePath, "albums");
 			_thumbnailCachePath = Path.Combine(ConfigManager.Settings.ServiceBasePath, "albums", ".thumbnails");
+		}
+
+		public string GetAlbumBasePath()
+		{
+			return _albumBasePath;
 		}
 
 		// ============================================
@@ -52,15 +56,19 @@ namespace YL.Services
 
 		public bool HasAlbumAccess(string albumName, List<string> roleNames, List<int> roleIds)
 		{
-			if (IsSystemMaster(roleNames))
+			if (this.IsSystemMaster(roleNames))
+			{
 				return true;
+			}
 
 			var accessList = new AlbumDao().GetAllAlbumAccess();
 			var albumAccess = accessList.Where(a => a.ALBUM_NAME == albumName).ToList();
 
 			// 접근 규칙이 없는 앨범은 모든 로그인 사용자에게 허용
 			if (albumAccess.Count == 0)
+			{
 				return true;
+			}
 
 			// 사용자의 역할 중 하나라도 접근 허용 역할에 포함되면 접근 허용
 			return albumAccess.Any(a => roleIds.Contains(a.ROLE_ID));
@@ -68,10 +76,12 @@ namespace YL.Services
 
 		public List<string> GetAccessibleAlbumNames(List<string> roleNames, List<int> roleIds)
 		{
-			var allAlbums = GetAlbumList();
+			var allAlbums = this.GetAlbumList();
 
-			if (IsSystemMaster(roleNames))
+			if (this.IsSystemMaster(roleNames))
+			{
 				return allAlbums;
+			}
 
 			var accessList = new AlbumDao().GetAllAlbumAccess();
 
