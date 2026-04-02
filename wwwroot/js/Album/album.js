@@ -54,8 +54,7 @@ class AlbumPage {
 		$('#sidebarClose').on('click', () => this.closeSidebar());
 		this.$sidebarOverlay.on('click', () => this.closeSidebar());
 
-		// 동기화/업로드/삭제
-		$('#btnSync').on('click', () => this.syncPhotos());
+		// 업로드/삭제
 		$('#btnUpload').on('click', () => this.triggerUpload());
 		$('#fileInput').on('change', (e) => this.uploadFiles(e.target.files));
 		$('#btnDeleteMode').on('click', () => this.toggleDeleteMode());
@@ -291,39 +290,6 @@ class AlbumPage {
 		});
 
 		this.$photoGrid.append($card);
-	}
-
-	// ============================================
-	// 동기화
-	// ============================================
-
-	syncPhotos() {
-		if (!this.currentAlbum) return;
-		if (!confirm('디스크의 사진을 DB에 동기화합니다.\n기존에 등록되지 않은 사진이 추가됩니다.\n\n진행하시겠습니까?')) return;
-
-		const $btn = $('#btnSync');
-		$btn.prop('disabled', true).find('i').addClass('fa-spin');
-
-		$.ajax({
-			url: '/Album/SyncPhotos',
-			type: 'POST',
-			data: { albumName: this.currentAlbum },
-			dataType: 'json',
-			success: (response) => {
-				$btn.prop('disabled', false).find('i').removeClass('fa-spin');
-
-				if (response.success) {
-					alert(response.count + '장의 사진이 동기화되었습니다.');
-					this.loadPhotos(this.currentAlbum);
-				} else {
-					alert('동기화 실패: ' + (response.error || '알 수 없는 오류'));
-				}
-			},
-			error: () => {
-				$btn.prop('disabled', false).find('i').removeClass('fa-spin');
-				alert('동기화 중 오류가 발생했습니다.');
-			}
-		});
 	}
 
 	// ============================================

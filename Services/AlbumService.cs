@@ -186,47 +186,6 @@ namespace YL.Services
 			return new AlbumDao().GetPhotos(albumName);
 		}
 
-		public List<AlbumPhoto> SyncAlbumMetadata(string albumName)
-		{
-			string albumPath = Path.Combine(_albumBasePath, albumName);
-
-			if (!Directory.Exists(albumPath))
-				return new List<AlbumPhoto>();
-
-			var dao = new AlbumDao();
-			var files = Directory.GetFiles(albumPath)
-				.Where(f => ImageExtensions.Contains(Path.GetExtension(f).ToLower()))
-				.OrderBy(f => f)
-				.ToList();
-
-			int order = 0;
-
-			foreach (var filePath in files)
-			{
-				string fileName = Path.GetFileName(filePath);
-				var fileInfo = new FileInfo(filePath);
-
-				int width = 0, height = 0;
-
-				try
-				{
-					using var codec = SKCodec.Create(filePath);
-
-					if (codec != null)
-					{
-						width = codec.Info.Width;
-						height = codec.Info.Height;
-					}
-				}
-				catch { }
-
-				dao.UpsertPhoto(albumName, fileName, width, height, fileInfo.Length, order);
-				order++;
-			}
-
-			return dao.GetPhotos(albumName);
-		}
-
 		public AlbumPhoto UploadPhoto(string albumName, IFormFile file)
 		{
 			string albumPath = Path.Combine(_albumBasePath, albumName);

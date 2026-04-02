@@ -244,24 +244,6 @@ namespace YL.Controllers.Webs
 			return this.Json(new { success = result });
 		}
 
-		[HttpPost]
-		public JsonResult SyncPhotos(string albumName)
-		{
-			if (!IsLoggedIn())
-			{
-				return this.Json(new { message = "로그인이 필요합니다." });
-			}
-
-			if (!HasAccess(albumName))
-			{
-				return this.Json(new { success = false, error = "접근 권한이 없습니다." });
-			}
-
-			var photos = new AlbumService().SyncAlbumMetadata(albumName);
-
-			return this.Json(new { success = true, count = photos.Count, photos });
-		}
-
 		// ============================================
 		// 앨범 관리 (시스템 마스터 전용)
 		// ============================================
