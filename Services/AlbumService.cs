@@ -335,26 +335,41 @@ namespace YL.Services
 			{
 				Directory.CreateDirectory(thumbDir);
 
-				using var inputStream = File.OpenRead(originalPath);
-				using var original = SKBitmap.Decode(inputStream);
-
-				if (original == null)
+				// EXIF 회전 정보를 적용하여 디코딩
+				using var codec = SKCodec.Create(originalPath);
+				if (codec == null)
 					return null;
 
-				float ratioX = (float)ThumbnailMaxWidth / original.Width;
-				float ratioY = (float)ThumbnailMaxHeight / original.Height;
+				var bitmap = SKBitmap.Decode(codec);
+				if (bitmap == null)
+					return null;
+
+				// EXIF Orientation에 따라 회전 적용
+				var origin = codec.EncodedOrigin;
+				if (origin != SKEncodedOrigin.TopLeft && origin != SKEncodedOrigin.Default)
+				{
+					var rotated = AutoOrient(bitmap, origin);
+					bitmap.Dispose();
+					bitmap = rotated;
+				}
+
+				float ratioX = (float)ThumbnailMaxWidth / bitmap.Width;
+				float ratioY = (float)ThumbnailMaxHeight / bitmap.Height;
 				float ratio = Math.Min(ratioX, ratioY);
 
 				if (ratio >= 1.0f)
 				{
+					bitmap.Dispose();
 					byte[] data = File.ReadAllBytes(originalPath);
 					return (data, GetContentType(fileName));
 				}
 
-				int newWidth = (int)(original.Width * ratio);
-				int newHeight = (int)(original.Height * ratio);
+				int newWidth = (int)(bitmap.Width * ratio);
+				int newHeight = (int)(bitmap.Height * ratio);
 
-				using var resized = original.Resize(new SKImageInfo(newWidth, newHeight), SKSamplingOptions.Default);
+				using var resized = bitmap.Resize(new SKImageInfo(newWidth, newHeight), new SKSamplingOptions(SKCubicResampler.Mitchell));
+				bitmap.Dispose();
+
 				using var image = SKImage.FromBitmap(resized);
 				using var encoded = image.Encode(SKEncodedImageFormat.Jpeg, ThumbnailQuality);
 
@@ -367,6 +382,77 @@ namespace YL.Services
 			{
 				byte[] data = File.ReadAllBytes(originalPath);
 				return (data, GetContentType(fileName));
+			}
+		}
+
+		private static SKBitmap AutoOrient(SKBitmap bitmap, SKEncodedOrigin origin)
+		{
+			switch (origin)
+			{
+				case SKEncodedOrigin.BottomRight: // 180도
+					{
+						var rotated = new SKBitmap(bitmap.Width, bitmap.Height);
+						using var canvas = new SKCanvas(rotated);
+						canvas.RotateDegrees(180, bitmap.Width / 2f, bitmap.Height / 2f);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return rotated;
+					}
+				case SKEncodedOrigin.RightTop: // 90도 시계방향
+					{
+						var rotated = new SKBitmap(bitmap.Height, bitmap.Width);
+						using var canvas = new SKCanvas(rotated);
+						canvas.Translate(rotated.Width, 0);
+						canvas.RotateDegrees(90);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return rotated;
+					}
+				case SKEncodedOrigin.LeftBottom: // 90도 반시계방향
+					{
+						var rotated = new SKBitmap(bitmap.Height, bitmap.Width);
+						using var canvas = new SKCanvas(rotated);
+						canvas.Translate(0, rotated.Height);
+						canvas.RotateDegrees(-90);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return rotated;
+					}
+				case SKEncodedOrigin.TopRight: // 좌우 반전
+					{
+						var flipped = new SKBitmap(bitmap.Width, bitmap.Height);
+						using var canvas = new SKCanvas(flipped);
+						canvas.Scale(-1, 1, bitmap.Width / 2f, 0);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return flipped;
+					}
+				case SKEncodedOrigin.LeftTop: // 좌우 반전 + 90도 반시계
+					{
+						var result = new SKBitmap(bitmap.Height, bitmap.Width);
+						using var canvas = new SKCanvas(result);
+						canvas.Translate(0, result.Height);
+						canvas.RotateDegrees(-90);
+						canvas.Scale(-1, 1, bitmap.Width / 2f, 0);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return result;
+					}
+				case SKEncodedOrigin.RightBottom: // 좌우 반전 + 90도 시계
+					{
+						var result = new SKBitmap(bitmap.Height, bitmap.Width);
+						using var canvas = new SKCanvas(result);
+						canvas.Translate(result.Width, 0);
+						canvas.RotateDegrees(90);
+						canvas.Scale(-1, 1, bitmap.Width / 2f, 0);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return result;
+					}
+				case SKEncodedOrigin.BottomLeft: // 상하 반전
+					{
+						var flipped = new SKBitmap(bitmap.Width, bitmap.Height);
+						using var canvas = new SKCanvas(flipped);
+						canvas.Scale(1, -1, 0, bitmap.Height / 2f);
+						canvas.DrawBitmap(bitmap, 0, 0);
+						return flipped;
+					}
+				default:
+					return bitmap.Copy();
 			}
 		}
 
