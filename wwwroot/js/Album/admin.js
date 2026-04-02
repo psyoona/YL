@@ -11,15 +11,11 @@ class AlbumAdmin {
 	}
 
 	bindEvents() {
-		// 역할 관리
-		$('#newRoleName').on('keydown', (e) => { if (e.keyCode === 13) this.addRole(); });
-		$('#btnAddRole').on('click', () => this.addRole());
+		$('#btnAddRole').on('click', () => this.addRole_onClick());
+		$('#btnAssignRole').on('click', () => this.assignUserRole_onClick());
+		$('#btnAddAccess').on('click', () => this.addAlbumAccess_onClick());
 
-		// 사용자 권한
-		$('#btnAssignRole').on('click', () => this.assignUserRole());
-
-		// 앨범 접근
-		$('#btnAddAccess').on('click', () => this.addAlbumAccess());
+		$('#newRoleName').on('keydown', (e) => { if (e.keyCode === 13) this.addRole_onClick(); });
 	}
 
 	// ============================================
@@ -27,17 +23,16 @@ class AlbumAdmin {
 	// ============================================
 
 	loadRoles() {
-		$.ajax({
-			url: '/Album/GetRoles',
-			type: 'POST',
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/GetRoles',
+			null,
+			(response) => {
 				if (response.success) {
 					this.renderRoles(response.roles);
 					this.updateRoleSelects(response.roles);
 				}
 			}
-		});
+		);
 	}
 
 	renderRoles(roles) {
@@ -52,7 +47,7 @@ class AlbumAdmin {
 		roles.forEach((role) => {
 			const $item = $('<div>').addClass('data-item');
 			const $info = $('<div>').addClass('item-info');
-			$info.html('<span class="item-name">' + this.escapeHtml(role.roleName) + '</span>');
+			$info.html('<span class="item-name">' + stringUtility.escapeHtml(role.roleName) + '</span>');
 
 			const $actions = $('<div>').addClass('item-actions');
 
@@ -87,7 +82,7 @@ class AlbumAdmin {
 		});
 	}
 
-	addRole() {
+	addRole_onClick() {
 		const roleName = $('#newRoleName').val().trim();
 
 		if (!roleName) {
@@ -95,12 +90,10 @@ class AlbumAdmin {
 			return;
 		}
 
-		$.ajax({
-			url: '/Album/AddRole',
-			type: 'POST',
-			data: { roleName: roleName },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/AddRole',
+			{ roleName: roleName },
+			(response) => {
 				if (response.success) {
 					$('#newRoleName').val('');
 					this.loadRoles();
@@ -108,16 +101,14 @@ class AlbumAdmin {
 					alert(response.error || '역할 추가에 실패했습니다.');
 				}
 			}
-		});
+		);
 	}
 
 	deleteRole(roleId) {
-		$.ajax({
-			url: '/Album/DeleteRole',
-			type: 'POST',
-			data: { roleId: roleId },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/DeleteRole',
+			{ roleId: roleId },
+			(response) => {
 				if (response.success) {
 					this.loadRoles();
 					this.loadUsers();
@@ -126,7 +117,7 @@ class AlbumAdmin {
 					alert(response.error || '역할 삭제에 실패했습니다.');
 				}
 			}
-		});
+		);
 	}
 
 	// ============================================
@@ -134,17 +125,16 @@ class AlbumAdmin {
 	// ============================================
 
 	loadUsers() {
-		$.ajax({
-			url: '/Album/GetUsers',
-			type: 'POST',
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/GetUsers',
+			null,
+			(response) => {
 				if (response.success) {
 					this.renderUserRoles(response.users, response.userRoles);
 					this.updateUserSelect(response.users);
 				}
 			}
-		});
+		);
 	}
 
 	renderUserRoles(users, userRoles) {
@@ -160,8 +150,8 @@ class AlbumAdmin {
 			const $userBlock = $('<div>').addClass('user-block');
 			const $userHeader = $('<div>').addClass('user-block-header');
 			$userHeader.html(
-				'<span class="user-phone">' + this.escapeHtml(user.phoneNumber) + '</span>' +
-				'<span class="user-name-badge">' + this.escapeHtml(user.userName) + '</span>'
+				'<span class="user-phone">' + stringUtility.escapeHtml(user.phoneNumber) + '</span>' +
+				'<span class="user-name-badge">' + stringUtility.escapeHtml(user.userName) + '</span>'
 			);
 			$userBlock.append($userHeader);
 
@@ -173,7 +163,7 @@ class AlbumAdmin {
 				roles.forEach((ur) => {
 					const $tag = $('<span>').addClass('role-tag');
 					$tag.html(
-						this.escapeHtml(ur.roleName) +
+						stringUtility.escapeHtml(ur.roleName) +
 						'<button class="tag-remove" title="역할 제거"><i class="fas fa-times"></i></button>'
 					);
 					$tag.find('.tag-remove').on('click', () => {
@@ -199,14 +189,14 @@ class AlbumAdmin {
 		$select.empty().append('<option value="">사용자 선택</option>');
 
 		users.forEach((user) => {
-			$select.append('<option value="' + this.escapeHtml(user.phoneNumber) + '">' +
-				this.escapeHtml(user.userName) + ' (' + this.escapeHtml(user.phoneNumber) + ')</option>');
+			$select.append('<option value="' + stringUtility.escapeHtml(user.phoneNumber) + '">' +
+				stringUtility.escapeHtml(user.userName) + ' (' + stringUtility.escapeHtml(user.phoneNumber) + ')</option>');
 		});
 
 		if (val) $select.val(val);
 	}
 
-	assignUserRole() {
+	assignUserRole_onClick() {
 		const phoneNumber = $('#assignUserSelect').val();
 		const roleId = $('#assignRoleSelect').val();
 
@@ -219,35 +209,31 @@ class AlbumAdmin {
 			return;
 		}
 
-		$.ajax({
-			url: '/Album/AssignUserRole',
-			type: 'POST',
-			data: { phoneNumber: phoneNumber, roleId: roleId },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/AssignUserRole',
+			{ phoneNumber: phoneNumber, roleId: roleId },
+			(response) => {
 				if (response.success) {
 					this.loadUsers();
 				} else {
 					alert(response.error || '역할 부여에 실패했습니다.');
 				}
 			}
-		});
+		);
 	}
 
 	removeUserRole(userRoleId) {
-		$.ajax({
-			url: '/Album/RemoveUserRole',
-			type: 'POST',
-			data: { userRoleId: userRoleId },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/RemoveUserRole',
+			{ userRoleId: userRoleId },
+			(response) => {
 				if (response.success) {
 					this.loadUsers();
 				} else {
 					alert(response.error || '역할 제거에 실패했습니다.');
 				}
 			}
-		});
+		);
 	}
 
 	// ============================================
@@ -255,17 +241,16 @@ class AlbumAdmin {
 	// ============================================
 
 	loadAlbumAccess() {
-		$.ajax({
-			url: '/Album/GetAlbumAccess',
-			type: 'POST',
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/GetAlbumAccess',
+			null,
+			(response) => {
 				if (response.success) {
 					this.renderAlbumAccess(response.accessList);
 					this.updateAlbumSelect(response.albums);
 				}
 			}
-		});
+		);
 	}
 
 	renderAlbumAccess(accessList) {
@@ -289,7 +274,7 @@ class AlbumAdmin {
 		Object.keys(grouped).sort().forEach((albumName) => {
 			const $block = $('<div>').addClass('access-block');
 			const $header = $('<div>').addClass('access-block-header');
-			$header.html('<i class="fas fa-folder me-2"></i>' + this.escapeHtml(albumName));
+			$header.html('<i class="fas fa-folder me-2"></i>' + stringUtility.escapeHtml(albumName));
 			$block.append($header);
 
 			const $tags = $('<div>').addClass('access-role-tags');
@@ -297,7 +282,7 @@ class AlbumAdmin {
 			grouped[albumName].forEach((item) => {
 				const $tag = $('<span>').addClass('role-tag');
 				$tag.html(
-					this.escapeHtml(item.roleName) +
+					stringUtility.escapeHtml(item.roleName) +
 					'<button class="tag-remove" title="접근 권한 제거"><i class="fas fa-times"></i></button>'
 				);
 				$tag.find('.tag-remove').on('click', () => {
@@ -319,14 +304,16 @@ class AlbumAdmin {
 		$select.empty().append('<option value="">앨범 선택</option>');
 
 		albums.forEach((album) => {
-			$select.append('<option value="' + this.escapeHtml(album.albumName) + '">' +
-				this.escapeHtml(album.displayName) + ' (' + this.escapeHtml(album.albumName) + ')</option>');
+			$select.append('<option value="' + stringUtility.escapeHtml(album.albumName) + '">' +
+				stringUtility.escapeHtml(album.displayName) + ' (' + stringUtility.escapeHtml(album.albumName) + ')</option>');
 		});
 
-		if (val) $select.val(val);
+		if (val) {
+			$select.val(val);
+		}
 	}
 
-	addAlbumAccess() {
+	addAlbumAccess_onClick() {
 		const albumName = $('#accessAlbumSelect').val();
 		const roleId = $('#accessRoleSelect').val();
 
@@ -339,47 +326,32 @@ class AlbumAdmin {
 			return;
 		}
 
-		$.ajax({
-			url: '/Album/AddAlbumAccess',
-			type: 'POST',
-			data: { albumName: albumName, roleId: roleId },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/AddAlbumAccess',
+			{ albumName: albumName, roleId: roleId },
+			(response) => {
 				if (response.success) {
 					this.loadAlbumAccess();
 				} else {
 					alert(response.error || '접근 권한 추가에 실패했습니다.');
 				}
 			}
-		});
+		);
 	}
 
 	removeAlbumAccess(accessId) {
-		$.ajax({
-			url: '/Album/RemoveAlbumAccess',
-			type: 'POST',
-			data: { accessId: accessId },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/RemoveAlbumAccess',
+			{ accessId: accessId },
+			(response) => {
 				if (response.success) {
 					this.loadAlbumAccess();
 				} else {
 					alert(response.error || '접근 권한 제거에 실패했습니다.');
 				}
 			}
-		});
-	}
-
-	// ============================================
-	// 유틸리티
-	// ============================================
-
-	escapeHtml(text) {
-		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-		return text.replace(/[&<>"']/g, (m) => map[m]);
+		);
 	}
 }
 
-$(document).ready(() => {
-	window.albumAdmin = new AlbumAdmin();
-});
+window.albumAdmin = new AlbumAdmin();

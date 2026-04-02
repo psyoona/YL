@@ -53,12 +53,10 @@ class AlbumLogin {
 
 		this.$btnLogin.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>로그인 중...');
 
-		$.ajax({
-			url: '/Album/Authenticate',
-			type: 'POST',
-			data: { phoneNumber: phoneNumber, password: password },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/Authenticate',
+			{ phoneNumber: phoneNumber, password: password },
+			(response) => {
 				if (response.success) {
 					this.showMessage(response.userName + '님 환영합니다!', 'success');
 					setTimeout(() => { window.location.href = '/Album/Index'; }, 800);
@@ -66,12 +64,8 @@ class AlbumLogin {
 					this.showMessage('핸드폰 번호 또는 비밀번호가 일치하지 않습니다.', 'error');
 					this.$btnLogin.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>로그인');
 				}
-			},
-			error: () => {
-				this.showMessage('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
-				this.$btnLogin.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>로그인');
 			}
-		});
+		);
 	}
 
 	showMessage(message, type) {

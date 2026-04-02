@@ -66,6 +66,11 @@
 		return input.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 	}
 
+	escapeHtml(text) {
+		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+		return text.replace(/[&<>"']/g, (m) => map[m]);
+	}
+
 	customStringify(parameters) {
 		let undefinedCount = 0;
 		let jsonString = '{';

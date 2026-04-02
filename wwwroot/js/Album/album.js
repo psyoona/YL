@@ -135,17 +135,16 @@ class AlbumPage {
 	// ============================================
 
 	loadAlbumList() {
-		$.ajax({
-			url: '/Album/GetAlbumList',
-			type: 'POST',
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/GetAlbumList',
+			null,
+			(response) => {
 				if (response.albums && response.albums.length > 0) {
 					this.albums = response.albums;
 					this.renderAlbumList();
 				}
 			}
-		});
+		);
 	}
 
 	renderAlbumList() {
@@ -156,10 +155,10 @@ class AlbumPage {
 			const $a = $('<a>').attr('data-album', album.albumName);
 
 			let html = '<i class="fas fa-folder"></i>' +
-				'<span class="album-name">' + this.escapeHtml(album.displayName) + '</span>';
+				'<span class="album-name">' + stringUtility.escapeHtml(album.displayName) + '</span>';
 
 			if (typeof isSystemMaster !== 'undefined' && isSystemMaster) {
-				html += '<span class="album-delete-btn" data-album="' + this.escapeHtml(album.albumName) + '" title="앨범 삭제">' +
+				html += '<span class="album-delete-btn" data-album="' + stringUtility.escapeHtml(album.albumName) + '" title="앨범 삭제">' +
 					'<i class="fas fa-times"></i></span>';
 			}
 
@@ -213,12 +212,10 @@ class AlbumPage {
 		this.$photoCount.text('');
 		this.loadedCount = 0;
 
-		$.ajax({
-			url: '/Album/GetPhotoList',
-			type: 'POST',
-			data: { albumName: albumName },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/GetPhotoList',
+			{ albumName: albumName },
+			(response) => {
 				this.$loadingSpinner.hide();
 
 				if (response.photos && response.photos.length > 0) {
@@ -233,12 +230,8 @@ class AlbumPage {
 					this.$photoCount.text('0장');
 					this.currentPhotos = [];
 				}
-			},
-			error: () => {
-				this.$loadingSpinner.hide();
-				this.$emptyState.show();
 			}
-		});
+		);
 	}
 
 	// ============================================
@@ -311,33 +304,10 @@ class AlbumPage {
 			formData.append('files', files[i]);
 		}
 
-		const $progress = $('#uploadProgress');
-		const $bar = $('#uploadProgressBar');
-		const $text = $('#uploadProgressText');
-
-		$progress.show();
-		$bar.css('width', '0%');
-		$text.text('업로드 중...');
-
-		$.ajax({
-			url: '/Album/UploadPhotos',
-			type: 'POST',
-			data: formData,
-			processData: false,
-			contentType: false,
-			xhr: () => {
-				const xhr = new window.XMLHttpRequest();
-				xhr.upload.addEventListener('progress', (e) => {
-					if (e.lengthComputable) {
-						const pct = Math.round((e.loaded / e.total) * 100);
-						$bar.css('width', pct + '%');
-						$text.text('업로드 중... ' + pct + '%');
-					}
-				});
-				return xhr;
-			},
-			success: (response) => {
-				$progress.hide();
+		webServer.uploadFiles(
+			'/Album/UploadPhotos',
+			formData,
+			(response) => {
 				$('#fileInput').val('');
 
 				if (response.success && response.photos) {
@@ -345,13 +315,8 @@ class AlbumPage {
 				} else {
 					alert(response.error || '업로드에 실패했습니다.');
 				}
-			},
-			error: () => {
-				$progress.hide();
-				$('#fileInput').val('');
-				alert('업로드 중 오류가 발생했습니다.');
 			}
-		});
+		);
 	}
 
 	// ============================================
@@ -396,16 +361,14 @@ class AlbumPage {
 
 		$('#deleteConfirmModal').fadeOut(200);
 
-		$.ajax({
-			url: '/Album/DeletePhoto',
-			type: 'POST',
-			data: {
+		webServer.getData(
+			'/Album/DeletePhoto',
+			{
 				albumName: this.currentAlbum,
 				fileName: photo.fileName,
 				photoId: photo.photoId
 			},
-			dataType: 'json',
-			success: (response) => {
+			(response) => {
 				if (response.success) {
 					this.currentPhotos.splice(index, 1);
 					this.$photoCount.text(this.currentPhotos.length + '장');
@@ -431,7 +394,7 @@ class AlbumPage {
 					alert(response.error || '삭제에 실패했습니다.');
 				}
 			}
-		});
+		);
 
 		this.pendingDeletePhoto = null;
 	}
@@ -462,12 +425,10 @@ class AlbumPage {
 			return;
 		}
 
-		$.ajax({
-			url: '/Album/CreateAlbum',
-			type: 'POST',
-			data: { albumName: albumName, displayName: displayName },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/CreateAlbum',
+			{ albumName: albumName, displayName: displayName },
+			(response) => {
 				$('#createAlbumModal').fadeOut(200);
 
 				if (response.success) {
@@ -475,11 +436,8 @@ class AlbumPage {
 				} else {
 					alert(response.error || '앨범 생성에 실패했습니다.');
 				}
-			},
-			error: () => {
-				alert('앨범 생성 중 오류가 발생했습니다.');
 			}
-		});
+		);
 	}
 
 	showDeleteAlbumConfirm(albumName, displayName) {
@@ -494,12 +452,10 @@ class AlbumPage {
 		const albumName = this.pendingDeleteAlbum;
 		$('#deleteAlbumModal').fadeOut(200);
 
-		$.ajax({
-			url: '/Album/DeleteAlbum',
-			type: 'POST',
-			data: { albumName: albumName },
-			dataType: 'json',
-			success: (response) => {
+		webServer.getData(
+			'/Album/DeleteAlbum',
+			{ albumName: albumName },
+			(response) => {
 				if (response.success) {
 					if (this.currentAlbum === albumName) {
 						this.currentAlbum = '';
@@ -516,11 +472,8 @@ class AlbumPage {
 				} else {
 					alert(response.error || '앨범 삭제에 실패했습니다.');
 				}
-			},
-			error: () => {
-				alert('앨범 삭제 중 오류가 발생했습니다.');
 			}
-		});
+		);
 
 		this.pendingDeleteAlbum = null;
 	}
@@ -578,16 +531,6 @@ class AlbumPage {
 		}
 	}
 
-	// ============================================
-	// 유틸리티
-	// ============================================
-
-	escapeHtml(text) {
-		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-		return text.replace(/[&<>"']/g, (m) => map[m]);
-	}
 }
 
-$(document).ready(() => {
-	window.albumPage = new AlbumPage();
-});
+window.albumPage = new AlbumPage();
