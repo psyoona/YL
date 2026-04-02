@@ -77,6 +77,4 @@ class AlbumLogin {
 	}
 }
 
-$(document).ready(() => {
-	window.albumLogin = new AlbumLogin();
-});
+window.albumLogin = new AlbumLogin();

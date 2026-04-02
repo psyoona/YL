@@ -15,12 +15,8 @@ class AlbumAdmin {
 		$('#btnAssignRole').on('click', () => this.assignUserRole_onClick());
 		$('#btnAddAccess').on('click', () => this.addAlbumAccess_onClick());
 
-		$('#newRoleName').on('keydown', (e) => { if (e.keyCode === 13) this.addRole_onClick(); });
+		$('#newRoleName').on('keydown', (e) => this.newRoleName_onKeyDown(e));
 	}
-
-	// ============================================
-	// 역할 관리
-	// ============================================
 
 	loadRoles() {
 		webServer.getData(
@@ -119,10 +115,6 @@ class AlbumAdmin {
 			}
 		);
 	}
-
-	// ============================================
-	// 사용자 권한 관리
-	// ============================================
 
 	loadUsers() {
 		webServer.getData(
@@ -236,10 +228,6 @@ class AlbumAdmin {
 		);
 	}
 
-	// ============================================
-	// 앨범 접근 관리
-	// ============================================
-
 	loadAlbumAccess() {
 		webServer.getData(
 			'/Album/GetAlbumAccess',
@@ -310,6 +298,12 @@ class AlbumAdmin {
 
 		if (val) {
 			$select.val(val);
+		}
+	}
+
+	newRoleName_onKeyDown(event) {
+		if (event.keyCode === 13) {
+			this.addRole_onClick();
 		}
 	}
 

@@ -1,6 +1,5 @@
 class AlbumPage {
 	constructor() {
-		// DOM 요소
 		this.$sidebar = $('#sidebar');
 		this.$sidebarOverlay = $('#sidebarOverlay');
 		this.$albumList = $('#albumList');
@@ -16,24 +15,20 @@ class AlbumPage {
 		this.$galleryContainer = $('#galleryContainer');
 		this.$topBarActions = $('#topBarActions');
 
-		// 상태
 		this.currentAlbum = '';
 		this.currentAlbumDisplayName = '';
 		this.currentPhotos = [];
 		this.currentPhotoIndex = 0;
 		this.albums = [];
 
-		// 무한 스크롤
 		this.PAGE_SIZE = 12;
 		this.loadedCount = 0;
 		this.isLoadingMore = false;
 
-		// 삭제 모드
 		this.deleteMode = false;
 		this.pendingDeletePhoto = null;
 		this.pendingDeleteAlbum = null;
 
-		// 터치
 		this.touchStartX = 0;
 
 		this.initialize();
@@ -44,36 +39,26 @@ class AlbumPage {
 		this.loadAlbumList();
 	}
 
-	// ============================================
-	// 이벤트 바인딩
-	// ============================================
-
 	bindEvents() {
-		// 사이드바
 		$('#menuToggle').on('click', () => this.openSidebar());
 		$('#sidebarClose').on('click', () => this.closeSidebar());
 		this.$sidebarOverlay.on('click', () => this.closeSidebar());
 
-		// 업로드/삭제
 		$('#btnUpload').on('click', () => this.triggerUpload());
 		$('#fileInput').on('change', (e) => this.uploadFiles(e.target.files));
 		$('#btnDeleteMode').on('click', () => this.toggleDeleteMode());
 
-		// 사진 삭제 모달
 		$('#btnDeleteCancel').on('click', () => this.closeDeleteConfirm());
 		$('#btnDeleteConfirm').on('click', () => this.confirmDeletePhoto());
 
-		// 앨범 추가
 		$('#btnAddAlbum').on('click', (e) => this.showCreateAlbumModal(e));
 		$('#btnCreateAlbumCancel').on('click', () => $('#createAlbumModal').fadeOut(200));
 		$('#btnCreateAlbumConfirm').on('click', () => this.createAlbum());
 		$('#newAlbumName').on('keydown', (e) => { if (e.keyCode === 13) this.createAlbum(); });
 
-		// 앨범 삭제 모달
 		$('#btnDeleteAlbumCancel').on('click', () => { $('#deleteAlbumModal').fadeOut(200); this.pendingDeleteAlbum = null; });
 		$('#btnDeleteAlbumConfirm').on('click', () => this.confirmDeleteAlbum());
 
-		// 뷰어
 		$('#viewerClose').on('click', () => this.closeViewer());
 		$('#viewerPrev').on('click', () => this.navigateViewer(-1));
 		$('#viewerNext').on('click', () => this.navigateViewer(1));
@@ -83,10 +68,8 @@ class AlbumPage {
 			}
 		});
 
-		// 키보드
 		$(document).on('keydown', (e) => this.handleKeydown(e));
 
-		// 터치 스와이프
 		this.$photoViewer.on('touchstart', (e) => { this.touchStartX = e.originalEvent.changedTouches[0].screenX; });
 		this.$photoViewer.on('touchend', (e) => {
 			const diff = this.touchStartX - e.originalEvent.changedTouches[0].screenX;
@@ -114,10 +97,6 @@ class AlbumPage {
 		$('#logoutConfirmModal').on('click', (e) => { if (e.target === e.currentTarget) $('#logoutConfirmModal').fadeOut(200); });
 	}
 
-	// ============================================
-	// 사이드바
-	// ============================================
-
 	openSidebar() {
 		this.$sidebar.addClass('open');
 		this.$sidebarOverlay.addClass('active');
@@ -129,10 +108,6 @@ class AlbumPage {
 		this.$sidebarOverlay.removeClass('active');
 		$('body').css('overflow', '');
 	}
-
-	// ============================================
-	// 앨범 목록
-	// ============================================
 
 	loadAlbumList() {
 		webServer.getData(
@@ -178,10 +153,6 @@ class AlbumPage {
 		});
 	}
 
-	// ============================================
-	// 앨범 선택
-	// ============================================
-
 	selectAlbum(albumName, displayName) {
 		if (this.currentAlbum === albumName) {
 			this.closeSidebar();
@@ -200,10 +171,6 @@ class AlbumPage {
 		this.closeSidebar();
 		this.loadPhotos(albumName);
 	}
-
-	// ============================================
-	// 사진 로드
-	// ============================================
 
 	loadPhotos(albumName) {
 		this.$emptyState.hide();
@@ -233,10 +200,6 @@ class AlbumPage {
 			}
 		);
 	}
-
-	// ============================================
-	// 배치 로딩 (무한 스크롤)
-	// ============================================
 
 	loadNextBatch() {
 		if (this.isLoadingMore || this.loadedCount >= this.currentPhotos.length) return;
@@ -285,10 +248,6 @@ class AlbumPage {
 		this.$photoGrid.append($card);
 	}
 
-	// ============================================
-	// 업로드
-	// ============================================
-
 	triggerUpload() {
 		if (!this.currentAlbum) return;
 		$('#fileInput').click();
@@ -318,10 +277,6 @@ class AlbumPage {
 			}
 		);
 	}
-
-	// ============================================
-	// 사진 삭제
-	// ============================================
 
 	toggleDeleteMode() {
 		if (this.deleteMode) {
@@ -399,10 +354,6 @@ class AlbumPage {
 		this.pendingDeletePhoto = null;
 	}
 
-	// ============================================
-	// 앨범 추가/삭제 (시스템 마스터)
-	// ============================================
-
 	showCreateAlbumModal(e) {
 		e.stopPropagation();
 		$('#newAlbumName').val('');
@@ -478,10 +429,6 @@ class AlbumPage {
 		this.pendingDeleteAlbum = null;
 	}
 
-	// ============================================
-	// 사진 뷰어
-	// ============================================
-
 	openViewer(index) {
 		this.currentPhotoIndex = index;
 		this.updateViewer();
@@ -514,10 +461,6 @@ class AlbumPage {
 
 		this.updateViewer();
 	}
-
-	// ============================================
-	// 키보드
-	// ============================================
 
 	handleKeydown(e) {
 		if (this.$photoViewer.is(':visible')) {
