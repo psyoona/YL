@@ -11,12 +11,14 @@
 			var connectionString = configuration.GetConnectionString("ConnectionString") ?? string.Empty;
 			var ipList = configuration.GetSection("Whitelist:IPList").Get<List<string>>() ?? new();
 			var serviceBasePath = configuration.GetValue<string>("ServiceBasePath") ?? string.Empty;
+			var albumEncryptionKey = configuration.GetValue<string>("AlbumEncryptionKey") ?? string.Empty;
 
 			Settings = new AppSettings
 			{
 				ConnectionString = connectionString,
 				IPWhitelist = ipList,
-				ServiceBasePath = serviceBasePath
+				ServiceBasePath = serviceBasePath,
+				AlbumEncryptionKey = albumEncryptionKey
 			};
 		}
 	}

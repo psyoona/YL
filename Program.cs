@@ -22,14 +22,6 @@ builder.Services.AddHttpLogging(o =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Session 설정 (앨범 로그인 용)
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-	options.IdleTimeout = TimeSpan.FromHours(24);
-	options.Cookie.HttpOnly = true;
-	options.Cookie.IsEssential = true;
-});
 
 var app = builder.Build();
 
@@ -39,7 +31,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
-app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -13,7 +13,7 @@ namespace YL.Services
 
 			if (encryptType == 1)
 			{
-				result = new SecurityHelper(encryptKey).EncryptAes256(plainText);
+				result = new SecurityHelper().EncryptAes256(plainText, encryptKey);
 			}
 			else if (encryptType == 2)
 			{
@@ -29,7 +29,7 @@ namespace YL.Services
 
 			if (encryptType == 1)
 			{
-				result = new SecurityHelper(encryptKey).DecryptAes256(encryptedText);
+				result = new SecurityHelper().DecryptAes256(encryptedText, encryptKey);
 			}
 
 			return result;

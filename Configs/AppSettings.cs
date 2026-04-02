@@ -7,5 +7,7 @@
 		public List<string> IPWhitelist { get; set; } = new();
 
 		public string ServiceBasePath { get; set; } = string.Empty;
+
+		public string AlbumEncryptionKey { get; set; } = string.Empty;
 	}
 }

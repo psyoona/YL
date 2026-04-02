@@ -7,14 +7,7 @@ namespace YL.Services
 	{
 		public SecurityHelper() { }
 
-		public SecurityHelper(string encryptKey)
-		{
-			EncryptKey = encryptKey;
-		}
-
-		public string EncryptKey { get; set; }
-
-		public string EncryptAes256(string plainText)
+		public string EncryptAes256(string plainText, string encryptKey)
 		{
 			try
 			{
@@ -23,8 +16,8 @@ namespace YL.Services
 				aes.BlockSize = 128;
 				aes.Mode = CipherMode.CBC;
 				aes.Padding = PaddingMode.PKCS7;
-				aes.Key = Encoding.UTF8.GetBytes(EncryptKey);
-				aes.IV = Encoding.UTF8.GetBytes(EncryptKey.Substring(0, 16));
+				aes.Key = Encoding.UTF8.GetBytes(encryptKey);
+				aes.IV = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 16));
 
 				ICryptoTransform encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
 				byte[] byteArray = null;
@@ -48,7 +41,7 @@ namespace YL.Services
 			}
 		}
 
-		public string DecryptAes256(string encryptedText)
+		public string DecryptAes256(string encryptedText, string encryptKey)
 		{
 			try
 			{
@@ -57,8 +50,8 @@ namespace YL.Services
 				aes.BlockSize = 128;
 				aes.Mode = CipherMode.CBC;
 				aes.Padding = PaddingMode.PKCS7;
-				aes.Key = Encoding.UTF8.GetBytes(EncryptKey);
-				aes.IV = Encoding.UTF8.GetBytes(EncryptKey.Substring(0, 16));
+				aes.Key = Encoding.UTF8.GetBytes(encryptKey);
+				aes.IV = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 16));
 
 				ICryptoTransform decrypt = aes.CreateDecryptor();
 				byte[] byteArray = null;

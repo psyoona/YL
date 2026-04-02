@@ -10,7 +10,10 @@
       "Bash(taskkill //F //PID 25516)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5100/Album/Login)",
       "Bash(taskkill //F //IM YL.exe)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(python3 -c \"import secrets; print\\(secrets.token_hex\\(16\\)\\)\")",
+      "Bash(python3 -c \"import secrets; print\\(secrets.token_hex\\(32\\)\\)\")",
+      "Bash(python3 -c \"import secrets, string; print\\(''''.join\\(secrets.choice\\(string.ascii_letters + string.digits\\) for _ in range\\(32\\)\\)\\)\")"
     ]
   }
 }

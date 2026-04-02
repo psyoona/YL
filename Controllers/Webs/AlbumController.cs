@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using YL.Filters;
+using YL.Functions;
+using YL.Helpers;
 using YL.Models.Dtos.Webs;
 using YL.Services;
 
@@ -9,12 +11,16 @@ namespace YL.Controllers.Webs
 	{
 		public AlbumController() { }
 
+		// ============================================
+		// 인증
+		// ============================================
+
 		[HttpGet]
 		public ActionResult Login()
 		{
 			this.Initialize();
 
-			if (this.IsLoggedIn())
+			if (this.GetAlbumSession() != null)
 			{
 				return this.RedirectToAction("Index");
 			}
@@ -30,17 +36,21 @@ namespace YL.Controllers.Webs
 
 			if (result.IsValid)
 			{
-				HttpContext.Session.SetString("AlbumUserPhone", phoneNumber);
-				HttpContext.Session.SetString("AlbumUserName", result.UserName);
-
 				var roles = service.GetUserRoles(phoneNumber);
 				var roleNames = roles.Select(r => r.ROLE_NAME).ToList();
 				var roleIds = roles.Select(r => r.ROLE_ID).ToList();
 
-				HttpContext.Session.SetString("AlbumUserRoles", string.Join(",", roleNames));
-				HttpContext.Session.SetString("AlbumUserRoleIds", string.Join(",", roleIds));
-				HttpContext.Session.SetString("AlbumIsSystemMaster",
-					roleNames.Contains(AlbumService.SystemMasterRole) ? "true" : "false");
+				var session = new AlbumSession
+				{
+					PhoneNumber = phoneNumber,
+					UserName = result.UserName,
+					Roles = string.Join(",", roleNames),
+					RoleIds = string.Join(",", roleIds),
+					IsSystemMaster = roleNames.Contains(AlbumService.SystemMasterRole),
+					ServerVersion = VersionHelper.GetApplicationVersion()
+				};
+
+				AlbumCookieHelper.SetSession(Response, session);
 			}
 
 			return this.Json(new { success = result.IsValid, userName = result.UserName });
@@ -49,43 +59,54 @@ namespace YL.Controllers.Webs
 		[HttpGet]
 		public ActionResult Logout()
 		{
-			HttpContext.Session.Remove("AlbumUserPhone");
-			HttpContext.Session.Remove("AlbumUserName");
-			HttpContext.Session.Remove("AlbumUserRoles");
-			HttpContext.Session.Remove("AlbumUserRoleIds");
-			HttpContext.Session.Remove("AlbumIsSystemMaster");
+			AlbumCookieHelper.ClearSession(Response);
 
 			return this.RedirectToAction("Login");
 		}
+
+		// ============================================
+		// 메인 페이지
+		// ============================================
 
 		[HttpGet]
 		public ActionResult Index()
 		{
 			this.Initialize();
 
-			if (!this.IsLoggedIn())
+			var session = this.GetAlbumSession();
+
+			if (session == null)
 			{
 				return this.RedirectToAction("Login");
 			}
 
-			ViewBag.UserName = HttpContext.Session.GetString("AlbumUserName");
-			ViewBag.IsSystemMaster = this.IsSystemMaster();
+			ViewBag.UserName = session.UserName;
+			ViewBag.IsSystemMaster = session.IsSystemMaster;
 
 			return this.View();
 		}
+
+		// ============================================
+		// 앨범 목록
+		// ============================================
 
 		[HttpPost]
 		[AlbumLoginRequired]
 		public JsonResult GetAlbumList()
 		{
+			var session = this.GetAlbumSession()!;
 			var service = new AlbumService();
-			var roleNames = this.GetSessionRoleNames();
-			var roleIds = this.GetSessionRoleIds();
+			var roleNames = this.ParseRoleNames(session);
+			var roleIds = this.ParseRoleIds(session);
 
 			var albums = service.GetAccessibleAlbums(roleNames, roleIds);
 
 			return this.Json(new { albums });
 		}
+
+		// ============================================
+		// 사진 관련
+		// ============================================
 
 		[HttpPost]
 		[AlbumLoginRequired]
@@ -180,6 +201,10 @@ namespace YL.Controllers.Webs
 			return this.Json(new { success = result });
 		}
 
+		// ============================================
+		// 앨범 관리 (시스템 마스터 전용)
+		// ============================================
+
 		[HttpPost]
 		[AlbumSystemMaster]
 		public JsonResult CreateAlbum(string albumName, string displayName)
@@ -207,22 +232,28 @@ namespace YL.Controllers.Webs
 			return this.Json(new { success = result, error = result ? "" : "앨범 삭제에 실패했습니다." });
 		}
 
+		// ============================================
+		// 관리자 페이지 (시스템 마스터 전용)
+		// ============================================
+
 		[HttpGet]
 		public ActionResult Admin()
 		{
 			this.Initialize();
 
-			if (!this.IsLoggedIn())
+			var session = this.GetAlbumSession();
+
+			if (session == null)
 			{
 				return this.RedirectToAction("Login");
 			}
 
-			if (!this.IsSystemMaster())
+			if (!session.IsSystemMaster)
 			{
 				return this.RedirectToAction("Index");
 			}
 
-			ViewBag.UserName = HttpContext.Session.GetString("AlbumUserName");
+			ViewBag.UserName = session.UserName;
 
 			return this.View();
 		}
@@ -307,36 +338,39 @@ namespace YL.Controllers.Webs
 			return this.Json(new { success = result });
 		}
 
+		// ============================================
+		// 헬퍼
+		// ============================================
+
+		private AlbumSession? GetAlbumSession()
+		{
+			return AlbumCookieHelper.GetSession(Request);
+		}
+
 		private bool HasAccess(string albumName)
 		{
+			var session = this.GetAlbumSession();
+
+			if (session == null)
+			{
+				return false;
+			}
+
 			var service = new AlbumService();
-			var roleNames = this.GetSessionRoleNames();
-			var roleIds = this.GetSessionRoleIds();
+			var roleNames = this.ParseRoleNames(session);
+			var roleIds = this.ParseRoleIds(session);
 
 			return service.HasAlbumAccess(albumName, roleNames, roleIds);
 		}
 
-		private bool IsLoggedIn()
+		private List<string> ParseRoleNames(AlbumSession session)
 		{
-			return HttpContext.Session.GetString("AlbumUserPhone") != null;
+			return session.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 		}
 
-		private bool IsSystemMaster()
+		private List<int> ParseRoleIds(AlbumSession session)
 		{
-			return HttpContext.Session.GetString("AlbumIsSystemMaster") == "true";
-		}
-
-		private List<string> GetSessionRoleNames()
-		{
-			string roles = HttpContext.Session.GetString("AlbumUserRoles") ?? "";
-			return roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-		}
-
-		private List<int> GetSessionRoleIds()
-		{
-			string ids = HttpContext.Session.GetString("AlbumUserRoleIds") ?? string.Empty;
-
-			return ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
+			return session.RoleIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
 				.Select(s => int.TryParse(s, out int id) ? id : 0)
 				.Where(id => id > 0)
 				.ToList();
