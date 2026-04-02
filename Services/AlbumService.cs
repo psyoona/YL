@@ -74,7 +74,7 @@ namespace YL.Services
 			return albumAccess.Any(a => roleIds.Contains(a.ROLE_ID));
 		}
 
-		public List<string> GetAccessibleAlbumNames(List<string> roleNames, List<int> roleIds)
+		public List<AlbumInfo> GetAccessibleAlbums(List<string> roleNames, List<int> roleIds)
 		{
 			var allAlbums = this.GetAlbumList();
 
@@ -85,9 +85,9 @@ namespace YL.Services
 
 			var accessList = new AlbumDao().GetAllAlbumAccess();
 
-			return allAlbums.Where(albumName =>
+			return allAlbums.Where(album =>
 			{
-				var albumAccess = accessList.Where(a => a.ALBUM_NAME == albumName).ToList();
+				var albumAccess = accessList.Where(a => a.ALBUM_NAME == album.ALBUM_NAME).ToList();
 
 				if (albumAccess.Count == 0)
 					return true;
@@ -100,29 +100,16 @@ namespace YL.Services
 		// 앨범 목록
 		// ============================================
 
-		public List<string> GetAlbumList()
+		public List<AlbumInfo> GetAlbumList()
 		{
-			List<string> albums = new List<string>();
-
-			if (Directory.Exists(_albumBasePath))
-			{
-				var directories = Directory.GetDirectories(_albumBasePath)
-					.Select(d => Path.GetFileName(d))
-					.Where(d => !d.StartsWith("."))
-					.OrderBy(d => d)
-					.ToList();
-
-				albums.AddRange(directories);
-			}
-
-			return albums;
+			return new AlbumDao().GetAlbums();
 		}
 
 		// ============================================
 		// 앨범 관리
 		// ============================================
 
-		public bool CreateAlbum(string albumName)
+		public bool CreateAlbum(string albumName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
 				return false;
@@ -134,13 +121,28 @@ namespace YL.Services
 			if (albumName.StartsWith("."))
 				return false;
 
-			string albumPath = Path.Combine(_albumBasePath, albumName);
+			if (string.IsNullOrWhiteSpace(displayName))
+				displayName = albumName;
 
-			if (Directory.Exists(albumPath))
+			// DB에 등록
+			bool dbResult = new AlbumDao().CreateAlbum(albumName, displayName);
+
+			if (!dbResult)
 				return false;
 
+			// 폴더 생성
+			string albumPath = Path.Combine(_albumBasePath, albumName);
 			Directory.CreateDirectory(albumPath);
+
 			return true;
+		}
+
+		public bool UpdateAlbum(string albumName, string displayName)
+		{
+			if (string.IsNullOrWhiteSpace(albumName) || string.IsNullOrWhiteSpace(displayName))
+				return false;
+
+			return new AlbumDao().UpdateAlbum(albumName, displayName);
 		}
 
 		public bool DeleteAlbum(string albumName)
@@ -148,17 +150,23 @@ namespace YL.Services
 			if (string.IsNullOrWhiteSpace(albumName))
 				return false;
 
-			string albumPath = Path.Combine(_albumBasePath, albumName);
+			// DB에서 소프트 삭제
+			bool dbResult = new AlbumDao().DeleteAlbumFromDb(albumName);
 
-			if (!Directory.Exists(albumPath))
+			if (!dbResult)
 				return false;
 
-			// .trash로 이동
-			string trashDir = Path.Combine(_albumBasePath, ".trash");
-			Directory.CreateDirectory(trashDir);
-			string trashPath = Path.Combine(trashDir, $"{DateTime.Now:yyyyMMddHHmmss}_{albumName}");
+			// 폴더를 .trash로 이동
+			string albumPath = Path.Combine(_albumBasePath, albumName);
 
-			Directory.Move(albumPath, trashPath);
+			if (Directory.Exists(albumPath))
+			{
+				string trashDir = Path.Combine(_albumBasePath, ".trash");
+				Directory.CreateDirectory(trashDir);
+				string trashPath = Path.Combine(trashDir, $"{DateTime.Now:yyyyMMddHHmmss}_{albumName}");
+
+				Directory.Move(albumPath, trashPath);
+			}
 
 			// 썸네일 캐시 삭제
 			string thumbDir = Path.Combine(_thumbnailCachePath, albumName);

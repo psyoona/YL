@@ -1,29 +1,46 @@
-$(document).ready(function () {
-	// ============================================
-	// 초기화
-	// ============================================
-	loadRoles();
-	loadUsers();
-	loadAlbumAccess();
+class AlbumAdmin {
+	constructor() {
+		this.initialize();
+	}
+
+	initialize() {
+		this.bindEvents();
+		this.loadRoles();
+		this.loadUsers();
+		this.loadAlbumAccess();
+	}
+
+	bindEvents() {
+		// 역할 관리
+		$('#newRoleName').on('keydown', (e) => { if (e.keyCode === 13) this.addRole(); });
+		$('#btnAddRole').on('click', () => this.addRole());
+
+		// 사용자 권한
+		$('#btnAssignRole').on('click', () => this.assignUserRole());
+
+		// 앨범 접근
+		$('#btnAddAccess').on('click', () => this.addAlbumAccess());
+	}
 
 	// ============================================
 	// 역할 관리
 	// ============================================
-	function loadRoles() {
+
+	loadRoles() {
 		$.ajax({
 			url: '/Album/GetRoles',
 			type: 'POST',
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					renderRoles(response.roles);
-					updateRoleSelects(response.roles);
+					this.renderRoles(response.roles);
+					this.updateRoleSelects(response.roles);
 				}
 			}
 		});
 	}
 
-	function renderRoles(roles) {
+	renderRoles(roles) {
 		const $list = $('#roleList');
 		$list.empty();
 
@@ -32,18 +49,18 @@ $(document).ready(function () {
 			return;
 		}
 
-		roles.forEach(function (role) {
+		roles.forEach((role) => {
 			const $item = $('<div>').addClass('data-item');
 			const $info = $('<div>').addClass('item-info');
-			$info.html('<span class="item-name">' + escapeHtml(role.roleName) + '</span>');
+			$info.html('<span class="item-name">' + this.escapeHtml(role.roleName) + '</span>');
 
 			const $actions = $('<div>').addClass('item-actions');
 
 			if (role.roleName !== '시스템 마스터') {
 				const $deleteBtn = $('<button>').addClass('btn-item-delete').html('<i class="fas fa-trash"></i>');
-				$deleteBtn.on('click', function () {
+				$deleteBtn.on('click', () => {
 					if (confirm('\'' + role.roleName + '\' 역할을 삭제하시겠습니까?\n관련된 사용자 역할과 앨범 접근 권한도 함께 삭제됩니다.')) {
-						deleteRole(role.roleId);
+						this.deleteRole(role.roleId);
 					}
 				});
 				$actions.append($deleteBtn);
@@ -56,26 +73,23 @@ $(document).ready(function () {
 		});
 	}
 
-	function updateRoleSelects(roles) {
+	updateRoleSelects(roles) {
 		$('#assignRoleSelect, #accessRoleSelect').each(function () {
 			const $select = $(this);
 			const val = $select.val();
 			$select.empty().append('<option value="">역할 선택</option>');
 
-			roles.forEach(function (role) {
-				$select.append('<option value="' + role.roleId + '">' + escapeHtml(role.roleName) + '</option>');
+			roles.forEach((role) => {
+				$select.append('<option value="' + role.roleId + '">' + role.roleName + '</option>');
 			});
 
 			if (val) $select.val(val);
 		});
 	}
 
-	$('#newRoleName').on('keydown', function (e) {
-		if (e.keyCode === 13) $('#btnAddRole').click();
-	});
-
-	$('#btnAddRole').on('click', function () {
+	addRole() {
 		const roleName = $('#newRoleName').val().trim();
+
 		if (!roleName) {
 			alert('역할명을 입력해주세요.');
 			return;
@@ -86,28 +100,28 @@ $(document).ready(function () {
 			type: 'POST',
 			data: { roleName: roleName },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
 					$('#newRoleName').val('');
-					loadRoles();
+					this.loadRoles();
 				} else {
 					alert(response.error || '역할 추가에 실패했습니다.');
 				}
 			}
 		});
-	});
+	}
 
-	function deleteRole(roleId) {
+	deleteRole(roleId) {
 		$.ajax({
 			url: '/Album/DeleteRole',
 			type: 'POST',
 			data: { roleId: roleId },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					loadRoles();
-					loadUsers();
-					loadAlbumAccess();
+					this.loadRoles();
+					this.loadUsers();
+					this.loadAlbumAccess();
 				} else {
 					alert(response.error || '역할 삭제에 실패했습니다.');
 				}
@@ -118,21 +132,22 @@ $(document).ready(function () {
 	// ============================================
 	// 사용자 권한 관리
 	// ============================================
-	function loadUsers() {
+
+	loadUsers() {
 		$.ajax({
 			url: '/Album/GetUsers',
 			type: 'POST',
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					renderUserRoles(response.users, response.userRoles);
-					updateUserSelect(response.users);
+					this.renderUserRoles(response.users, response.userRoles);
+					this.updateUserSelect(response.users);
 				}
 			}
 		});
 	}
 
-	function renderUserRoles(users, userRoles) {
+	renderUserRoles(users, userRoles) {
 		const $list = $('#userRoleList');
 		$list.empty();
 
@@ -141,29 +156,29 @@ $(document).ready(function () {
 			return;
 		}
 
-		users.forEach(function (user) {
+		users.forEach((user) => {
 			const $userBlock = $('<div>').addClass('user-block');
 			const $userHeader = $('<div>').addClass('user-block-header');
 			$userHeader.html(
-				'<span class="user-phone">' + escapeHtml(user.phoneNumber) + '</span>' +
-				'<span class="user-name-badge">' + escapeHtml(user.userName) + '</span>'
+				'<span class="user-phone">' + this.escapeHtml(user.phoneNumber) + '</span>' +
+				'<span class="user-name-badge">' + this.escapeHtml(user.userName) + '</span>'
 			);
 			$userBlock.append($userHeader);
 
-			const roles = userRoles.filter(function (ur) { return ur.phoneNumber === user.phoneNumber; });
+			const roles = userRoles.filter((ur) => ur.phoneNumber === user.phoneNumber);
 
 			if (roles.length > 0) {
 				const $roleList = $('<div>').addClass('user-role-tags');
 
-				roles.forEach(function (ur) {
+				roles.forEach((ur) => {
 					const $tag = $('<span>').addClass('role-tag');
 					$tag.html(
-						escapeHtml(ur.roleName) +
+						this.escapeHtml(ur.roleName) +
 						'<button class="tag-remove" title="역할 제거"><i class="fas fa-times"></i></button>'
 					);
-					$tag.find('.tag-remove').on('click', function () {
+					$tag.find('.tag-remove').on('click', () => {
 						if (confirm(user.userName + '에게서 \'' + ur.roleName + '\' 역할을 제거하시겠습니까?')) {
-							removeUserRole(ur.userRoleId);
+							this.removeUserRole(ur.userRoleId);
 						}
 					});
 					$roleList.append($tag);
@@ -178,20 +193,20 @@ $(document).ready(function () {
 		});
 	}
 
-	function updateUserSelect(users) {
+	updateUserSelect(users) {
 		const $select = $('#assignUserSelect');
 		const val = $select.val();
 		$select.empty().append('<option value="">사용자 선택</option>');
 
-		users.forEach(function (user) {
-			$select.append('<option value="' + escapeHtml(user.phoneNumber) + '">' +
-				escapeHtml(user.userName) + ' (' + escapeHtml(user.phoneNumber) + ')</option>');
+		users.forEach((user) => {
+			$select.append('<option value="' + this.escapeHtml(user.phoneNumber) + '">' +
+				this.escapeHtml(user.userName) + ' (' + this.escapeHtml(user.phoneNumber) + ')</option>');
 		});
 
 		if (val) $select.val(val);
 	}
 
-	$('#btnAssignRole').on('click', function () {
+	assignUserRole() {
 		const phoneNumber = $('#assignUserSelect').val();
 		const roleId = $('#assignRoleSelect').val();
 
@@ -209,25 +224,25 @@ $(document).ready(function () {
 			type: 'POST',
 			data: { phoneNumber: phoneNumber, roleId: roleId },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					loadUsers();
+					this.loadUsers();
 				} else {
 					alert(response.error || '역할 부여에 실패했습니다.');
 				}
 			}
 		});
-	});
+	}
 
-	function removeUserRole(userRoleId) {
+	removeUserRole(userRoleId) {
 		$.ajax({
 			url: '/Album/RemoveUserRole',
 			type: 'POST',
 			data: { userRoleId: userRoleId },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					loadUsers();
+					this.loadUsers();
 				} else {
 					alert(response.error || '역할 제거에 실패했습니다.');
 				}
@@ -238,21 +253,22 @@ $(document).ready(function () {
 	// ============================================
 	// 앨범 접근 관리
 	// ============================================
-	function loadAlbumAccess() {
+
+	loadAlbumAccess() {
 		$.ajax({
 			url: '/Album/GetAlbumAccess',
 			type: 'POST',
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					renderAlbumAccess(response.accessList);
-					updateAlbumSelect(response.albums);
+					this.renderAlbumAccess(response.accessList);
+					this.updateAlbumSelect(response.albums);
 				}
 			}
 		});
 	}
 
-	function renderAlbumAccess(accessList) {
+	renderAlbumAccess(accessList) {
 		const $list = $('#albumAccessList');
 		$list.empty();
 
@@ -263,30 +279,30 @@ $(document).ready(function () {
 
 		// 앨범별로 그룹
 		const grouped = {};
-		accessList.forEach(function (item) {
+		accessList.forEach((item) => {
 			if (!grouped[item.albumName]) {
 				grouped[item.albumName] = [];
 			}
 			grouped[item.albumName].push(item);
 		});
 
-		Object.keys(grouped).sort().forEach(function (albumName) {
+		Object.keys(grouped).sort().forEach((albumName) => {
 			const $block = $('<div>').addClass('access-block');
 			const $header = $('<div>').addClass('access-block-header');
-			$header.html('<i class="fas fa-folder me-2"></i>' + escapeHtml(albumName));
+			$header.html('<i class="fas fa-folder me-2"></i>' + this.escapeHtml(albumName));
 			$block.append($header);
 
 			const $tags = $('<div>').addClass('access-role-tags');
 
-			grouped[albumName].forEach(function (item) {
+			grouped[albumName].forEach((item) => {
 				const $tag = $('<span>').addClass('role-tag');
 				$tag.html(
-					escapeHtml(item.roleName) +
+					this.escapeHtml(item.roleName) +
 					'<button class="tag-remove" title="접근 권한 제거"><i class="fas fa-times"></i></button>'
 				);
-				$tag.find('.tag-remove').on('click', function () {
+				$tag.find('.tag-remove').on('click', () => {
 					if (confirm(albumName + ' 앨범에서 \'' + item.roleName + '\' 역할의 접근 권한을 제거하시겠습니까?')) {
-						removeAlbumAccess(item.accessId);
+						this.removeAlbumAccess(item.accessId);
 					}
 				});
 				$tags.append($tag);
@@ -297,19 +313,20 @@ $(document).ready(function () {
 		});
 	}
 
-	function updateAlbumSelect(albums) {
+	updateAlbumSelect(albums) {
 		const $select = $('#accessAlbumSelect');
 		const val = $select.val();
 		$select.empty().append('<option value="">앨범 선택</option>');
 
-		albums.forEach(function (albumName) {
-			$select.append('<option value="' + escapeHtml(albumName) + '">' + escapeHtml(albumName) + '</option>');
+		albums.forEach((album) => {
+			$select.append('<option value="' + this.escapeHtml(album.albumName) + '">' +
+				this.escapeHtml(album.displayName) + ' (' + this.escapeHtml(album.albumName) + ')</option>');
 		});
 
 		if (val) $select.val(val);
 	}
 
-	$('#btnAddAccess').on('click', function () {
+	addAlbumAccess() {
 		const albumName = $('#accessAlbumSelect').val();
 		const roleId = $('#accessRoleSelect').val();
 
@@ -327,25 +344,25 @@ $(document).ready(function () {
 			type: 'POST',
 			data: { albumName: albumName, roleId: roleId },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					loadAlbumAccess();
+					this.loadAlbumAccess();
 				} else {
 					alert(response.error || '접근 권한 추가에 실패했습니다.');
 				}
 			}
 		});
-	});
+	}
 
-	function removeAlbumAccess(accessId) {
+	removeAlbumAccess(accessId) {
 		$.ajax({
 			url: '/Album/RemoveAlbumAccess',
 			type: 'POST',
 			data: { accessId: accessId },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					loadAlbumAccess();
+					this.loadAlbumAccess();
 				} else {
 					alert(response.error || '접근 권한 제거에 실패했습니다.');
 				}
@@ -356,8 +373,13 @@ $(document).ready(function () {
 	// ============================================
 	// 유틸리티
 	// ============================================
-	function escapeHtml(text) {
+
+	escapeHtml(text) {
 		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-		return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+		return text.replace(/[&<>"']/g, (m) => map[m]);
 	}
+}
+
+$(document).ready(() => {
+	window.albumAdmin = new AlbumAdmin();
 });

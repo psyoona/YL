@@ -1,172 +1,243 @@
-$(document).ready(function () {
-	// ============================================
-	// 변수 선언
-	// ============================================
-	const $sidebar = $('#sidebar');
-	const $sidebarOverlay = $('#sidebarOverlay');
-	const $menuToggle = $('#menuToggle');
-	const $sidebarClose = $('#sidebarClose');
-	const $albumList = $('#albumList');
-	const $photoGrid = $('#photoGrid');
-	const $emptyState = $('#emptyState');
-	const $loadingSpinner = $('#loadingSpinner');
-	const $currentAlbumTitle = $('#currentAlbumTitle');
-	const $photoCount = $('#photoCount');
-	const $photoViewer = $('#photoViewer');
-	const $viewerImage = $('#viewerImage');
-	const $viewerTitle = $('#viewerTitle');
-	const $viewerCounter = $('#viewerCounter');
-	const $galleryContainer = $('#galleryContainer');
-	const $topBarActions = $('#topBarActions');
+class AlbumPage {
+	constructor() {
+		// DOM 요소
+		this.$sidebar = $('#sidebar');
+		this.$sidebarOverlay = $('#sidebarOverlay');
+		this.$albumList = $('#albumList');
+		this.$photoGrid = $('#photoGrid');
+		this.$emptyState = $('#emptyState');
+		this.$loadingSpinner = $('#loadingSpinner');
+		this.$currentAlbumTitle = $('#currentAlbumTitle');
+		this.$photoCount = $('#photoCount');
+		this.$photoViewer = $('#photoViewer');
+		this.$viewerImage = $('#viewerImage');
+		this.$viewerTitle = $('#viewerTitle');
+		this.$viewerCounter = $('#viewerCounter');
+		this.$galleryContainer = $('#galleryContainer');
+		this.$topBarActions = $('#topBarActions');
 
-	let currentAlbum = '';
-	let currentPhotos = [];
-	let currentPhotoIndex = 0;
+		// 상태
+		this.currentAlbum = '';
+		this.currentAlbumDisplayName = '';
+		this.currentPhotos = [];
+		this.currentPhotoIndex = 0;
+		this.albums = [];
 
-	// 무한 스크롤
-	const PAGE_SIZE = 12;
-	let loadedCount = 0;
-	let isLoadingMore = false;
+		// 무한 스크롤
+		this.PAGE_SIZE = 12;
+		this.loadedCount = 0;
+		this.isLoadingMore = false;
 
-	// 삭제 모드
-	let deleteMode = false;
-	let pendingDeletePhoto = null;
+		// 삭제 모드
+		this.deleteMode = false;
+		this.pendingDeletePhoto = null;
+		this.pendingDeleteAlbum = null;
 
-	// 앨범 삭제
-	let pendingDeleteAlbum = null;
+		// 터치
+		this.touchStartX = 0;
 
-	const albumDisplayNames = {
-		'yoogeon_50th': '유건이 50일'
-	};
-
-	// ============================================
-	// 초기화
-	// ============================================
-	loadAlbumList();
-
-	// ============================================
-	// 사이드바 토글
-	// ============================================
-	$menuToggle.on('click', function () {
-		$sidebar.addClass('open');
-		$sidebarOverlay.addClass('active');
-		$('body').css('overflow', 'hidden');
-	});
-
-	function closeSidebar() {
-		$sidebar.removeClass('open');
-		$sidebarOverlay.removeClass('active');
-		$('body').css('overflow', '');
+		this.initialize();
 	}
 
-	$sidebarClose.on('click', closeSidebar);
-	$sidebarOverlay.on('click', closeSidebar);
+	initialize() {
+		this.bindEvents();
+		this.loadAlbumList();
+	}
+
+	// ============================================
+	// 이벤트 바인딩
+	// ============================================
+
+	bindEvents() {
+		// 사이드바
+		$('#menuToggle').on('click', () => this.openSidebar());
+		$('#sidebarClose').on('click', () => this.closeSidebar());
+		this.$sidebarOverlay.on('click', () => this.closeSidebar());
+
+		// 동기화/업로드/삭제
+		$('#btnSync').on('click', () => this.syncPhotos());
+		$('#btnUpload').on('click', () => this.triggerUpload());
+		$('#fileInput').on('change', (e) => this.uploadFiles(e.target.files));
+		$('#btnDeleteMode').on('click', () => this.toggleDeleteMode());
+
+		// 사진 삭제 모달
+		$('#btnDeleteCancel').on('click', () => this.closeDeleteConfirm());
+		$('#btnDeleteConfirm').on('click', () => this.confirmDeletePhoto());
+
+		// 앨범 추가
+		$('#btnAddAlbum').on('click', (e) => this.showCreateAlbumModal(e));
+		$('#btnCreateAlbumCancel').on('click', () => $('#createAlbumModal').fadeOut(200));
+		$('#btnCreateAlbumConfirm').on('click', () => this.createAlbum());
+		$('#newAlbumName').on('keydown', (e) => { if (e.keyCode === 13) this.createAlbum(); });
+
+		// 앨범 삭제 모달
+		$('#btnDeleteAlbumCancel').on('click', () => { $('#deleteAlbumModal').fadeOut(200); this.pendingDeleteAlbum = null; });
+		$('#btnDeleteAlbumConfirm').on('click', () => this.confirmDeleteAlbum());
+
+		// 뷰어
+		$('#viewerClose').on('click', () => this.closeViewer());
+		$('#viewerPrev').on('click', () => this.navigateViewer(-1));
+		$('#viewerNext').on('click', () => this.navigateViewer(1));
+		this.$photoViewer.on('click', (e) => {
+			if ($(e.target).is('.viewer-body') || $(e.target).is('.viewer-image-container')) {
+				this.closeViewer();
+			}
+		});
+
+		// 키보드
+		$(document).on('keydown', (e) => this.handleKeydown(e));
+
+		// 터치 스와이프
+		this.$photoViewer.on('touchstart', (e) => { this.touchStartX = e.originalEvent.changedTouches[0].screenX; });
+		this.$photoViewer.on('touchend', (e) => {
+			const diff = this.touchStartX - e.originalEvent.changedTouches[0].screenX;
+			if (Math.abs(diff) > 50) {
+				this.navigateViewer(diff > 0 ? 1 : -1);
+			}
+		});
+
+		// 무한 스크롤
+		this.$galleryContainer.on('scroll', () => {
+			if (this.$galleryContainer[0].scrollTop + this.$galleryContainer[0].clientHeight >= this.$galleryContainer[0].scrollHeight - 300) {
+				this.loadNextBatch();
+			}
+		});
+		$(window).on('scroll', () => {
+			if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
+				this.loadNextBatch();
+			}
+		});
+
+		// 로그아웃
+		$('#btnLogout').on('click', (e) => { e.preventDefault(); $('#logoutConfirmModal').fadeIn(200); });
+		$('#btnLogoutCancel').on('click', () => $('#logoutConfirmModal').fadeOut(200));
+		$('#btnLogoutConfirm').on('click', () => { window.location.href = '/Album/Logout'; });
+		$('#logoutConfirmModal').on('click', (e) => { if (e.target === e.currentTarget) $('#logoutConfirmModal').fadeOut(200); });
+	}
+
+	// ============================================
+	// 사이드바
+	// ============================================
+
+	openSidebar() {
+		this.$sidebar.addClass('open');
+		this.$sidebarOverlay.addClass('active');
+		$('body').css('overflow', 'hidden');
+	}
+
+	closeSidebar() {
+		this.$sidebar.removeClass('open');
+		this.$sidebarOverlay.removeClass('active');
+		$('body').css('overflow', '');
+	}
 
 	// ============================================
 	// 앨범 목록
 	// ============================================
-	function loadAlbumList() {
+
+	loadAlbumList() {
 		$.ajax({
 			url: '/Album/GetAlbumList',
 			type: 'POST',
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.albums && response.albums.length > 0) {
-					renderAlbumList(response.albums);
+					this.albums = response.albums;
+					this.renderAlbumList();
 				}
 			}
 		});
 	}
 
-	function renderAlbumList(albums) {
-		$albumList.empty();
+	renderAlbumList() {
+		this.$albumList.empty();
 
-		albums.forEach(function (albumName) {
-			const displayName = albumDisplayNames[albumName] || albumName;
+		this.albums.forEach((album) => {
 			const $li = $('<li>');
-			const $a = $('<a>').attr('data-album', albumName);
+			const $a = $('<a>').attr('data-album', album.albumName);
 
 			let html = '<i class="fas fa-folder"></i>' +
-				'<span class="album-name">' + escapeHtml(displayName) + '</span>';
+				'<span class="album-name">' + this.escapeHtml(album.displayName) + '</span>';
 
 			if (typeof isSystemMaster !== 'undefined' && isSystemMaster) {
-				html += '<span class="album-delete-btn" data-album="' + escapeHtml(albumName) + '" title="앨범 삭제">' +
+				html += '<span class="album-delete-btn" data-album="' + this.escapeHtml(album.albumName) + '" title="앨범 삭제">' +
 					'<i class="fas fa-times"></i></span>';
 			}
 
 			$a.html(html);
 
-			$a.on('click', function (e) {
+			$a.on('click', (e) => {
 				if ($(e.target).closest('.album-delete-btn').length) {
 					e.stopPropagation();
-					showDeleteAlbumConfirm(albumName);
+					this.showDeleteAlbumConfirm(album.albumName, album.displayName);
 					return;
 				}
-				selectAlbum(albumName);
+				this.selectAlbum(album.albumName, album.displayName);
 			});
 
 			$li.append($a);
-			$albumList.append($li);
+			this.$albumList.append($li);
 		});
 	}
 
 	// ============================================
 	// 앨범 선택
 	// ============================================
-	function selectAlbum(albumName) {
-		if (currentAlbum === albumName) {
-			closeSidebar();
+
+	selectAlbum(albumName, displayName) {
+		if (this.currentAlbum === albumName) {
+			this.closeSidebar();
 			return;
 		}
 
-		currentAlbum = albumName;
-		exitDeleteMode();
+		this.currentAlbum = albumName;
+		this.currentAlbumDisplayName = displayName;
+		this.exitDeleteMode();
 
-		$albumList.find('a').removeClass('active');
-		$albumList.find('a[data-album="' + albumName + '"]').addClass('active');
+		this.$albumList.find('a').removeClass('active');
+		this.$albumList.find('a[data-album="' + albumName + '"]').addClass('active');
 
-		const displayName = albumDisplayNames[albumName] || albumName;
-		$currentAlbumTitle.text(displayName);
-
-		$topBarActions.show();
-		closeSidebar();
-		loadPhotos(albumName);
+		this.$currentAlbumTitle.text(displayName);
+		this.$topBarActions.show();
+		this.closeSidebar();
+		this.loadPhotos(albumName);
 	}
 
 	// ============================================
 	// 사진 로드
 	// ============================================
-	function loadPhotos(albumName) {
-		$emptyState.hide();
-		$photoGrid.hide().empty();
-		$loadingSpinner.show();
-		$photoCount.text('');
-		loadedCount = 0;
+
+	loadPhotos(albumName) {
+		this.$emptyState.hide();
+		this.$photoGrid.hide().empty();
+		this.$loadingSpinner.show();
+		this.$photoCount.text('');
+		this.loadedCount = 0;
 
 		$.ajax({
 			url: '/Album/GetPhotoList',
 			type: 'POST',
 			data: { albumName: albumName },
 			dataType: 'json',
-			success: function (response) {
-				$loadingSpinner.hide();
+			success: (response) => {
+				this.$loadingSpinner.hide();
 
 				if (response.photos && response.photos.length > 0) {
-					currentPhotos = response.photos;
-					$photoCount.text(response.photos.length + '장');
-					$photoGrid.show();
-					loadNextBatch();
+					this.currentPhotos = response.photos;
+					this.$photoCount.text(response.photos.length + '장');
+					this.$photoGrid.show();
+					this.loadNextBatch();
 				} else {
-					$emptyState.find('h3').text('사진이 없습니다');
-					$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
-					$emptyState.show();
-					$photoCount.text('0장');
-					currentPhotos = [];
+					this.$emptyState.find('h3').text('사진이 없습니다');
+					this.$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
+					this.$emptyState.show();
+					this.$photoCount.text('0장');
+					this.currentPhotos = [];
 				}
 			},
-			error: function () {
-				$loadingSpinner.hide();
-				$emptyState.show();
+			error: () => {
+				this.$loadingSpinner.hide();
+				this.$emptyState.show();
 			}
 		});
 	}
@@ -174,21 +245,22 @@ $(document).ready(function () {
 	// ============================================
 	// 배치 로딩 (무한 스크롤)
 	// ============================================
-	function loadNextBatch() {
-		if (isLoadingMore || loadedCount >= currentPhotos.length) return;
 
-		isLoadingMore = true;
-		const end = Math.min(loadedCount + PAGE_SIZE, currentPhotos.length);
+	loadNextBatch() {
+		if (this.isLoadingMore || this.loadedCount >= this.currentPhotos.length) return;
 
-		for (let i = loadedCount; i < end; i++) {
-			appendPhotoCard(currentAlbum, currentPhotos[i], i);
+		this.isLoadingMore = true;
+		const end = Math.min(this.loadedCount + this.PAGE_SIZE, this.currentPhotos.length);
+
+		for (let i = this.loadedCount; i < end; i++) {
+			this.appendPhotoCard(this.currentAlbum, this.currentPhotos[i], i);
 		}
 
-		loadedCount = end;
-		isLoadingMore = false;
+		this.loadedCount = end;
+		this.isLoadingMore = false;
 	}
 
-	function appendPhotoCard(albumName, photo, index) {
+	appendPhotoCard(albumName, photo, index) {
 		const thumbUrl = '/Album/GetThumbnail?albumName=' + encodeURIComponent(albumName) + '&fileName=' + encodeURIComponent(photo.fileName);
 
 		const $card = $('<div>').addClass('photo-card').attr('data-index', index);
@@ -210,78 +282,64 @@ $(document).ready(function () {
 
 		$card.append($img).append($overlay).append($deleteIcon);
 
-		$card.on('click', function () {
-			if (deleteMode) {
-				showDeleteConfirm(photo, index);
+		$card.on('click', () => {
+			if (this.deleteMode) {
+				this.showDeleteConfirm(photo, index);
 			} else {
-				openViewer(index);
+				this.openViewer(index);
 			}
 		});
 
-		$photoGrid.append($card);
+		this.$photoGrid.append($card);
 	}
 
-	// 무한 스크롤
-	$galleryContainer.on('scroll', function () {
-		if (this.scrollTop + this.clientHeight >= this.scrollHeight - 300) {
-			loadNextBatch();
-		}
-	});
-
-	$(window).on('scroll', function () {
-		if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
-			loadNextBatch();
-		}
-	});
-
 	// ============================================
-	// 동기화 기능
+	// 동기화
 	// ============================================
-	$('#btnSync').on('click', function () {
-		if (!currentAlbum) return;
 
+	syncPhotos() {
+		if (!this.currentAlbum) return;
 		if (!confirm('디스크의 사진을 DB에 동기화합니다.\n기존에 등록되지 않은 사진이 추가됩니다.\n\n진행하시겠습니까?')) return;
 
-		const $btn = $(this);
+		const $btn = $('#btnSync');
 		$btn.prop('disabled', true).find('i').addClass('fa-spin');
 
 		$.ajax({
 			url: '/Album/SyncPhotos',
 			type: 'POST',
-			data: { albumName: currentAlbum },
+			data: { albumName: this.currentAlbum },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				$btn.prop('disabled', false).find('i').removeClass('fa-spin');
 
 				if (response.success) {
 					alert(response.count + '장의 사진이 동기화되었습니다.');
-					loadPhotos(currentAlbum);
+					this.loadPhotos(this.currentAlbum);
 				} else {
 					alert('동기화 실패: ' + (response.error || '알 수 없는 오류'));
 				}
 			},
-			error: function () {
+			error: () => {
 				$btn.prop('disabled', false).find('i').removeClass('fa-spin');
 				alert('동기화 중 오류가 발생했습니다.');
 			}
 		});
-	});
+	}
 
 	// ============================================
-	// 업로드 기능
+	// 업로드
 	// ============================================
-	$('#btnUpload').on('click', function () {
-		if (!currentAlbum) return;
+
+	triggerUpload() {
+		if (!this.currentAlbum) return;
 		$('#fileInput').click();
-	});
+	}
 
-	$('#fileInput').on('change', function () {
-		const files = this.files;
-
+	uploadFiles(files) {
 		if (!files || files.length === 0) return;
 
 		const formData = new FormData();
-		formData.append('albumName', currentAlbum);
+		formData.append('albumName', this.currentAlbum);
 
 		for (let i = 0; i < files.length; i++) {
 			formData.append('files', files[i]);
@@ -301,9 +359,9 @@ $(document).ready(function () {
 			data: formData,
 			processData: false,
 			contentType: false,
-			xhr: function () {
+			xhr: () => {
 				const xhr = new window.XMLHttpRequest();
-				xhr.upload.addEventListener('progress', function (e) {
+				xhr.upload.addEventListener('progress', (e) => {
 					if (e.lengthComputable) {
 						const pct = Math.round((e.loaded / e.total) * 100);
 						$bar.css('width', pct + '%');
@@ -312,62 +370,63 @@ $(document).ready(function () {
 				});
 				return xhr;
 			},
-			success: function (response) {
+			success: (response) => {
 				$progress.hide();
 				$('#fileInput').val('');
 
 				if (response.success && response.photos) {
-					loadPhotos(currentAlbum);
+					this.loadPhotos(this.currentAlbum);
 				} else {
 					alert(response.error || '업로드에 실패했습니다.');
 				}
 			},
-			error: function () {
+			error: () => {
 				$progress.hide();
 				$('#fileInput').val('');
 				alert('업로드 중 오류가 발생했습니다.');
 			}
 		});
-	});
+	}
 
 	// ============================================
-	// 사진 삭제 기능
+	// 사진 삭제
 	// ============================================
-	$('#btnDeleteMode').on('click', function () {
-		if (deleteMode) {
-			exitDeleteMode();
+
+	toggleDeleteMode() {
+		if (this.deleteMode) {
+			this.exitDeleteMode();
 		} else {
-			enterDeleteMode();
+			this.enterDeleteMode();
 		}
-	});
+	}
 
-	function enterDeleteMode() {
-		deleteMode = true;
+	enterDeleteMode() {
+		this.deleteMode = true;
 		$('#btnDeleteMode').addClass('active');
-		$photoGrid.addClass('delete-mode');
+		this.$photoGrid.addClass('delete-mode');
 	}
 
-	function exitDeleteMode() {
-		deleteMode = false;
+	exitDeleteMode() {
+		this.deleteMode = false;
 		$('#btnDeleteMode').removeClass('active');
-		$photoGrid.removeClass('delete-mode');
+		this.$photoGrid.removeClass('delete-mode');
 	}
 
-	function showDeleteConfirm(photo, index) {
-		pendingDeletePhoto = { photo: photo, index: index };
+	showDeleteConfirm(photo, index) {
+		this.pendingDeletePhoto = { photo: photo, index: index };
 		$('#deleteConfirmModal').fadeIn(200);
 	}
 
-	$('#btnDeleteCancel').on('click', function () {
+	closeDeleteConfirm() {
 		$('#deleteConfirmModal').fadeOut(200);
-		pendingDeletePhoto = null;
-	});
+		this.pendingDeletePhoto = null;
+	}
 
-	$('#btnDeleteConfirm').on('click', function () {
-		if (!pendingDeletePhoto) return;
+	confirmDeletePhoto() {
+		if (!this.pendingDeletePhoto) return;
 
-		const photo = pendingDeletePhoto.photo;
-		const index = pendingDeletePhoto.index;
+		const photo = this.pendingDeletePhoto.photo;
+		const index = this.pendingDeletePhoto.index;
 
 		$('#deleteConfirmModal').fadeOut(200);
 
@@ -375,32 +434,32 @@ $(document).ready(function () {
 			url: '/Album/DeletePhoto',
 			type: 'POST',
 			data: {
-				albumName: currentAlbum,
+				albumName: this.currentAlbum,
 				fileName: photo.fileName,
 				photoId: photo.photoId
 			},
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					currentPhotos.splice(index, 1);
-					$photoCount.text(currentPhotos.length + '장');
+					this.currentPhotos.splice(index, 1);
+					this.$photoCount.text(this.currentPhotos.length + '장');
 
-					$photoGrid.empty();
-					loadedCount = 0;
+					this.$photoGrid.empty();
+					this.loadedCount = 0;
 
-					const batchEnd = Math.min(currentPhotos.length, loadedCount + PAGE_SIZE * 3);
+					const batchEnd = Math.min(this.currentPhotos.length, this.PAGE_SIZE * 3);
 
 					for (let i = 0; i < batchEnd; i++) {
-						appendPhotoCard(currentAlbum, currentPhotos[i], i);
+						this.appendPhotoCard(this.currentAlbum, this.currentPhotos[i], i);
 					}
 
-					loadedCount = batchEnd;
+					this.loadedCount = batchEnd;
 
-					if (currentPhotos.length === 0) {
-						$photoGrid.hide();
-						$emptyState.find('h3').text('사진이 없습니다');
-						$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
-						$emptyState.show();
+					if (this.currentPhotos.length === 0) {
+						this.$photoGrid.hide();
+						this.$emptyState.find('h3').text('사진이 없습니다');
+						this.$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
+						this.$emptyState.show();
 					}
 				} else {
 					alert(response.error || '삭제에 실패했습니다.');
@@ -408,72 +467,65 @@ $(document).ready(function () {
 			}
 		});
 
-		pendingDeletePhoto = null;
-	});
+		this.pendingDeletePhoto = null;
+	}
 
 	// ============================================
 	// 앨범 추가/삭제 (시스템 마스터)
 	// ============================================
-	$('#btnAddAlbum').on('click', function (e) {
+
+	showCreateAlbumModal(e) {
 		e.stopPropagation();
 		$('#newAlbumName').val('');
+		$('#newAlbumDisplayName').val('');
 		$('#createAlbumModal').fadeIn(200);
-		setTimeout(function () { $('#newAlbumName').focus(); }, 250);
-	});
+		setTimeout(() => { $('#newAlbumName').focus(); }, 250);
+	}
 
-	$('#btnCreateAlbumCancel').on('click', function () {
-		$('#createAlbumModal').fadeOut(200);
-	});
-
-	$('#newAlbumName').on('keydown', function (e) {
-		if (e.keyCode === 13) {
-			$('#btnCreateAlbumConfirm').click();
-		}
-	});
-
-	$('#btnCreateAlbumConfirm').on('click', function () {
+	createAlbum() {
 		const albumName = $('#newAlbumName').val().trim();
+		const displayName = $('#newAlbumDisplayName').val().trim();
 
 		if (!albumName) {
-			alert('앨범 이름을 입력해주세요.');
+			alert('앨범 폴더명을 입력해주세요.');
+			return;
+		}
+
+		if (!displayName) {
+			alert('앨범 표시명을 입력해주세요.');
 			return;
 		}
 
 		$.ajax({
 			url: '/Album/CreateAlbum',
 			type: 'POST',
-			data: { albumName: albumName },
+			data: { albumName: albumName, displayName: displayName },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				$('#createAlbumModal').fadeOut(200);
 
 				if (response.success) {
-					loadAlbumList();
+					this.loadAlbumList();
 				} else {
 					alert(response.error || '앨범 생성에 실패했습니다.');
 				}
 			},
-			error: function () {
+			error: () => {
 				alert('앨범 생성 중 오류가 발생했습니다.');
 			}
 		});
-	});
+	}
 
-	function showDeleteAlbumConfirm(albumName) {
-		pendingDeleteAlbum = albumName;
-		$('#deleteAlbumName').text(albumName);
+	showDeleteAlbumConfirm(albumName, displayName) {
+		this.pendingDeleteAlbum = albumName;
+		$('#deleteAlbumName').text(displayName || albumName);
 		$('#deleteAlbumModal').fadeIn(200);
 	}
 
-	$('#btnDeleteAlbumCancel').on('click', function () {
-		$('#deleteAlbumModal').fadeOut(200);
-		pendingDeleteAlbum = null;
-	});
+	confirmDeleteAlbum() {
+		if (!this.pendingDeleteAlbum) return;
 
-	$('#btnDeleteAlbumConfirm').on('click', function () {
-		if (!pendingDeleteAlbum) return;
-
-		const albumName = pendingDeleteAlbum;
+		const albumName = this.pendingDeleteAlbum;
 		$('#deleteAlbumModal').fadeOut(200);
 
 		$.ajax({
@@ -481,132 +533,95 @@ $(document).ready(function () {
 			type: 'POST',
 			data: { albumName: albumName },
 			dataType: 'json',
-			success: function (response) {
+			success: (response) => {
 				if (response.success) {
-					if (currentAlbum === albumName) {
-						currentAlbum = '';
-						currentPhotos = [];
-						$photoGrid.hide().empty();
-						$emptyState.find('h3').text('앨범을 선택해주세요');
-						$emptyState.find('p').html('좌측 메뉴에서 앨범을 선택하면<br>사진들이 여기에 표시됩니다');
-						$emptyState.show();
-						$currentAlbumTitle.text('앨범을 선택해주세요');
-						$topBarActions.hide();
-						$photoCount.text('');
+					if (this.currentAlbum === albumName) {
+						this.currentAlbum = '';
+						this.currentPhotos = [];
+						this.$photoGrid.hide().empty();
+						this.$emptyState.find('h3').text('앨범을 선택해주세요');
+						this.$emptyState.find('p').html('좌측 메뉴에서 앨범을 선택하면<br>사진들이 여기에 표시됩니다');
+						this.$emptyState.show();
+						this.$currentAlbumTitle.text('앨범을 선택해주세요');
+						this.$topBarActions.hide();
+						this.$photoCount.text('');
 					}
-					loadAlbumList();
+					this.loadAlbumList();
 				} else {
 					alert(response.error || '앨범 삭제에 실패했습니다.');
 				}
 			},
-			error: function () {
+			error: () => {
 				alert('앨범 삭제 중 오류가 발생했습니다.');
 			}
 		});
 
-		pendingDeleteAlbum = null;
-	});
+		this.pendingDeleteAlbum = null;
+	}
 
 	// ============================================
 	// 사진 뷰어
 	// ============================================
-	function openViewer(index) {
-		currentPhotoIndex = index;
-		updateViewer();
-		$photoViewer.fadeIn(200);
+
+	openViewer(index) {
+		this.currentPhotoIndex = index;
+		this.updateViewer();
+		this.$photoViewer.fadeIn(200);
 		$('body').css('overflow', 'hidden');
 	}
 
-	function closeViewer() {
-		$photoViewer.fadeOut(200);
+	closeViewer() {
+		this.$photoViewer.fadeOut(200);
 		$('body').css('overflow', '');
 	}
 
-	function updateViewer() {
-		const photo = currentPhotos[currentPhotoIndex];
-		const imageUrl = '/Album/GetPhoto?albumName=' + encodeURIComponent(currentAlbum) + '&fileName=' + encodeURIComponent(photo.fileName);
+	updateViewer() {
+		const photo = this.currentPhotos[this.currentPhotoIndex];
+		const imageUrl = '/Album/GetPhoto?albumName=' + encodeURIComponent(this.currentAlbum) + '&fileName=' + encodeURIComponent(photo.fileName);
 
-		$viewerImage.attr('src', imageUrl);
-		$viewerTitle.text(photo.fileName);
-		$viewerCounter.text((currentPhotoIndex + 1) + ' / ' + currentPhotos.length);
+		this.$viewerImage.attr('src', imageUrl);
+		this.$viewerTitle.text(photo.fileName);
+		this.$viewerCounter.text((this.currentPhotoIndex + 1) + ' / ' + this.currentPhotos.length);
 	}
 
-	function navigateViewer(direction) {
-		currentPhotoIndex += direction;
+	navigateViewer(direction) {
+		this.currentPhotoIndex += direction;
 
-		if (currentPhotoIndex < 0) {
-			currentPhotoIndex = currentPhotos.length - 1;
-		} else if (currentPhotoIndex >= currentPhotos.length) {
-			currentPhotoIndex = 0;
+		if (this.currentPhotoIndex < 0) {
+			this.currentPhotoIndex = this.currentPhotos.length - 1;
+		} else if (this.currentPhotoIndex >= this.currentPhotos.length) {
+			this.currentPhotoIndex = 0;
 		}
 
-		updateViewer();
+		this.updateViewer();
 	}
 
-	$('#viewerClose').on('click', closeViewer);
-	$('#viewerPrev').on('click', function () { navigateViewer(-1); });
-	$('#viewerNext').on('click', function () { navigateViewer(1); });
+	// ============================================
+	// 키보드
+	// ============================================
 
-	$photoViewer.on('click', function (e) {
-		if ($(e.target).is('.viewer-body') || $(e.target).is('.viewer-image-container')) {
-			closeViewer();
-		}
-	});
-
-	$(document).on('keydown', function (e) {
-		if ($photoViewer.is(':visible')) {
+	handleKeydown(e) {
+		if (this.$photoViewer.is(':visible')) {
 			switch (e.keyCode) {
-				case 27: closeViewer(); break;
-				case 37: navigateViewer(-1); break;
-				case 39: navigateViewer(1); break;
+				case 27: this.closeViewer(); break;
+				case 37: this.navigateViewer(-1); break;
+				case 39: this.navigateViewer(1); break;
 			}
-		} else if (e.keyCode === 27 && deleteMode) {
-			exitDeleteMode();
+		} else if (e.keyCode === 27 && this.deleteMode) {
+			this.exitDeleteMode();
 		}
-	});
-
-	// 터치 스와이프
-	let touchStartX = 0;
-
-	$photoViewer.on('touchstart', function (e) {
-		touchStartX = e.originalEvent.changedTouches[0].screenX;
-	});
-
-	$photoViewer.on('touchend', function (e) {
-		const diff = touchStartX - e.originalEvent.changedTouches[0].screenX;
-
-		if (Math.abs(diff) > 50) {
-			navigateViewer(diff > 0 ? 1 : -1);
-		}
-	});
-
-	// ============================================
-	// 로그아웃
-	// ============================================
-	$('#btnLogout').on('click', function (e) {
-		e.preventDefault();
-		$('#logoutConfirmModal').fadeIn(200);
-	});
-
-	$('#btnLogoutCancel').on('click', function () {
-		$('#logoutConfirmModal').fadeOut(200);
-	});
-
-	$('#btnLogoutConfirm').on('click', function () {
-		window.location.href = '/Album/Logout';
-	});
-
-	$('#logoutConfirmModal').on('click', function (e) {
-		if (e.target === this) {
-			$('#logoutConfirmModal').fadeOut(200);
-		}
-	});
+	}
 
 	// ============================================
 	// 유틸리티
 	// ============================================
-	function escapeHtml(text) {
+
+	escapeHtml(text) {
 		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-		return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+		return text.replace(/[&<>"']/g, (m) => map[m]);
 	}
+}
+
+$(document).ready(() => {
+	window.albumPage = new AlbumPage();
 });

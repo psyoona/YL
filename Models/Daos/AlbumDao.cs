@@ -93,6 +93,101 @@ namespace YL.Models.Daos
 		}
 
 		// ============================================
+		// 앨범 관련
+		// ============================================
+
+		public List<AlbumInfo> GetAlbums()
+		{
+			SqlDataReader sqlDataReader = SqlHelper.ExecuteReader(
+				this.ConnectionString,
+				CommandType.StoredProcedure,
+				"SP_ALBUM_GET_ALBUMS");
+
+			List<AlbumInfo> albums = Binder.BindToList<AlbumInfo>(sqlDataReader);
+
+			SqlHelper.CloseSqlDataReader(sqlDataReader);
+
+			return albums;
+		}
+
+		public bool CreateAlbum(string albumName, string displayName)
+		{
+			SqlParameter[] parameters = new SqlParameter[]
+			{
+				new SqlParameter("@ALBUM_NAME", SqlDbType.NVarChar) { Value = albumName },
+				new SqlParameter("@DISPLAY_NAME", SqlDbType.NVarChar) { Value = displayName }
+			};
+
+			SqlDataReader sqlDataReader = SqlHelper.ExecuteReader(
+				this.ConnectionString,
+				CommandType.StoredProcedure,
+				"SP_ALBUM_CREATE_ALBUM",
+				parameters);
+
+			bool success = false;
+
+			if (sqlDataReader.Read())
+			{
+				success = sqlDataReader.GetBoolean(sqlDataReader.GetOrdinal("SUCCESS"));
+			}
+
+			SqlHelper.CloseSqlDataReader(sqlDataReader);
+
+			return success;
+		}
+
+		public bool DeleteAlbumFromDb(string albumName)
+		{
+			SqlParameter[] parameters = new SqlParameter[]
+			{
+				new SqlParameter("@ALBUM_NAME", SqlDbType.NVarChar) { Value = albumName }
+			};
+
+			SqlDataReader sqlDataReader = SqlHelper.ExecuteReader(
+				this.ConnectionString,
+				CommandType.StoredProcedure,
+				"SP_ALBUM_DELETE_ALBUM",
+				parameters);
+
+			bool success = false;
+
+			if (sqlDataReader.Read())
+			{
+				success = sqlDataReader.GetBoolean(sqlDataReader.GetOrdinal("SUCCESS"));
+			}
+
+			SqlHelper.CloseSqlDataReader(sqlDataReader);
+
+			return success;
+		}
+
+		public bool UpdateAlbum(string albumName, string displayName)
+		{
+			SqlParameter[] parameters = new SqlParameter[]
+			{
+				new SqlParameter("@ALBUM_NAME", SqlDbType.NVarChar) { Value = albumName },
+				new SqlParameter("@DISPLAY_NAME", SqlDbType.NVarChar) { Value = displayName }
+			};
+
+			SqlDataReader sqlDataReader = SqlHelper.ExecuteReader(
+				this.ConnectionString,
+				CommandType.StoredProcedure,
+				"SP_ALBUM_UPDATE_ALBUM",
+				parameters);
+
+			bool success = false;
+
+			if (sqlDataReader.Read())
+			{
+				success = sqlDataReader.GetBoolean(sqlDataReader.GetOrdinal("SUCCESS"));
+			}
+
+			SqlHelper.CloseSqlDataReader(sqlDataReader);
+
+			return success;
+		}
+
+		// ============================================
 		// 역할 관련
 		// ============================================
 
