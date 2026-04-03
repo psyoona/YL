@@ -309,29 +309,41 @@
 
 	#successGetData(response, successCallback) {
 		if (response) {
-			if (response && (response.messageCode || response.message)) {
-				let message = response.message ? response.message : messageUtility.getMessage(response.messageCode);
+			if (response && (response.code || response.messageCode || response.message)) {
+				let message = '';
 
-				let options = {
-					message: message,
-					type: messageUtility.TYPES.INFORMATION
-				};
+				if (response.code && window.localeHelper) {
+					message = localeHelper.getMessage(String(response.code));
+				} else if (response.message) {
+					message = response.message;
+				} else {
+					message = messageUtility.getMessage(response.messageCode);
+				}
 
-				if (response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.EXPIRED_SESSION) ||
-					response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.PUBLISHED_NEW_VERSION) ||
-					response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.DUPLICATE_LOGIN)) {
-					options.confirmCallback = () => {
-						location.href = 'Logout';
+				if (window.localeHelper) {
+					localeHelper.showAlertMessage(message);
+				} else {
+					let options = {
+						message: message,
+						type: messageUtility.TYPES.INFORMATION
 					};
+
+					if (response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.EXPIRED_SESSION) ||
+						response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.PUBLISHED_NEW_VERSION) ||
+						response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.DUPLICATE_LOGIN)) {
+						options.confirmCallback = () => {
+							location.href = 'Logout';
+						};
+					}
+
+					if (response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.NOT_MATCH_HASH_VALUE)) {
+						location.href = `Error/${messageUtility.SERVER_MESSAGE.NOT_MATCH_HASH_VALUE}`;
+
+						return;
+					}
+
+					screenUtility.showDialog(options);
 				}
-
-				if (response.message == messageUtility.getMessage(messageUtility.SERVER_MESSAGE.NOT_MATCH_HASH_VALUE)) {
-					location.href = `Error/${messageUtility.SERVER_MESSAGE.NOT_MATCH_HASH_VALUE}`;
-
-					return;
-				}
-
-				screenUtility.showDialog(options);
 
 				return;
 			}

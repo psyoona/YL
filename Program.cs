@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.HttpLogging;
 using YL.Configs;
 using YL.Handlers;
-using YL.Helpers;
+using YL.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-LocaleHelper.Initialize(app.Environment.WebRootPath);
+ErrorCodeValidator.Validate(app.Environment.WebRootPath);
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
