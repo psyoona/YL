@@ -33,7 +33,9 @@ namespace YL.Services
 			var user = new AlbumDao().Login(phoneNumber, passwordHash);
 
 			if (!user.IsValid)
+			{
 				return (false, "", null);
+			}
 
 			var roles = new AlbumDao().GetUserRoles(phoneNumber);
 			var roleNames = roles.Select(r => r.ROLE_NAME).ToList();
@@ -54,10 +56,10 @@ namespace YL.Services
 
 		public void ValidateAlbumAccess(string albumName, AlbumSession session)
 		{
-			var roleNames = ParseRoleNames(session);
-			var roleIds = ParseRoleIds(session);
+			var roleNames = this.ParseRoleNames(session);
+			var roleIds = this.ParseRoleIds(session);
 
-			if (!HasAlbumAccess(albumName, roleNames, roleIds))
+			if (!this.HasAlbumAccess(albumName, roleNames, roleIds))
 			{
 				throw new CustomException(AlbumErrors.AlbumAccessDenied);
 			}
@@ -65,10 +67,10 @@ namespace YL.Services
 
 		public List<AlbumInfo> GetAccessibleAlbums(AlbumSession session)
 		{
-			var roleNames = ParseRoleNames(session);
-			var roleIds = ParseRoleIds(session);
+			var roleNames = this.ParseRoleNames(session);
+			var roleIds = this.ParseRoleIds(session);
 
-			return GetAccessibleAlbums(roleNames, roleIds);
+			return this.GetAccessibleAlbums(roleNames, roleIds);
 		}
 
 		private bool IsSystemMaster(List<string> roleNames)
