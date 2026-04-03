@@ -13,7 +13,15 @@
       "Bash(python3 -c \":*)",
       "Bash(python3 -c \"import secrets; print\\(secrets.token_hex\\(16\\)\\)\")",
       "Bash(python3 -c \"import secrets; print\\(secrets.token_hex\\(32\\)\\)\")",
-      "Bash(python3 -c \"import secrets, string; print\\(''''.join\\(secrets.choice\\(string.ascii_letters + string.digits\\) for _ in range\\(32\\)\\)\\)\")"
+      "Bash(python3 -c \"import secrets, string; print\\(''''.join\\(secrets.choice\\(string.ascii_letters + string.digits\\) for _ in range\\(32\\)\\)\\)\")",
+      "Bash(grep -r \"Date.*=\\\\|Date\\\\|''''Date''''\\\\|2034\" D:/Github/YL --include=*.cs --include=*.config --include=*.json --exclude-dir=bin --exclude-dir=obj --exclude-dir=.vs)",
+      "Bash(grep -r \"app\\\\.Use\\\\|middleware\\\\|Response\\\\.Headers\\\\[\" D:/Github/YL --include=*.cs --exclude-dir=bin --exclude-dir=obj -i)",
+      "Bash(grep -r \"Response\\\\|Header\\\\|Date\" D:/Github/YL/Controllers --include=*.cs -i)",
+      "Bash(grep -r \"Add.*Middleware\\\\|Use.*Middleware\\\\|custom.*header\\\\|\"\"Date\"\"\" \"D:/Github/YL\" --include=\"*.cs\" ! -path \"*/bin/*\" ! -path \"*/obj/*\" -i)",
+      "Bash(grep -r response. D:/Github/YL --include=*.cs ! -path */bin/* ! -path */obj/*)",
+      "Bash(grep -r \"Jan\\\\|Feb\\\\|Mar\\\\|Apr\\\\|May\\\\|Jun\\\\|Jul\\\\|Aug\\\\|Sep\\\\|Oct\\\\|Nov\\\\|Dec\\\\|2034\\\\|setHeader\\\\|Response\\\\.Headers.*Add\\\\|response\\\\.Headers\" \"D:/Github/YL\" --include=\"*.cs\" --include=\"*.config\" --include=\"*.json\" ! -path \"*/bin/*\" ! -path \"*/obj/*\" ! -path \"*/.vs/*\")",
+      "Bash(xargs grep:*)",
+      "Bash(grep -i \"date.*header\\\\|header.*date\\\\|2034\\\\|response.*header\\\\|\\\\.headers\\\\[\" \"D:/Github/YL/Models/Daos/\"*.cs)"
     ]
   }
 }
