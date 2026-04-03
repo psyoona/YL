@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using YL.Helpers;
+using YL.Models.Dtos.Commons;
 
 namespace YL.Filters
 {
@@ -11,7 +12,7 @@ namespace YL.Filters
 
 			if (session == null)
 			{
-				throw new UnauthorizedAccessException("로그인이 필요합니다.");
+				throw new CustomException(AlbumErrors.LoginRequired);
 			}
 
 			base.OnActionExecuting(context);

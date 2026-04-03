@@ -4,6 +4,7 @@ using SkiaSharp;
 using YL.Configs;
 using YL.Functions;
 using YL.Models.Daos;
+using YL.Models.Dtos.Commons;
 using YL.Models.Dtos.Webs;
 
 namespace YL.Services
@@ -58,7 +59,7 @@ namespace YL.Services
 
 			if (!HasAlbumAccess(albumName, roleNames, roleIds))
 			{
-				throw new UnauthorizedAccessException("접근 권한이 없습니다.");
+				throw new CustomException(AlbumErrors.AlbumAccessDenied);
 			}
 		}
 
@@ -126,17 +127,17 @@ namespace YL.Services
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
 			{
-				throw new InvalidOperationException("앨범 폴더명을 입력해주세요.");
+				throw new CustomException(AlbumErrors.AlbumNameRequired);
 			}
 
 			if (albumName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
 			{
-				throw new InvalidOperationException("앨범 폴더명에 사용할 수 없는 문자가 포함되어 있습니다.");
+				throw new CustomException(AlbumErrors.AlbumNameInvalidChars);
 			}
 
 			if (albumName.StartsWith("."))
 			{
-				throw new InvalidOperationException("앨범 폴더명은 '.'으로 시작할 수 없습니다.");
+				throw new CustomException(AlbumErrors.AlbumNameStartsWithDot);
 			}
 
 			if (string.IsNullOrWhiteSpace(displayName))
@@ -144,7 +145,7 @@ namespace YL.Services
 
 			if (!new AlbumDao().CreateAlbum(albumName, displayName))
 			{
-				throw new InvalidOperationException("앨범 생성에 실패했습니다. 이미 존재하는 이름입니다.");
+				throw new CustomException(AlbumErrors.AlbumCreateFailed);
 			}
 
 			string albumPath = Path.Combine(_albumBasePath, albumName);
@@ -155,12 +156,12 @@ namespace YL.Services
 		{
 			if (string.IsNullOrWhiteSpace(albumName) || string.IsNullOrWhiteSpace(displayName))
 			{
-				throw new InvalidOperationException("앨범명과 표시명을 입력해주세요.");
+				throw new CustomException(AlbumErrors.AlbumNameOrDisplayRequired);
 			}
 
 			if (!new AlbumDao().UpdateAlbum(albumName, displayName))
 			{
-				throw new InvalidOperationException("앨범 수정에 실패했습니다.");
+				throw new CustomException(AlbumErrors.AlbumUpdateFailed);
 			}
 		}
 
@@ -168,12 +169,12 @@ namespace YL.Services
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
 			{
-				throw new InvalidOperationException("앨범명을 입력해주세요.");
+				throw new CustomException(AlbumErrors.AlbumDeleteNameRequired);
 			}
 
 			if (!new AlbumDao().DeleteAlbumFromDb(albumName))
 			{
-				throw new InvalidOperationException("앨범 삭제에 실패했습니다.");
+				throw new CustomException(AlbumErrors.AlbumDeleteFailed);
 			}
 
 			string albumPath = Path.Combine(_albumBasePath, albumName);
@@ -224,7 +225,7 @@ namespace YL.Services
 
 			if (!ImageExtensions.Contains(extension))
 			{
-				throw new InvalidOperationException("지원하지 않는 이미지 형식입니다.");
+				throw new CustomException(AlbumErrors.UnsupportedImageFormat);
 			}
 
 			string fileName = file.FileName;
@@ -468,7 +469,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().AddRole(roleName))
 			{
-				throw new InvalidOperationException("이미 존재하는 역할입니다.");
+				throw new CustomException(AlbumErrors.RoleAlreadyExists);
 			}
 		}
 
@@ -476,7 +477,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().DeleteRole(roleId))
 			{
-				throw new InvalidOperationException("시스템 마스터 역할은 삭제할 수 없습니다.");
+				throw new CustomException(AlbumErrors.SystemRoleCannotDelete);
 			}
 		}
 
@@ -494,7 +495,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().AssignUserRole(phoneNumber, roleId))
 			{
-				throw new InvalidOperationException("이미 할당된 역할입니다.");
+				throw new CustomException(AlbumErrors.RoleAlreadyAssigned);
 			}
 		}
 
@@ -502,7 +503,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().RemoveUserRole(userRoleId))
 			{
-				throw new InvalidOperationException("역할 제거에 실패했습니다.");
+				throw new CustomException(AlbumErrors.RoleRemoveFailed);
 			}
 		}
 
@@ -515,7 +516,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().AddAlbumAccess(albumName, roleId))
 			{
-				throw new InvalidOperationException("이미 설정된 접근 권한입니다.");
+				throw new CustomException(AlbumErrors.AccessAlreadyExists);
 			}
 		}
 
@@ -523,7 +524,7 @@ namespace YL.Services
 		{
 			if (!new AlbumDao().RemoveAlbumAccess(accessId))
 			{
-				throw new InvalidOperationException("접근 권한 제거에 실패했습니다.");
+				throw new CustomException(AlbumErrors.AccessRemoveFailed);
 			}
 		}
 
