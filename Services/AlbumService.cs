@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using SkiaSharp;
 using YL.Configs;
+using YL.Functions;
 using YL.Models.Daos;
 using YL.Models.Dtos.Webs;
 
@@ -25,36 +26,51 @@ namespace YL.Services
 			_thumbnailCachePath = Path.Combine(ConfigManager.Settings.ServiceBasePath, "albums", ".thumbnails");
 		}
 
-		public string GetAlbumBasePath()
-		{
-			return _albumBasePath;
-		}
-
-		// ============================================
-		// 인증
-		// ============================================
-
-		public AlbumUser Login(string phoneNumber, string password)
+		public (bool IsValid, string UserName, AlbumSession? Session) Authenticate(string phoneNumber, string password)
 		{
 			string passwordHash = ComputeSha256Hash(password);
-			return new AlbumDao().Login(phoneNumber, passwordHash);
+			var user = new AlbumDao().Login(phoneNumber, passwordHash);
+
+			if (!user.IsValid)
+				return (false, "", null);
+
+			var roles = new AlbumDao().GetUserRoles(phoneNumber);
+			var roleNames = roles.Select(r => r.ROLE_NAME).ToList();
+			var roleIds = roles.Select(r => r.ROLE_ID).ToList();
+
+			var session = new AlbumSession
+			{
+				PhoneNumber = phoneNumber,
+				UserName = user.UserName,
+				Roles = string.Join(",", roleNames),
+				RoleIds = string.Join(",", roleIds),
+				IsSystemMaster = roleNames.Contains(SystemMasterRole),
+				ServerVersion = VersionHelper.GetApplicationVersion()
+			};
+
+			return (true, user.UserName, session);
 		}
 
-		// ============================================
-		// 역할/권한
-		// ============================================
-
-		public List<AlbumRole> GetUserRoles(string phoneNumber)
+		public bool HasAlbumAccess(string albumName, AlbumSession session)
 		{
-			return new AlbumDao().GetUserRoles(phoneNumber);
+			var roleNames = ParseRoleNames(session);
+			var roleIds = ParseRoleIds(session);
+			return HasAlbumAccess(albumName, roleNames, roleIds);
 		}
 
-		public bool IsSystemMaster(List<string> roleNames)
+		public List<AlbumInfo> GetAccessibleAlbums(AlbumSession session)
+		{
+			var roleNames = ParseRoleNames(session);
+			var roleIds = ParseRoleIds(session);
+			return GetAccessibleAlbums(roleNames, roleIds);
+		}
+
+		private bool IsSystemMaster(List<string> roleNames)
 		{
 			return roleNames.Contains(SystemMasterRole);
 		}
 
-		public bool HasAlbumAccess(string albumName, List<string> roleNames, List<int> roleIds)
+		private bool HasAlbumAccess(string albumName, List<string> roleNames, List<int> roleIds)
 		{
 			if (this.IsSystemMaster(roleNames))
 			{
@@ -64,17 +80,13 @@ namespace YL.Services
 			var accessList = new AlbumDao().GetAllAlbumAccess();
 			var albumAccess = accessList.Where(a => a.ALBUM_NAME == albumName).ToList();
 
-			// 접근 규칙이 없는 앨범은 모든 로그인 사용자에게 허용
 			if (albumAccess.Count == 0)
-			{
 				return true;
-			}
 
-			// 사용자의 역할 중 하나라도 접근 허용 역할에 포함되면 접근 허용
 			return albumAccess.Any(a => roleIds.Contains(a.ROLE_ID));
 		}
 
-		public List<AlbumInfo> GetAccessibleAlbums(List<string> roleNames, List<int> roleIds)
+		private List<AlbumInfo> GetAccessibleAlbums(List<string> roleNames, List<int> roleIds)
 		{
 			var allAlbums = this.GetAlbumList();
 
@@ -96,25 +108,16 @@ namespace YL.Services
 			}).ToList();
 		}
 
-		// ============================================
-		// 앨범 목록
-		// ============================================
-
 		public List<AlbumInfo> GetAlbumList()
 		{
 			return new AlbumDao().GetAlbums();
 		}
-
-		// ============================================
-		// 앨범 관리
-		// ============================================
 
 		public bool CreateAlbum(string albumName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
 				return false;
 
-			// 폴더명에 사용할 수 없는 문자 체크
 			if (albumName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
 				return false;
 
@@ -124,13 +127,11 @@ namespace YL.Services
 			if (string.IsNullOrWhiteSpace(displayName))
 				displayName = albumName;
 
-			// DB에 등록
 			bool dbResult = new AlbumDao().CreateAlbum(albumName, displayName);
 
 			if (!dbResult)
 				return false;
 
-			// 폴더 생성
 			string albumPath = Path.Combine(_albumBasePath, albumName);
 			Directory.CreateDirectory(albumPath);
 
@@ -150,13 +151,11 @@ namespace YL.Services
 			if (string.IsNullOrWhiteSpace(albumName))
 				return false;
 
-			// DB에서 소프트 삭제
 			bool dbResult = new AlbumDao().DeleteAlbumFromDb(albumName);
 
 			if (!dbResult)
 				return false;
 
-			// 폴더를 .trash로 이동
 			string albumPath = Path.Combine(_albumBasePath, albumName);
 
 			if (Directory.Exists(albumPath))
@@ -168,7 +167,6 @@ namespace YL.Services
 				Directory.Move(albumPath, trashPath);
 			}
 
-			// 썸네일 캐시 삭제
 			string thumbDir = Path.Combine(_thumbnailCachePath, albumName);
 
 			if (Directory.Exists(thumbDir))
@@ -177,16 +175,25 @@ namespace YL.Services
 			return true;
 		}
 
-		// ============================================
-		// 사진 관련
-		// ============================================
-
 		public List<AlbumPhoto> GetPhotoList(string albumName)
 		{
 			return new AlbumDao().GetPhotos(albumName);
 		}
 
-		public AlbumPhoto UploadPhoto(string albumName, IFormFile file)
+		public List<AlbumPhoto> UploadPhotos(string albumName, List<IFormFile> files)
+		{
+			var uploaded = new List<AlbumPhoto>();
+
+			foreach (var file in files)
+			{
+				if (file.Length > 0)
+					uploaded.Add(UploadPhoto(albumName, file));
+			}
+
+			return uploaded;
+		}
+
+		private AlbumPhoto UploadPhoto(string albumName, IFormFile file)
 		{
 			string albumPath = Path.Combine(_albumBasePath, albumName);
 			Directory.CreateDirectory(albumPath);
@@ -302,7 +309,6 @@ namespace YL.Services
 			{
 				Directory.CreateDirectory(thumbDir);
 
-				// EXIF 회전 정보를 적용하여 디코딩
 				using var codec = SKCodec.Create(originalPath);
 				if (codec == null)
 					return null;
@@ -311,7 +317,6 @@ namespace YL.Services
 				if (bitmap == null)
 					return null;
 
-				// EXIF Orientation에 따라 회전 적용
 				var origin = codec.EncodedOrigin;
 				if (origin != SKEncodedOrigin.TopLeft && origin != SKEncodedOrigin.Default)
 				{
@@ -423,10 +428,6 @@ namespace YL.Services
 			}
 		}
 
-		// ============================================
-		// 관리자 기능
-		// ============================================
-
 		public List<AlbumRole> GetAllRoles()
 		{
 			return new AlbumDao().GetAllRoles();
@@ -477,9 +478,18 @@ namespace YL.Services
 			return new AlbumDao().RemoveAlbumAccess(accessId);
 		}
 
-		// ============================================
-		// 유틸리티
-		// ============================================
+		private List<string> ParseRoleNames(AlbumSession session)
+		{
+			return session.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+		}
+
+		private List<int> ParseRoleIds(AlbumSession session)
+		{
+			return session.RoleIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+				.Select(s => int.TryParse(s, out int id) ? id : 0)
+				.Where(id => id > 0)
+				.ToList();
+		}
 
 		private bool ValidatePath(string filePath)
 		{
