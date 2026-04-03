@@ -358,12 +358,12 @@ class AlbumPage {
 		const displayName = $('#newAlbumDisplayName').val().trim();
 
 		if (!albumName) {
-			alert('앨범 폴더명을 입력해주세요.');
+			localeHelper.showAlert('C_ALBUM_NAME_REQUIRED');
 			return;
 		}
 
 		if (!displayName) {
-			alert('앨범 표시명을 입력해주세요.');
+			localeHelper.showAlert('C_ALBUM_DISPLAY_REQUIRED');
 			return;
 		}
 

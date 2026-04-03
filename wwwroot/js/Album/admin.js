@@ -48,9 +48,10 @@ class AlbumAdmin {
 			if (role.roleName !== '시스템 마스터') {
 				const $deleteBtn = $('<button>').addClass('btn-item-delete').html('<i class="fas fa-trash"></i>');
 				$deleteBtn.on('click', () => {
-					if (confirm('\'' + role.roleName + '\' 역할을 삭제하시겠습니까?\n관련된 사용자 역할과 앨범 접근 권한도 함께 삭제됩니다.')) {
-						this.deleteRole(role.roleId);
-					}
+					localeHelper.showConfirmMessage(
+						'\'' + role.roleName + '\'' + localeHelper.getMessage('C_CONFIRM_DELETE_ROLE'),
+						() => this.deleteRole(role.roleId)
+					);
 				});
 				$actions.append($deleteBtn);
 			} else {
@@ -80,7 +81,7 @@ class AlbumAdmin {
 		const roleName = $('#newRoleName').val().trim();
 
 		if (!roleName) {
-			alert('역할명을 입력해주세요.');
+			localeHelper.showAlert('C_ROLE_NAME_REQUIRED');
 			return;
 		}
 
@@ -147,9 +148,10 @@ class AlbumAdmin {
 						'<button class="tag-remove" title="역할 제거"><i class="fas fa-times"></i></button>'
 					);
 					$tag.find('.tag-remove').on('click', () => {
-						if (confirm(user.userName + '에게서 \'' + ur.roleName + '\' 역할을 제거하시겠습니까?')) {
-							this.removeUserRole(ur.userRoleId);
-						}
+						localeHelper.showConfirmMessage(
+							user.userName + ' - \'' + ur.roleName + '\' ' + localeHelper.getMessage('C_CONFIRM_REMOVE_USER_ROLE'),
+							() => this.removeUserRole(ur.userRoleId)
+						);
 					});
 					$roleList.append($tag);
 				});
@@ -181,11 +183,11 @@ class AlbumAdmin {
 		const roleId = $('#assignRoleSelect').val();
 
 		if (!phoneNumber) {
-			alert('사용자를 선택해주세요.');
+			localeHelper.showAlert('C_SELECT_USER');
 			return;
 		}
 		if (!roleId) {
-			alert('역할을 선택해주세요.');
+			localeHelper.showAlert('C_SELECT_ROLE');
 			return;
 		}
 
@@ -252,9 +254,10 @@ class AlbumAdmin {
 					'<button class="tag-remove" title="접근 권한 제거"><i class="fas fa-times"></i></button>'
 				);
 				$tag.find('.tag-remove').on('click', () => {
-					if (confirm(albumName + ' 앨범에서 \'' + item.roleName + '\' 역할의 접근 권한을 제거하시겠습니까?')) {
-						this.removeAlbumAccess(item.accessId);
-					}
+					localeHelper.showConfirmMessage(
+						albumName + ' - \'' + item.roleName + '\' ' + localeHelper.getMessage('C_CONFIRM_REMOVE_ALBUM_ACCESS'),
+						() => this.removeAlbumAccess(item.accessId)
+					);
 				});
 				$tags.append($tag);
 			});
@@ -290,11 +293,11 @@ class AlbumAdmin {
 		const roleId = $('#accessRoleSelect').val();
 
 		if (!albumName) {
-			alert('앨범을 선택해주세요.');
+			localeHelper.showAlert('C_SELECT_ALBUM');
 			return;
 		}
 		if (!roleId) {
-			alert('역할을 선택해주세요.');
+			localeHelper.showAlert('C_SELECT_ROLE');
 			return;
 		}
 

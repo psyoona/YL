@@ -15,9 +15,21 @@
 	<script defer src="~/js/Common/stringUtility.js?v=@ViewBag.Cacheversion"></script>
 	<script defer src="~/js/Common/webServer.js?v=@ViewBag.Cacheversion"></script>
 
+	<script defer src="~/js/Album/localeHelper.js?v=@ViewBag.Cacheversion"></script>
+
 	<title>@ViewBag.PageTitle</title>
 </head>
 <body>
 	@RenderBody()
+
+	<div class="album-modal" id="albumDialog" style="display: none;">
+		<div class="album-modal-box">
+			<p id="albumDialogMessage"></p>
+			<div class="album-modal-actions">
+				<button class="btn-modal-cancel" id="albumDialogCancel"></button>
+				<button class="btn-modal-confirm" id="albumDialogConfirm"></button>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

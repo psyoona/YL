@@ -1,6 +1,7 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using YL.Helpers;
 using YL.Models.Dtos.Commons;
 
 namespace YL.Handlers
@@ -36,7 +37,10 @@ namespace YL.Handlers
 				}
 				else if (exception is CustomException customException)
 				{
-					result = JsonSerializer.Serialize(new { success = false, code = customException.Code, message = customException.CustomMessage }, options);
+					string locale = LocaleHelper.GetLocaleFromRequest(context.Request);
+					string message = LocaleHelper.GetMessage(customException.Code, locale);
+
+					result = JsonSerializer.Serialize(new { success = false, code = customException.Code, message }, options);
 				}
 				else
 				{

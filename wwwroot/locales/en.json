@@ -1,0 +1,40 @@
+{
+  "1001": "Login required.",
+  "1002": "Access denied.",
+  "1003": "You do not have access to this album.",
+
+  "2001": "Please enter album folder name.",
+  "2002": "Album folder name contains invalid characters.",
+  "2003": "Album folder name cannot start with '.'.",
+  "2004": "Failed to create album. The name already exists.",
+  "2005": "Please enter both album name and display name.",
+  "2006": "Failed to update album.",
+  "2007": "Please enter album name.",
+  "2008": "Failed to delete album.",
+
+  "3001": "Unsupported image format.",
+
+  "4001": "Role already exists.",
+  "4002": "System master role cannot be deleted.",
+  "4003": "Role already assigned.",
+  "4004": "Failed to remove role.",
+  "4005": "Access permission already exists.",
+  "4006": "Failed to remove access permission.",
+
+  "C_PHONE_REQUIRED": "Please enter phone number.",
+  "C_PHONE_INVALID": "Please enter a valid phone number.",
+  "C_PASSWORD_REQUIRED": "Please enter password.",
+  "C_LOGIN_FAILED": "Phone number or password is incorrect.",
+  "C_LOGIN_SUCCESS": ", welcome!",
+  "C_ALBUM_NAME_REQUIRED": "Please enter album folder name.",
+  "C_ALBUM_DISPLAY_REQUIRED": "Please enter album display name.",
+  "C_ROLE_NAME_REQUIRED": "Please enter role name.",
+  "C_SELECT_USER": "Please select a user.",
+  "C_SELECT_ROLE": "Please select a role.",
+  "C_SELECT_ALBUM": "Please select an album.",
+  "C_CONFIRM_DELETE_ROLE": "' role? Related user roles and album access will also be deleted.",
+  "C_CONFIRM_REMOVE_USER_ROLE": "?",
+  "C_CONFIRM_REMOVE_ALBUM_ACCESS": "?",
+  "C_CONFIRM": "OK",
+  "C_CANCEL": "Cancel"
+}
