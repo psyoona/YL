@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace YL.Services
+namespace YL.Helpers
 {
 	public class SecurityHelper
 	{
