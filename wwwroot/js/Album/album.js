@@ -268,12 +268,7 @@ class AlbumPage {
 			formData,
 			(response) => {
 				$('#fileInput').val('');
-
-				if (response.success && response.photos) {
-					this.loadPhotos(this.currentAlbum);
-				} else {
-					alert(response.error || '업로드에 실패했습니다.');
-				}
+				this.loadPhotos(this.currentAlbum);
 			}
 		);
 	}
@@ -324,29 +319,25 @@ class AlbumPage {
 				photoId: photo.photoId
 			},
 			(response) => {
-				if (response.success) {
-					this.currentPhotos.splice(index, 1);
-					this.$photoCount.text(this.currentPhotos.length + '장');
+				this.currentPhotos.splice(index, 1);
+				this.$photoCount.text(this.currentPhotos.length + '장');
 
-					this.$photoGrid.empty();
-					this.loadedCount = 0;
+				this.$photoGrid.empty();
+				this.loadedCount = 0;
 
-					const batchEnd = Math.min(this.currentPhotos.length, this.PAGE_SIZE * 3);
+				const batchEnd = Math.min(this.currentPhotos.length, this.PAGE_SIZE * 3);
 
-					for (let i = 0; i < batchEnd; i++) {
-						this.appendPhotoCard(this.currentAlbum, this.currentPhotos[i], i);
-					}
+				for (let i = 0; i < batchEnd; i++) {
+					this.appendPhotoCard(this.currentAlbum, this.currentPhotos[i], i);
+				}
 
-					this.loadedCount = batchEnd;
+				this.loadedCount = batchEnd;
 
-					if (this.currentPhotos.length === 0) {
-						this.$photoGrid.hide();
-						this.$emptyState.find('h3').text('사진이 없습니다');
-						this.$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
-						this.$emptyState.show();
-					}
-				} else {
-					alert(response.error || '삭제에 실패했습니다.');
+				if (this.currentPhotos.length === 0) {
+					this.$photoGrid.hide();
+					this.$emptyState.find('h3').text('사진이 없습니다');
+					this.$emptyState.find('p').html('업로드 버튼을 눌러<br>사진을 추가해보세요');
+					this.$emptyState.show();
 				}
 			}
 		);
@@ -381,12 +372,7 @@ class AlbumPage {
 			{ albumName: albumName, displayName: displayName },
 			(response) => {
 				$('#createAlbumModal').fadeOut(200);
-
-				if (response.success) {
-					this.loadAlbumList();
-				} else {
-					alert(response.error || '앨범 생성에 실패했습니다.');
-				}
+				this.loadAlbumList();
 			}
 		);
 	}
@@ -407,22 +393,18 @@ class AlbumPage {
 			'/Album/DeleteAlbum',
 			{ albumName: albumName },
 			(response) => {
-				if (response.success) {
-					if (this.currentAlbum === albumName) {
-						this.currentAlbum = '';
-						this.currentPhotos = [];
-						this.$photoGrid.hide().empty();
-						this.$emptyState.find('h3').text('앨범을 선택해주세요');
-						this.$emptyState.find('p').html('좌측 메뉴에서 앨범을 선택하면<br>사진들이 여기에 표시됩니다');
-						this.$emptyState.show();
-						this.$currentAlbumTitle.text('앨범을 선택해주세요');
-						this.$topBarActions.hide();
-						this.$photoCount.text('');
-					}
-					this.loadAlbumList();
-				} else {
-					alert(response.error || '앨범 삭제에 실패했습니다.');
+				if (this.currentAlbum === albumName) {
+					this.currentAlbum = '';
+					this.currentPhotos = [];
+					this.$photoGrid.hide().empty();
+					this.$emptyState.find('h3').text('앨범을 선택해주세요');
+					this.$emptyState.find('p').html('좌측 메뉴에서 앨범을 선택하면<br>사진들이 여기에 표시됩니다');
+					this.$emptyState.show();
+					this.$currentAlbumTitle.text('앨범을 선택해주세요');
+					this.$topBarActions.hide();
+					this.$photoCount.text('');
 				}
+				this.loadAlbumList();
 			}
 		);
 

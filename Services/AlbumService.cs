@@ -51,17 +51,22 @@ namespace YL.Services
 			return (true, user.UserName, session);
 		}
 
-		public bool HasAlbumAccess(string albumName, AlbumSession session)
+		public void ValidateAlbumAccess(string albumName, AlbumSession session)
 		{
 			var roleNames = ParseRoleNames(session);
 			var roleIds = ParseRoleIds(session);
-			return HasAlbumAccess(albumName, roleNames, roleIds);
+
+			if (!HasAlbumAccess(albumName, roleNames, roleIds))
+			{
+				throw new UnauthorizedAccessException("접근 권한이 없습니다.");
+			}
 		}
 
 		public List<AlbumInfo> GetAccessibleAlbums(AlbumSession session)
 		{
 			var roleNames = ParseRoleNames(session);
 			var roleIds = ParseRoleIds(session);
+
 			return GetAccessibleAlbums(roleNames, roleIds);
 		}
 
@@ -81,7 +86,9 @@ namespace YL.Services
 			var albumAccess = accessList.Where(a => a.ALBUM_NAME == albumName).ToList();
 
 			if (albumAccess.Count == 0)
+			{
 				return true;
+			}
 
 			return albumAccess.Any(a => roleIds.Contains(a.ROLE_ID));
 		}
@@ -102,7 +109,9 @@ namespace YL.Services
 				var albumAccess = accessList.Where(a => a.ALBUM_NAME == album.ALBUM_NAME).ToList();
 
 				if (albumAccess.Count == 0)
+				{
 					return true;
+				}
 
 				return albumAccess.Any(a => roleIds.Contains(a.ROLE_ID));
 			}).ToList();
@@ -113,48 +122,59 @@ namespace YL.Services
 			return new AlbumDao().GetAlbums();
 		}
 
-		public bool CreateAlbum(string albumName, string displayName)
+		public void CreateAlbum(string albumName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
-				return false;
+			{
+				throw new InvalidOperationException("앨범 폴더명을 입력해주세요.");
+			}
 
 			if (albumName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-				return false;
+			{
+				throw new InvalidOperationException("앨범 폴더명에 사용할 수 없는 문자가 포함되어 있습니다.");
+			}
 
 			if (albumName.StartsWith("."))
-				return false;
+			{
+				throw new InvalidOperationException("앨범 폴더명은 '.'으로 시작할 수 없습니다.");
+			}
 
 			if (string.IsNullOrWhiteSpace(displayName))
 				displayName = albumName;
 
-			bool dbResult = new AlbumDao().CreateAlbum(albumName, displayName);
-
-			if (!dbResult)
-				return false;
+			if (!new AlbumDao().CreateAlbum(albumName, displayName))
+			{
+				throw new InvalidOperationException("앨범 생성에 실패했습니다. 이미 존재하는 이름입니다.");
+			}
 
 			string albumPath = Path.Combine(_albumBasePath, albumName);
 			Directory.CreateDirectory(albumPath);
-
-			return true;
 		}
 
-		public bool UpdateAlbum(string albumName, string displayName)
+		public void UpdateAlbum(string albumName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(albumName) || string.IsNullOrWhiteSpace(displayName))
-				return false;
+			{
+				throw new InvalidOperationException("앨범명과 표시명을 입력해주세요.");
+			}
 
-			return new AlbumDao().UpdateAlbum(albumName, displayName);
+			if (!new AlbumDao().UpdateAlbum(albumName, displayName))
+			{
+				throw new InvalidOperationException("앨범 수정에 실패했습니다.");
+			}
 		}
 
-		public bool DeleteAlbum(string albumName)
+		public void DeleteAlbum(string albumName)
 		{
 			if (string.IsNullOrWhiteSpace(albumName))
-				return false;
+			{
+				throw new InvalidOperationException("앨범명을 입력해주세요.");
+			}
 
-			bool dbResult = new AlbumDao().DeleteAlbumFromDb(albumName);
-
-			if (!dbResult)
-				return false;
+			if (!new AlbumDao().DeleteAlbumFromDb(albumName))
+			{
+				throw new InvalidOperationException("앨범 삭제에 실패했습니다.");
+			}
 
 			string albumPath = Path.Combine(_albumBasePath, albumName);
 
@@ -170,9 +190,9 @@ namespace YL.Services
 			string thumbDir = Path.Combine(_thumbnailCachePath, albumName);
 
 			if (Directory.Exists(thumbDir))
+			{
 				Directory.Delete(thumbDir, true);
-
-			return true;
+			}
 		}
 
 		public List<AlbumPhoto> GetPhotoList(string albumName)
@@ -187,7 +207,9 @@ namespace YL.Services
 			foreach (var file in files)
 			{
 				if (file.Length > 0)
+				{
 					uploaded.Add(UploadPhoto(albumName, file));
+				}
 			}
 
 			return uploaded;
@@ -201,7 +223,9 @@ namespace YL.Services
 			string extension = Path.GetExtension(file.FileName).ToLower();
 
 			if (!ImageExtensions.Contains(extension))
+			{
 				throw new InvalidOperationException("지원하지 않는 이미지 형식입니다.");
+			}
 
 			string fileName = file.FileName;
 			string targetPath = Path.Combine(albumPath, fileName);
@@ -240,7 +264,9 @@ namespace YL.Services
 			string thumbPath = Path.Combine(_thumbnailCachePath, albumName, fileName);
 
 			if (File.Exists(thumbPath))
+			{
 				File.Delete(thumbPath);
+			}
 
 			return new AlbumPhoto
 			{
@@ -252,10 +278,9 @@ namespace YL.Services
 			};
 		}
 
-		public bool DeletePhoto(string albumName, string fileName, int photoId)
+		public void DeletePhoto(string albumName, string fileName, int photoId)
 		{
-			var dao = new AlbumDao();
-			dao.DeletePhoto(photoId);
+			new AlbumDao().DeletePhoto(photoId);
 
 			string sourcePath = Path.Combine(_albumBasePath, albumName, fileName);
 
@@ -272,8 +297,6 @@ namespace YL.Services
 
 			if (File.Exists(thumbPath))
 				File.Delete(thumbPath);
-
-			return true;
 		}
 
 		public (byte[] data, string contentType)? GetPhoto(string albumName, string fileName)
@@ -281,7 +304,9 @@ namespace YL.Services
 			string filePath = Path.Combine(_albumBasePath, albumName, fileName);
 
 			if (!ValidatePath(filePath))
+			{
 				return null;
+			}
 
 			byte[] data = File.ReadAllBytes(filePath);
 			string contentType = GetContentType(fileName);
@@ -294,7 +319,9 @@ namespace YL.Services
 			string originalPath = Path.Combine(_albumBasePath, albumName, fileName);
 
 			if (!ValidatePath(originalPath))
+			{
 				return null;
+			}
 
 			string thumbDir = Path.Combine(_thumbnailCachePath, albumName);
 			string thumbPath = Path.Combine(thumbDir, fileName);
@@ -311,11 +338,15 @@ namespace YL.Services
 
 				using var codec = SKCodec.Create(originalPath);
 				if (codec == null)
+				{
 					return null;
+				}
 
 				var bitmap = SKBitmap.Decode(codec);
 				if (bitmap == null)
+				{
 					return null;
+				}
 
 				var origin = codec.EncodedOrigin;
 				if (origin != SKEncodedOrigin.TopLeft && origin != SKEncodedOrigin.Default)
@@ -433,14 +464,20 @@ namespace YL.Services
 			return new AlbumDao().GetAllRoles();
 		}
 
-		public bool AddRole(string roleName)
+		public void AddRole(string roleName)
 		{
-			return new AlbumDao().AddRole(roleName);
+			if (!new AlbumDao().AddRole(roleName))
+			{
+				throw new InvalidOperationException("이미 존재하는 역할입니다.");
+			}
 		}
 
-		public bool DeleteRole(int roleId)
+		public void DeleteRole(int roleId)
 		{
-			return new AlbumDao().DeleteRole(roleId);
+			if (!new AlbumDao().DeleteRole(roleId))
+			{
+				throw new InvalidOperationException("시스템 마스터 역할은 삭제할 수 없습니다.");
+			}
 		}
 
 		public List<AlbumUserInfo> GetAllUsers()
@@ -453,14 +490,20 @@ namespace YL.Services
 			return new AlbumDao().GetAllUserRoles();
 		}
 
-		public bool AssignUserRole(string phoneNumber, int roleId)
+		public void AssignUserRole(string phoneNumber, int roleId)
 		{
-			return new AlbumDao().AssignUserRole(phoneNumber, roleId);
+			if (!new AlbumDao().AssignUserRole(phoneNumber, roleId))
+			{
+				throw new InvalidOperationException("이미 할당된 역할입니다.");
+			}
 		}
 
-		public bool RemoveUserRole(int userRoleId)
+		public void RemoveUserRole(int userRoleId)
 		{
-			return new AlbumDao().RemoveUserRole(userRoleId);
+			if (!new AlbumDao().RemoveUserRole(userRoleId))
+			{
+				throw new InvalidOperationException("역할 제거에 실패했습니다.");
+			}
 		}
 
 		public List<AlbumAccessMapping> GetAllAlbumAccess()
@@ -468,14 +511,20 @@ namespace YL.Services
 			return new AlbumDao().GetAllAlbumAccess();
 		}
 
-		public bool AddAlbumAccess(string albumName, int roleId)
+		public void AddAlbumAccess(string albumName, int roleId)
 		{
-			return new AlbumDao().AddAlbumAccess(albumName, roleId);
+			if (!new AlbumDao().AddAlbumAccess(albumName, roleId))
+			{
+				throw new InvalidOperationException("이미 설정된 접근 권한입니다.");
+			}
 		}
 
-		public bool RemoveAlbumAccess(int accessId)
+		public void RemoveAlbumAccess(int accessId)
 		{
-			return new AlbumDao().RemoveAlbumAccess(accessId);
+			if (!new AlbumDao().RemoveAlbumAccess(accessId))
+			{
+				throw new InvalidOperationException("접근 권한 제거에 실패했습니다.");
+			}
 		}
 
 		private List<string> ParseRoleNames(AlbumSession session)
@@ -494,7 +543,9 @@ namespace YL.Services
 		private bool ValidatePath(string filePath)
 		{
 			if (!File.Exists(filePath))
+			{
 				return false;
+			}
 
 			string fullPath = Path.GetFullPath(filePath);
 			string basePath = Path.GetFullPath(_albumBasePath);
@@ -505,6 +556,7 @@ namespace YL.Services
 		private static string GetContentType(string fileName)
 		{
 			string extension = Path.GetExtension(fileName).ToLower();
+
 			return extension switch
 			{
 				".jpg" or ".jpeg" => "image/jpeg",
@@ -522,6 +574,7 @@ namespace YL.Services
 			byte[] hashBytes = SHA256.HashData(bytes);
 
 			StringBuilder sb = new StringBuilder();
+
 			foreach (byte b in hashBytes)
 			{
 				sb.Append($"{b:x2}");

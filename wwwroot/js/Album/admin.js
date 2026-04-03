@@ -23,10 +23,8 @@ class AlbumAdmin {
 			'/Album/GetRoles',
 			null,
 			(response) => {
-				if (response.success) {
-					this.renderRoles(response.roles);
-					this.updateRoleSelects(response.roles);
-				}
+				this.renderRoles(response.roles);
+				this.updateRoleSelects(response.roles);
 			}
 		);
 	}
@@ -90,12 +88,8 @@ class AlbumAdmin {
 			'/Album/AddRole',
 			{ roleName: roleName },
 			(response) => {
-				if (response.success) {
-					$('#newRoleName').val('');
-					this.loadRoles();
-				} else {
-					alert(response.error || '역할 추가에 실패했습니다.');
-				}
+				$('#newRoleName').val('');
+				this.loadRoles();
 			}
 		);
 	}
@@ -105,13 +99,9 @@ class AlbumAdmin {
 			'/Album/DeleteRole',
 			{ roleId: roleId },
 			(response) => {
-				if (response.success) {
-					this.loadRoles();
-					this.loadUsers();
-					this.loadAlbumAccess();
-				} else {
-					alert(response.error || '역할 삭제에 실패했습니다.');
-				}
+				this.loadRoles();
+				this.loadUsers();
+				this.loadAlbumAccess();
 			}
 		);
 	}
@@ -121,10 +111,8 @@ class AlbumAdmin {
 			'/Album/GetUsers',
 			null,
 			(response) => {
-				if (response.success) {
-					this.renderUserRoles(response.users, response.userRoles);
-					this.updateUserSelect(response.users);
-				}
+				this.renderUserRoles(response.users, response.userRoles);
+				this.updateUserSelect(response.users);
 			}
 		);
 	}
@@ -205,11 +193,7 @@ class AlbumAdmin {
 			'/Album/AssignUserRole',
 			{ phoneNumber: phoneNumber, roleId: roleId },
 			(response) => {
-				if (response.success) {
-					this.loadUsers();
-				} else {
-					alert(response.error || '역할 부여에 실패했습니다.');
-				}
+				this.loadUsers();
 			}
 		);
 	}
@@ -219,11 +203,7 @@ class AlbumAdmin {
 			'/Album/RemoveUserRole',
 			{ userRoleId: userRoleId },
 			(response) => {
-				if (response.success) {
-					this.loadUsers();
-				} else {
-					alert(response.error || '역할 제거에 실패했습니다.');
-				}
+				this.loadUsers();
 			}
 		);
 	}
@@ -233,10 +213,8 @@ class AlbumAdmin {
 			'/Album/GetAlbumAccess',
 			null,
 			(response) => {
-				if (response.success) {
-					this.renderAlbumAccess(response.accessList);
-					this.updateAlbumSelect(response.albums);
-				}
+				this.renderAlbumAccess(response.accessList);
+				this.updateAlbumSelect(response.albums);
 			}
 		);
 	}
@@ -324,11 +302,7 @@ class AlbumAdmin {
 			'/Album/AddAlbumAccess',
 			{ albumName: albumName, roleId: roleId },
 			(response) => {
-				if (response.success) {
-					this.loadAlbumAccess();
-				} else {
-					alert(response.error || '접근 권한 추가에 실패했습니다.');
-				}
+				this.loadAlbumAccess();
 			}
 		);
 	}
@@ -338,11 +312,7 @@ class AlbumAdmin {
 			'/Album/RemoveAlbumAccess',
 			{ accessId: accessId },
 			(response) => {
-				if (response.success) {
-					this.loadAlbumAccess();
-				} else {
-					alert(response.error || '접근 권한 제거에 실패했습니다.');
-				}
+				this.loadAlbumAccess();
 			}
 		);
 	}
