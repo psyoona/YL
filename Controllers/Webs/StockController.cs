@@ -7,10 +7,6 @@ namespace YL.Controllers.Webs
 {
 	public class StockController : BaseController
 	{
-		// ============================================
-		// 페이지
-		// ============================================
-
 		[HttpGet]
 		public ActionResult Login()
 		{
