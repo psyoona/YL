@@ -10,5 +10,10 @@ namespace YL.Models.Daos
 		{
 			return ConfigManager.Settings.ConnectionString;
 		}
+
+		protected string GetStockConnectionString()
+		{
+			return ConfigManager.Settings.StockConnectionString;
+		}
 	}
 }
