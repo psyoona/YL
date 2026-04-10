@@ -1071,6 +1071,268 @@ body {
 	to { transform: rotate(360deg); }
 }
 
+/* ============================================
+   자동매매 제어
+   ============================================ */
+
+.trader-control {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.trader-status-card {
+	background: var(--bg-card);
+	border-radius: var(--radius);
+	border: 1px solid var(--border-color);
+	padding: 24px;
+	transition: var(--transition);
+}
+
+.trader-status-card.running {
+	border-color: rgba(16, 185, 129, 0.3);
+}
+
+.trader-status-card.stopped {
+	border-color: rgba(239, 68, 68, 0.2);
+}
+
+.trader-status-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 24px;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.trader-status-indicator {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.status-dot {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	display: inline-block;
+	flex-shrink: 0;
+}
+
+.dot-running {
+	background: var(--primary);
+	box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+	animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.dot-stopped {
+	background: var(--danger);
+	opacity: 0.7;
+}
+
+@keyframes pulse-dot {
+	0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+	50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.7); }
+}
+
+.status-text {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.trader-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.btn-trader {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 22px;
+	border: none;
+	border-radius: var(--radius-sm);
+	font-size: 14px;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+	transition: var(--transition);
+}
+
+.btn-trader:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
+}
+
+.btn-trader-start {
+	background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+	color: white;
+}
+
+.btn-trader-start:not(:disabled):hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-trader-stop {
+	background: linear-gradient(135deg, var(--danger), #DC2626);
+	color: white;
+}
+
+.btn-trader-stop:not(:disabled):hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.trader-info-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 16px;
+}
+
+.trader-info-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 14px 16px;
+	background: var(--bg-secondary);
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border-color);
+}
+
+.info-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.info-value {
+	font-size: 15px;
+	font-weight: 500;
+	color: var(--text-primary);
+	word-break: break-all;
+}
+
+.info-path {
+	font-size: 12px;
+	color: var(--text-secondary);
+	font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* 콘솔 */
+.trader-console {
+	background: var(--bg-card);
+	border-radius: var(--radius);
+	border: 1px solid var(--border-color);
+	overflow: hidden;
+}
+
+.console-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 20px;
+	background: var(--bg-secondary);
+	border-bottom: 1px solid var(--border-color);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-secondary);
+}
+
+.btn-console-refresh {
+	background: var(--bg-hover);
+	border: 1px solid var(--border-color);
+	color: var(--text-secondary);
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: var(--transition);
+	font-size: 13px;
+}
+
+.btn-console-refresh:hover {
+	color: var(--text-primary);
+	border-color: var(--text-muted);
+}
+
+.console-body {
+	padding: 16px 20px;
+	max-height: 400px;
+	overflow-y: auto;
+	font-family: 'Consolas', 'Courier New', monospace;
+	font-size: 13px;
+	line-height: 1.7;
+	background: #0C1222;
+}
+
+.console-empty {
+	text-align: center;
+	color: var(--text-muted);
+	padding: 40px 0;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+.log-line {
+	color: var(--text-secondary);
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.log-error {
+	color: #FCA5A5;
+}
+
+.log-success {
+	color: var(--primary-light);
+}
+
+.log-warn {
+	color: #FBBF24;
+}
+
+/* 사이드바 구분선 */
+.nav-divider {
+	height: 1px;
+	background: var(--border-color);
+	margin: 8px 20px;
+	list-style: none;
+}
+
+@media (max-width: 768px) {
+	.trader-status-header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.trader-actions {
+		justify-content: stretch;
+	}
+
+	.btn-trader {
+		flex: 1;
+		justify-content: center;
+	}
+
+	.trader-info-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.console-body {
+		max-height: 300px;
+		font-size: 12px;
+	}
+}
+
 /* 버전 정보 */
 .version-info {
 	position: fixed;

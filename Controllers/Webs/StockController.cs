@@ -135,5 +135,45 @@ namespace YL.Controllers.Webs
 
 			return this.Json(new { logs });
 		}
+
+		// ============================================
+		// 자동매매 프로그램 제어 API
+		// ============================================
+
+		[HttpPost]
+		[StockLoginRequired]
+		public JsonResult GetTraderStatus()
+		{
+			var status = StockAutoTraderManager.GetStatus();
+
+			return this.Json(status);
+		}
+
+		[HttpPost]
+		[StockLoginRequired]
+		public JsonResult StartTrader()
+		{
+			var (success, message) = StockAutoTraderManager.Start();
+
+			return this.Json(new { success, message });
+		}
+
+		[HttpPost]
+		[StockLoginRequired]
+		public JsonResult StopTrader()
+		{
+			var (success, message) = StockAutoTraderManager.Stop();
+
+			return this.Json(new { success, message });
+		}
+
+		[HttpPost]
+		[StockLoginRequired]
+		public JsonResult GetTraderLogs()
+		{
+			var logs = StockAutoTraderManager.GetLogs();
+
+			return this.Json(new { logs });
+		}
 	}
 }

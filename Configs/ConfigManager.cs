@@ -14,6 +14,7 @@
 			var serviceBasePath = configuration.GetValue<string>("ServiceBasePath") ?? string.Empty;
 			var albumEncryptionKey = configuration.GetValue<string>("AlbumEncryptionKey") ?? string.Empty;
 			var stockEncryptionKey = configuration.GetValue<string>("StockEncryptionKey") ?? string.Empty;
+			var stockAutoTraderExePath = configuration.GetValue<string>("StockAutoTraderExePath") ?? string.Empty;
 
 			Settings = new AppSettings
 			{
@@ -22,7 +23,8 @@
 				IPWhitelist = ipList,
 				ServiceBasePath = serviceBasePath,
 				AlbumEncryptionKey = albumEncryptionKey,
-				StockEncryptionKey = stockEncryptionKey
+				StockEncryptionKey = stockEncryptionKey,
+				StockAutoTraderExePath = stockAutoTraderExePath
 			};
 		}
 	}

@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.HttpLogging;
 using YL.Configs;
 using YL.Handlers;
+using YL.Services;
 using YL.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigManager.Initialize(builder.Configuration);
+StockAutoTraderManager.ExePath = ConfigManager.Settings.StockAutoTraderExePath;
 
 builder.Services.AddHttpLogging(o =>
 {

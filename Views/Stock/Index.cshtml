@@ -54,6 +54,13 @@
 						<span>거래 로그</span>
 					</a>
 				</li>
+				<li class="nav-divider"></li>
+				<li>
+					<a href="#" class="nav-item" data-page="trader">
+						<i class="fas fa-robot"></i>
+						<span>자동매매 제어</span>
+					</a>
+				</li>
 			</ul>
 		</nav>
 
@@ -189,6 +196,62 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- 자동매매 제어 -->
+		<div class="page-content" id="page-trader" style="display:none;">
+			<div class="trader-control">
+				<!-- 상태 카드 -->
+				<div class="trader-status-card" id="traderStatusCard">
+					<div class="trader-status-header">
+						<div class="trader-status-indicator" id="traderIndicator">
+							<span class="status-dot" id="statusDot"></span>
+							<span class="status-text" id="statusText">확인 중...</span>
+						</div>
+						<div class="trader-actions">
+							<button class="btn-trader btn-trader-start" id="btnStartTrader" disabled>
+								<i class="fas fa-play"></i>
+								<span>실행</span>
+							</button>
+							<button class="btn-trader btn-trader-stop" id="btnStopTrader" disabled>
+								<i class="fas fa-stop"></i>
+								<span>중지</span>
+							</button>
+						</div>
+					</div>
+					<div class="trader-info-grid">
+						<div class="trader-info-item">
+							<span class="info-label">PID</span>
+							<span class="info-value" id="traderPid">-</span>
+						</div>
+						<div class="trader-info-item">
+							<span class="info-label">시작 시간</span>
+							<span class="info-value" id="traderStartedAt">-</span>
+						</div>
+						<div class="trader-info-item">
+							<span class="info-label">실행 시간</span>
+							<span class="info-value" id="traderUptime">-</span>
+						</div>
+						<div class="trader-info-item">
+							<span class="info-label">실행 경로</span>
+							<span class="info-value info-path" id="traderExePath">-</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- 콘솔 로그 -->
+				<div class="trader-console">
+					<div class="console-header">
+						<span><i class="fas fa-terminal me-2"></i>콘솔 출력</span>
+						<button class="btn-console-refresh" id="btnRefreshLogs" title="새로고침">
+							<i class="fas fa-sync-alt"></i>
+						</button>
+					</div>
+					<div class="console-body" id="traderConsole">
+						<div class="console-empty">로그가 없습니다</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</main>
 </div>
 
@@ -248,6 +311,31 @@
 		<div class="modal-actions">
 			<button class="btn-modal-cancel" id="logoutCancel">취소</button>
 			<button class="btn-modal-confirm" id="logoutConfirm">로그아웃</button>
+		</div>
+	</div>
+</div>
+
+<!-- 자동매매 실행 확인 모달 -->
+<div class="stock-modal" id="traderStartModal" style="display:none;">
+	<div class="stock-modal-box">
+		<i class="fas fa-play-circle" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+		<p>자동매매 프로그램을 실행하시겠습니까?</p>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="traderStartCancel">취소</button>
+			<button class="btn-modal-confirm" id="traderStartConfirm">실행</button>
+		</div>
+	</div>
+</div>
+
+<!-- 자동매매 중지 확인 모달 -->
+<div class="stock-modal" id="traderStopModal" style="display:none;">
+	<div class="stock-modal-box">
+		<i class="fas fa-exclamation-triangle warning-icon"></i>
+		<p>자동매매 프로그램을 중지하시겠습니까?</p>
+		<p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">진행 중인 매매가 있을 경우 중단됩니다.</p>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="traderStopCancel">취소</button>
+			<button class="btn-modal-delete" id="traderStopConfirm">중지</button>
 		</div>
 	</div>
 </div>

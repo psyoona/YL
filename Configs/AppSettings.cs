@@ -13,5 +13,7 @@
 		public string AlbumEncryptionKey { get; set; } = string.Empty;
 
 		public string StockEncryptionKey { get; set; } = string.Empty;
+
+		public string StockAutoTraderExePath { get; set; } = string.Empty;
 	}
 }

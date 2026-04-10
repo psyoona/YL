@@ -2,6 +2,7 @@ class StockManager {
 	constructor() {
 		this.currentPage = 'stocks';
 		this.deleteCallback = null;
+		this.traderPollingTimer = null;
 
 		this.bindEvents();
 		this.loadStocks();
@@ -45,6 +46,23 @@ class StockManager {
 			}
 			this.closeDeleteModal();
 		});
+
+		// 자동매매 제어
+		$('#btnStartTrader').on('click', () => $('#traderStartModal').fadeIn(200));
+		$('#traderStartCancel').on('click', () => $('#traderStartModal').fadeOut(200));
+		$('#traderStartConfirm').on('click', () => {
+			$('#traderStartModal').fadeOut(200);
+			this.startTrader();
+		});
+
+		$('#btnStopTrader').on('click', () => $('#traderStopModal').fadeIn(200));
+		$('#traderStopCancel').on('click', () => $('#traderStopModal').fadeOut(200));
+		$('#traderStopConfirm').on('click', () => {
+			$('#traderStopModal').fadeOut(200);
+			this.stopTrader();
+		});
+
+		$('#btnRefreshLogs').on('click', () => this.loadTraderStatus());
 	}
 
 	// ============================================
@@ -79,15 +97,20 @@ class StockManager {
 			stocks: '종목 관리',
 			holdings: '보유 종목',
 			orders: '주문 내역',
-			logs: '거래 로그'
+			logs: '거래 로그',
+			trader: '자동매매 제어'
 		};
 		$('#pageTitle').text(titles[page]);
+
+		// 자동매매 페이지 떠날 때 폴링 중지
+		this.stopTraderPolling();
 
 		switch (page) {
 			case 'stocks': this.loadStocks(); break;
 			case 'holdings': this.loadHoldings(); break;
 			case 'orders': this.loadOrders(); break;
 			case 'logs': this.loadTradeLogs(); break;
+			case 'trader': this.loadTraderStatus(); this.startTraderPolling(); break;
 		}
 	}
 
@@ -349,6 +372,87 @@ class StockManager {
 
 			$('#logTableBody').html(html);
 		});
+	}
+
+	// ============================================
+	// 자동매매 제어
+	// ============================================
+
+	loadTraderStatus() {
+		webServer.getData('/Stock/GetTraderStatus', null, (response) => {
+			this.updateTraderUI(response);
+		});
+	}
+
+	updateTraderUI(status) {
+		const running = status.isRunning;
+		const $card = $('#traderStatusCard');
+		const $dot = $('#statusDot');
+		const $text = $('#statusText');
+
+		if (running) {
+			$card.removeClass('stopped').addClass('running');
+			$dot.removeClass('dot-stopped').addClass('dot-running');
+			$text.text('실행 중');
+			$('#btnStartTrader').prop('disabled', true);
+			$('#btnStopTrader').prop('disabled', false);
+		} else {
+			$card.removeClass('running').addClass('stopped');
+			$dot.removeClass('dot-running').addClass('dot-stopped');
+			$text.text('중지됨');
+			$('#btnStartTrader').prop('disabled', false);
+			$('#btnStopTrader').prop('disabled', true);
+		}
+
+		$('#traderPid').text(status.pid || '-');
+		$('#traderStartedAt').text(status.startedAt || '-');
+		$('#traderUptime').text(status.uptime || '-');
+		$('#traderExePath').text(status.exePath || '-');
+
+		// 콘솔 로그 업데이트
+		const $console = $('#traderConsole');
+		if (status.logs && status.logs.length > 0) {
+			let logHtml = '';
+			status.logs.forEach(line => {
+				let cls = 'log-line';
+				if (line.includes('[ERROR]')) cls += ' log-error';
+				else if (line.includes('매수') || line.includes('시작')) cls += ' log-success';
+				else if (line.includes('매도') || line.includes('중지') || line.includes('종료')) cls += ' log-warn';
+				logHtml += `<div class="${cls}">${this.escapeHtml(line)}</div>`;
+			});
+			$console.html(logHtml);
+			$console.scrollTop($console[0].scrollHeight);
+		} else {
+			$console.html('<div class="console-empty">로그가 없습니다</div>');
+		}
+	}
+
+	startTrader() {
+		$('#btnStartTrader').prop('disabled', true);
+		webServer.getData('/Stock/StartTrader', null, (response) => {
+			this.loadTraderStatus();
+		});
+	}
+
+	stopTrader() {
+		$('#btnStopTrader').prop('disabled', true);
+		webServer.getData('/Stock/StopTrader', null, (response) => {
+			this.loadTraderStatus();
+		});
+	}
+
+	startTraderPolling() {
+		this.stopTraderPolling();
+		this.traderPollingTimer = setInterval(() => {
+			this.loadTraderStatus();
+		}, 5000);
+	}
+
+	stopTraderPolling() {
+		if (this.traderPollingTimer) {
+			clearInterval(this.traderPollingTimer);
+			this.traderPollingTimer = null;
+		}
 	}
 
 	// ============================================
