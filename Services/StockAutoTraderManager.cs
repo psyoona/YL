@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace YL.Services
 {
@@ -61,7 +62,9 @@ namespace YL.Services
 						UseShellExecute = false,
 						RedirectStandardOutput = true,
 						RedirectStandardError = true,
-						CreateNoWindow = true
+						CreateNoWindow = true,
+						StandardOutputEncoding = Encoding.UTF8,
+						StandardErrorEncoding = Encoding.UTF8
 					};
 
 					_process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
