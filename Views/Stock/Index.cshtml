@@ -64,6 +64,17 @@
 			</ul>
 		</nav>
 
+		<div class="sidebar-system-info">
+			<div class="system-info-title">
+				<i class="fas fa-info-circle"></i>
+				<span>System Info</span>
+			</div>
+			<div class="system-info-item">
+				<span class="system-info-label">Version</span>
+				<span class="system-info-value">v@(ViewBag.CacheVersion)</span>
+			</div>
+		</div>
+
 		<div class="sidebar-footer">
 			<a href="#" id="btnLogout" class="btn-logout">
 				<i class="fas fa-sign-out-alt me-2"></i>로그아웃
@@ -339,7 +350,5 @@
 		</div>
 	</div>
 </div>
-
-<div class="version-info">v@(ViewBag.CacheVersion)</div>
 
 <script defer src="~/js/Stock/stock.js?v=@ViewBag.CacheVersion"></script>
