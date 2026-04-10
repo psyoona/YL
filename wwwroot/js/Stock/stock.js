@@ -412,6 +412,10 @@ class StockManager {
 		// 콘솔 로그 업데이트
 		const $console = $('#traderConsole');
 		if (status.logs && status.logs.length > 0) {
+			// 스크롤이 맨 아래 근처인지 확인 (여유값 30px)
+			const el = $console[0];
+			const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+
 			let logHtml = '';
 			status.logs.forEach(line => {
 				let cls = 'log-line';
@@ -421,7 +425,11 @@ class StockManager {
 				logHtml += `<div class="${cls}">${this.escapeHtml(line)}</div>`;
 			});
 			$console.html(logHtml);
-			$console.scrollTop($console[0].scrollHeight);
+
+			// 실행 중이고 스크롤이 맨 아래였을 때만 자동 스크롤
+			if (running && wasAtBottom) {
+				$console.scrollTop(el.scrollHeight);
+			}
 		} else {
 			$console.html('<div class="console-empty">로그가 없습니다</div>');
 		}
