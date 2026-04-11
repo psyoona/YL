@@ -63,6 +63,16 @@ class StockManager {
 		});
 
 		$('#btnRefreshLogs').on('click', () => this.loadTraderStatus());
+
+		// 백테스트
+		$('#btnRunBacktest').on('click', () => this.runBacktest());
+		$('#btnToggleBtLog').on('click', () => {
+			$('#btLogBody').slideToggle(200);
+			$('#btnToggleBtLog i').toggleClass('fa-chevron-down fa-chevron-up');
+		});
+
+		// 일봉 수집
+		$('#btnCollectDailyPrices').on('click', () => this.collectDailyPrices());
 	}
 
 	// ============================================
@@ -98,7 +108,9 @@ class StockManager {
 			holdings: '보유 종목',
 			orders: '주문 내역',
 			logs: '거래 로그',
-			trader: '자동매매 제어'
+			trader: '자동매매 제어',
+			backtest: '백테스트',
+			collect: '일봉 수집'
 		};
 		$('#pageTitle').text(titles[page]);
 
@@ -111,6 +123,8 @@ class StockManager {
 			case 'orders': this.loadOrders(); break;
 			case 'logs': this.loadTradeLogs(); break;
 			case 'trader': this.loadTraderStatus(); this.startTraderPolling(); break;
+			case 'backtest': this.initBacktest(); break;
+			case 'collect': this.initCollect(); break;
 		}
 	}
 
@@ -461,6 +475,162 @@ class StockManager {
 			clearInterval(this.traderPollingTimer);
 			this.traderPollingTimer = null;
 		}
+	}
+
+	// ============================================
+	// 백테스트
+	// ============================================
+
+	initBacktest() {
+		// 기본 날짜 설정 (최근 6개월)
+		if (!$('#btEndDate').val()) {
+			const today = new Date();
+			const sixMonthsAgo = new Date();
+			sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+			$('#btEndDate').val(today.toISOString().split('T')[0]);
+			$('#btStartDate').val(sixMonthsAgo.toISOString().split('T')[0]);
+		}
+	}
+
+	runBacktest() {
+		const startDate = $('#btStartDate').val();
+		const endDate = $('#btEndDate').val();
+		const capital = parseInt($('#btCapital').val()) || 10000000;
+
+		if (!startDate || !endDate) {
+			alert('시작일과 종료일을 입력해주세요.');
+			return;
+		}
+
+		if (startDate >= endDate) {
+			alert('종료일은 시작일 이후여야 합니다.');
+			return;
+		}
+
+		$('#btnRunBacktest').prop('disabled', true);
+		$('#backtestLoading').show();
+		$('#backtestResults').hide();
+
+		webServer.getData('/Stock/RunBacktest', { startDate, endDate, capital }, (response) => {
+			$('#btnRunBacktest').prop('disabled', false);
+			$('#backtestLoading').hide();
+
+			if (!response.success) {
+				alert(response.message || '백테스트 실행에 실패했습니다.');
+				return;
+			}
+
+			this.displayBacktestResults(response);
+		});
+	}
+
+	displayBacktestResults(data) {
+		$('#backtestResults').show();
+
+		// 요약 지표
+		const returnVal = data.totalReturn;
+		const returnClass = returnVal > 0 ? 'profit-positive' : returnVal < 0 ? 'profit-negative' : '';
+		$('#btTotalReturn').html(`<span class="${returnClass}">${returnVal > 0 ? '+' : ''}${returnVal}%</span>`);
+		$('#btFinalCapital').text(Number(data.finalCapital).toLocaleString() + '원');
+		$('#btWinRate').text(data.winRate + '%');
+		$('#btTotalTrades').text(`${data.totalTrades}회 (${data.winningTrades}승 ${data.losingTrades}패)`);
+		$('#btMDD').html(`<span class="profit-negative">-${data.maxDrawdownPercent}%</span>`);
+		$('#btProfitFactor').text(data.profitFactor);
+		$('#btAvgWin').html(`<span class="profit-positive">+${data.avgWinPercent}%</span>`);
+		$('#btAvgLoss').html(`<span class="profit-negative">${data.avgLossPercent}%</span>`);
+
+		// 거래 내역
+		const trades = data.trades || [];
+		let html = '';
+		trades.forEach(t => {
+			const plClass = t.profitLossPercent > 0 ? 'profit-positive' : t.profitLossPercent < 0 ? 'profit-negative' : '';
+			const plText = t.profitLossPercent !== null ? `${t.profitLossPercent > 0 ? '+' : ''}${t.profitLossPercent}%` : '-';
+			html += `<tr>
+				<td data-label="종목">${this.escapeHtml(t.stockCode)}</td>
+				<td data-label="매수일">${t.buyDate || '-'}</td>
+				<td data-label="매수가">${Number(t.buyPrice).toLocaleString()}</td>
+				<td data-label="수량">${t.quantity}</td>
+				<td data-label="매도일">${t.sellDate || '-'}</td>
+				<td data-label="매도가">${t.sellPrice ? Number(t.sellPrice).toLocaleString() : '-'}</td>
+				<td data-label="수익률"><span class="${plClass}">${plText}</span></td>
+				<td data-label="사유" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this.escapeHtml(t.sellReason || '-')}</td>
+			</tr>`;
+		});
+		$('#btTradeTableBody').html(html);
+
+		// 실행 로그
+		const logs = data.log || [];
+		let logHtml = '';
+		logs.forEach(line => {
+			let cls = 'log-line';
+			if (line.includes('매도') || line.includes('손절')) cls += ' log-warn';
+			else if (line.includes('매수')) cls += ' log-success';
+			else if (line.includes('====') || line.includes('결과')) cls += ' log-success';
+			logHtml += `<div class="${cls}">${this.escapeHtml(line)}</div>`;
+		});
+		$('#btLogBody').html(logHtml);
+	}
+
+	// ============================================
+	// 일봉 수집
+	// ============================================
+
+	initCollect() {
+		// 기본 날짜 설정 (최근 1년)
+		if (!$('#collectEndDate').val()) {
+			const today = new Date();
+			const oneYearAgo = new Date();
+			oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+			$('#collectEndDate').val(today.toISOString().split('T')[0]);
+			$('#collectStartDate').val(oneYearAgo.toISOString().split('T')[0]);
+		}
+	}
+
+	collectDailyPrices() {
+		const startDate = $('#collectStartDate').val();
+		const endDate = $('#collectEndDate').val();
+
+		if (!startDate || !endDate) {
+			alert('시작일과 종료일을 입력해주세요.');
+			return;
+		}
+
+		if (startDate >= endDate) {
+			alert('종료일은 시작일 이후여야 합니다.');
+			return;
+		}
+
+		if (!confirm(`${startDate} ~ ${endDate} 기간의 일봉 데이터를 수집합니다.\n감시 종목 수에 따라 시간이 소요됩니다. 진행하시겠습니까?`)) {
+			return;
+		}
+
+		$('#btnCollectDailyPrices').prop('disabled', true);
+		$('#collectLoading').show();
+		$('#collectResults').hide();
+
+		webServer.getData('/Stock/CollectDailyPrices', { startDate, endDate }, (response) => {
+			$('#btnCollectDailyPrices').prop('disabled', false);
+			$('#collectLoading').hide();
+			$('#collectResults').show();
+
+			$('#collectTotalStocks').text(response.totalStocks ? response.totalStocks + '개' : '-');
+			$('#collectTotalRecords').text(response.totalRecords ? response.totalRecords.toLocaleString() + '건' : '-');
+
+			const msgClass = response.success ? 'collect-message-success' : 'collect-message-error';
+			$('#collectMessage').html(`<div class="${msgClass}">${this.escapeHtml(response.message || '')}</div>`);
+
+			// 오류 목록
+			if (response.errors && response.errors.length > 0) {
+				let errHtml = '<h4><i class="fas fa-exclamation-triangle me-1"></i>오류 목록</h4><ul>';
+				response.errors.forEach(e => {
+					errHtml += `<li>${this.escapeHtml(e)}</li>`;
+				});
+				errHtml += '</ul>';
+				$('#collectErrors').html(errHtml).show();
+			} else {
+				$('#collectErrors').hide();
+			}
+		});
 	}
 
 	// ============================================

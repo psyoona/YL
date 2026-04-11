@@ -61,6 +61,18 @@
 						<span>자동매매 제어</span>
 					</a>
 				</li>
+				<li>
+					<a href="#" class="nav-item" data-page="backtest">
+						<i class="fas fa-flask"></i>
+						<span>백테스트</span>
+					</a>
+				</li>
+				<li>
+					<a href="#" class="nav-item" data-page="collect">
+						<i class="fas fa-database"></i>
+						<span>일봉 수집</span>
+					</a>
+				</li>
 			</ul>
 		</nav>
 
@@ -259,6 +271,171 @@
 					</div>
 					<div class="console-body" id="traderConsole">
 						<div class="console-empty">로그가 없습니다</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 백테스트 -->
+		<div class="page-content" id="page-backtest" style="display:none;">
+			<div class="backtest-container">
+				<!-- 설정 카드 -->
+				<div class="backtest-config-card">
+					<h3 class="backtest-section-title"><i class="fas fa-cog me-2"></i>백테스트 설정</h3>
+					<div class="backtest-form">
+						<div class="backtest-form-row">
+							<div class="backtest-form-group">
+								<label for="btStartDate">시작일</label>
+								<input type="date" id="btStartDate" />
+							</div>
+							<div class="backtest-form-group">
+								<label for="btEndDate">종료일</label>
+								<input type="date" id="btEndDate" />
+							</div>
+							<div class="backtest-form-group">
+								<label for="btCapital">초기 자본금</label>
+								<input type="number" id="btCapital" value="10000000" min="100000" step="1000000" />
+							</div>
+						</div>
+						<div class="backtest-form-actions">
+							<button class="btn-primary-action" id="btnRunBacktest">
+								<i class="fas fa-play me-1"></i>백테스트 실행
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 실행 중 표시 -->
+				<div class="backtest-loading" id="backtestLoading" style="display:none;">
+					<div class="backtest-spinner"></div>
+					<p>백테스트 실행 중... (최대 5분 소요)</p>
+				</div>
+
+				<!-- 결과 영역 -->
+				<div id="backtestResults" style="display:none;">
+					<!-- 요약 카드 -->
+					<div class="backtest-summary">
+						<h3 class="backtest-section-title"><i class="fas fa-chart-bar me-2"></i>결과 요약</h3>
+						<div class="backtest-metrics">
+							<div class="backtest-metric">
+								<span class="metric-label">총 수익률</span>
+								<span class="metric-value" id="btTotalReturn">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">최종 자본</span>
+								<span class="metric-value" id="btFinalCapital">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">승률</span>
+								<span class="metric-value" id="btWinRate">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">총 거래</span>
+								<span class="metric-value" id="btTotalTrades">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">MDD</span>
+								<span class="metric-value" id="btMDD">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">Profit Factor</span>
+								<span class="metric-value" id="btProfitFactor">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">평균 수익</span>
+								<span class="metric-value" id="btAvgWin">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">평균 손실</span>
+								<span class="metric-value" id="btAvgLoss">-</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- 거래 내역 -->
+					<div class="backtest-trades">
+						<h3 class="backtest-section-title"><i class="fas fa-list me-2"></i>거래 내역</h3>
+						<div class="table-wrapper">
+							<table class="data-table" id="btTradeTable">
+								<thead>
+									<tr>
+										<th>종목</th>
+										<th>매수일</th>
+										<th>매수가</th>
+										<th>수량</th>
+										<th>매도일</th>
+										<th>매도가</th>
+										<th>수익률</th>
+										<th>사유</th>
+									</tr>
+								</thead>
+								<tbody id="btTradeTableBody"></tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- 실행 로그 -->
+					<div class="backtest-log-section">
+						<h3 class="backtest-section-title">
+							<i class="fas fa-terminal me-2"></i>실행 로그
+							<button class="btn-console-refresh" id="btnToggleBtLog" title="접기/펼치기">
+								<i class="fas fa-chevron-down"></i>
+							</button>
+						</h3>
+						<div class="console-body backtest-log-body" id="btLogBody" style="display:none;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 일봉 수집 -->
+		<div class="page-content" id="page-collect" style="display:none;">
+			<div class="backtest-container">
+				<div class="backtest-config-card">
+					<h3 class="backtest-section-title"><i class="fas fa-database me-2"></i>일봉 데이터 수집</h3>
+					<p class="collect-description">
+						한국투자증권 KIS API에서 감시 종목의 일봉(OHLCV) 데이터를 수집합니다.<br>
+						백테스트를 실행하려면 먼저 해당 기간의 일봉 데이터가 필요합니다.
+					</p>
+					<div class="backtest-form">
+						<div class="backtest-form-row" style="grid-template-columns: 1fr 1fr;">
+							<div class="backtest-form-group">
+								<label for="collectStartDate">시작일</label>
+								<input type="date" id="collectStartDate" />
+							</div>
+							<div class="backtest-form-group">
+								<label for="collectEndDate">종료일</label>
+								<input type="date" id="collectEndDate" />
+							</div>
+						</div>
+						<div class="backtest-form-actions">
+							<button class="btn-primary-action" id="btnCollectDailyPrices">
+								<i class="fas fa-download me-1"></i>수집 시작
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 수집 중 표시 -->
+				<div class="backtest-loading" id="collectLoading" style="display:none;">
+					<div class="backtest-spinner"></div>
+					<p>일봉 데이터 수집 중... (종목 수에 따라 최대 10분 소요)</p>
+				</div>
+
+				<!-- 수집 결과 -->
+				<div id="collectResults" style="display:none;">
+					<div class="backtest-summary">
+						<h3 class="backtest-section-title"><i class="fas fa-check-circle me-2"></i>수집 결과</h3>
+						<div class="backtest-metrics" style="grid-template-columns: repeat(2, 1fr);">
+							<div class="backtest-metric">
+								<span class="metric-label">수집 종목 수</span>
+								<span class="metric-value" id="collectTotalStocks">-</span>
+							</div>
+							<div class="backtest-metric">
+								<span class="metric-label">저장 건수</span>
+								<span class="metric-value" id="collectTotalRecords">-</span>
+							</div>
+						</div>
+						<div id="collectMessage" class="collect-message"></div>
+						<div id="collectErrors" class="collect-errors" style="display:none;"></div>
 					</div>
 				</div>
 			</div>
