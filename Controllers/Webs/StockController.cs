@@ -155,7 +155,7 @@ namespace YL.Controllers.Webs
 		{
 			var (success, message) = StockAutoTraderManager.Start();
 
-			return this.Json(new { success, message });
+			return this.Json(new { success, msg = message });
 		}
 
 		[HttpPost]
@@ -164,7 +164,7 @@ namespace YL.Controllers.Webs
 		{
 			var (success, message) = StockAutoTraderManager.Stop();
 
-			return this.Json(new { success, message });
+			return this.Json(new { success, msg = message });
 		}
 
 		[HttpPost]
@@ -193,14 +193,14 @@ namespace YL.Controllers.Webs
 		{
 			if (BacktestManager.IsRunning)
 			{
-				return this.Json(new { success = false, message = "백테스트가 이미 실행 중입니다." });
+				return this.Json(new { success = false, msg = "백테스트가 이미 실행 중입니다." });
 			}
 
 			var result = await BacktestManager.RunAsync(startDate, endDate, capital);
 
 			if (result == null)
 			{
-				return this.Json(new { success = false, message = "백테스트 실행에 실패했습니다." });
+				return this.Json(new { success = false, msg = "백테스트 실행에 실패했습니다." });
 			}
 
 			return this.Json(result);
@@ -223,14 +223,14 @@ namespace YL.Controllers.Webs
 		{
 			if (DailyPriceCollectManager.IsRunning)
 			{
-				return this.Json(new { success = false, message = "일봉 수집이 이미 실행 중입니다." });
+				return this.Json(new { success = false, msg = "일봉 수집이 이미 실행 중입니다." });
 			}
 
 			var result = await DailyPriceCollectManager.RunAsync(startDate, endDate);
 
 			if (result == null)
 			{
-				return this.Json(new { success = false, message = "일봉 수집 실행에 실패했습니다." });
+				return this.Json(new { success = false, msg = "일봉 수집 실행에 실패했습니다." });
 			}
 
 			return this.Json(result);

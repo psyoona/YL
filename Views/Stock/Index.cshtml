@@ -528,4 +528,17 @@
 	</div>
 </div>
 
+<!-- 범용 알림/확인 모달 -->
+<div class="stock-modal" id="commonModal" style="display:none;">
+	<div class="stock-modal-box">
+		<i id="commonModalIcon" class="fas fa-info-circle" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+		<p id="commonModalMessage"></p>
+		<p id="commonModalSub" style="font-size: 13px; color: var(--text-muted); margin-top: 8px; display:none;"></p>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="commonModalCancel" style="display:none;">취소</button>
+			<button class="btn-modal-confirm" id="commonModalConfirm">확인</button>
+		</div>
+	</div>
+</div>
+
 <script defer src="~/js/Stock/stock.js?v=@ViewBag.CacheVersion"></script>

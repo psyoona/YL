@@ -492,18 +492,18 @@ class StockManager {
 		}
 	}
 
-	runBacktest() {
+	async runBacktest() {
 		const startDate = $('#btStartDate').val();
 		const endDate = $('#btEndDate').val();
 		const capital = parseInt($('#btCapital').val()) || 10000000;
 
 		if (!startDate || !endDate) {
-			alert('시작일과 종료일을 입력해주세요.');
+			await this.showModal('시작일과 종료일을 입력해주세요.');
 			return;
 		}
 
 		if (startDate >= endDate) {
-			alert('종료일은 시작일 이후여야 합니다.');
+			await this.showModal('종료일은 시작일 이후여야 합니다.');
 			return;
 		}
 
@@ -511,12 +511,12 @@ class StockManager {
 		$('#backtestLoading').show();
 		$('#backtestResults').hide();
 
-		webServer.getData('/Stock/RunBacktest', { startDate, endDate, capital }, (response) => {
+		webServer.getData('/Stock/RunBacktest', { startDate, endDate, capital }, async (response) => {
 			$('#btnRunBacktest').prop('disabled', false);
 			$('#backtestLoading').hide();
 
 			if (!response.success) {
-				alert(response.message || '백테스트 실행에 실패했습니다.');
+				await this.showModal(response.msg || '백테스트 실행에 실패했습니다.');
 				return;
 			}
 
@@ -586,23 +586,30 @@ class StockManager {
 		}
 	}
 
-	collectDailyPrices() {
+	async collectDailyPrices() {
 		const startDate = $('#collectStartDate').val();
 		const endDate = $('#collectEndDate').val();
 
 		if (!startDate || !endDate) {
-			alert('시작일과 종료일을 입력해주세요.');
+			await this.showModal('시작일과 종료일을 입력해주세요.');
 			return;
 		}
 
 		if (startDate >= endDate) {
-			alert('종료일은 시작일 이후여야 합니다.');
+			await this.showModal('종료일은 시작일 이후여야 합니다.');
 			return;
 		}
 
-		if (!confirm(`${startDate} ~ ${endDate} 기간의 일봉 데이터를 수집합니다.\n감시 종목 수에 따라 시간이 소요됩니다. 진행하시겠습니까?`)) {
-			return;
-		}
+		const confirmed = await this.showModal(
+			`${startDate} ~ ${endDate} 기간의 일봉 데이터를 수집합니다.`,
+			{
+				type: 'confirm',
+				sub: '감시 종목 수에 따라 시간이 소요됩니다. 진행하시겠습니까?',
+				confirmText: '수집 시작',
+				icon: 'fas fa-database'
+			}
+		);
+		if (!confirmed) return;
 
 		$('#btnCollectDailyPrices').prop('disabled', true);
 		$('#collectLoading').show();
@@ -617,7 +624,7 @@ class StockManager {
 			$('#collectTotalRecords').text(response.totalRecords ? response.totalRecords.toLocaleString() + '건' : '-');
 
 			const msgClass = response.success ? 'collect-message-success' : 'collect-message-error';
-			$('#collectMessage').html(`<div class="${msgClass}">${this.escapeHtml(response.message || '')}</div>`);
+			$('#collectMessage').html(`<div class="${msgClass}">${this.escapeHtml(response.msg || '')}</div>`);
 
 			// 오류 목록
 			if (response.errors && response.errors.length > 0) {
@@ -640,6 +647,56 @@ class StockManager {
 	closeDeleteModal() {
 		$('#deleteModal').fadeOut(200);
 		this.deleteCallback = null;
+	}
+
+	// ============================================
+	// 범용 모달
+	// ============================================
+
+	showModal(message, options = {}) {
+		return new Promise((resolve) => {
+			const { type = 'alert', icon = null, sub = null, confirmText = '확인', cancelText = '취소' } = options;
+			const $modal = $('#commonModal');
+			const $icon = $('#commonModalIcon');
+			const $msg = $('#commonModalMessage');
+			const $sub = $('#commonModalSub');
+			const $cancel = $('#commonModalCancel');
+			const $confirm = $('#commonModalConfirm');
+
+			// 아이콘 설정
+			if (icon) {
+				$icon.attr('class', icon).css('color', '');
+			} else if (type === 'confirm') {
+				$icon.attr('class', 'fas fa-question-circle').css({ fontSize: '48px', color: 'var(--primary-light)' });
+			} else {
+				$icon.attr('class', 'fas fa-exclamation-circle').css({ fontSize: '48px', color: 'var(--accent)' });
+			}
+
+			$msg.text(message);
+
+			if (sub) {
+				$sub.text(sub).show();
+			} else {
+				$sub.hide();
+			}
+
+			$confirm.text(confirmText);
+			$cancel.text(cancelText);
+
+			if (type === 'confirm') {
+				$cancel.show();
+				$confirm.attr('class', 'btn-modal-confirm');
+			} else {
+				$cancel.hide();
+				$confirm.attr('class', 'btn-modal-confirm');
+			}
+
+			// 이벤트 바인딩 (한 번만)
+			$confirm.off('click').on('click', () => { $modal.fadeOut(200); resolve(true); });
+			$cancel.off('click').on('click', () => { $modal.fadeOut(200); resolve(false); });
+
+			$modal.fadeIn(200);
+		});
 	}
 
 	// ============================================
