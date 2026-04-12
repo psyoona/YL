@@ -1,18 +1,21 @@
+// ============================================
+// Stock Manager - 코어 (네비게이션, 사이드바, 유틸리티)
+// ============================================
+
 class StockManager {
 	constructor() {
 		this.currentPage = 'stocks';
 		this.deleteCallback = null;
 		this.traderPollingTimer = null;
 
-		this.bindEvents();
-		this.loadStocks();
+		this.bindCoreEvents();
 	}
 
 	// ============================================
-	// 이벤트 바인딩
+	// 코어 이벤트 바인딩
 	// ============================================
 
-	bindEvents() {
+	bindCoreEvents() {
 		// 사이드바 토글
 		$('#menuToggle').on('click', () => this.openSidebar());
 		$('#sidebarClose').on('click', () => this.closeSidebar());
@@ -33,11 +36,6 @@ class StockManager {
 		$('#logoutCancel').on('click', () => $('#logoutModal').fadeOut(200));
 		$('#logoutConfirm').on('click', () => { window.location.href = '/Stock/Logout'; });
 
-		// 종목 추가
-		$('#btnAddStock').on('click', () => this.openStockModal());
-		$('#stockModalCancel').on('click', () => this.closeStockModal());
-		$('#stockModalConfirm').on('click', () => this.saveStock());
-
 		// 삭제 모달
 		$('#deleteModalCancel').on('click', () => this.closeDeleteModal());
 		$('#deleteModalConfirm').on('click', () => {
@@ -46,33 +44,6 @@ class StockManager {
 			}
 			this.closeDeleteModal();
 		});
-
-		// 자동매매 제어
-		$('#btnStartTrader').on('click', () => $('#traderStartModal').fadeIn(200));
-		$('#traderStartCancel').on('click', () => $('#traderStartModal').fadeOut(200));
-		$('#traderStartConfirm').on('click', () => {
-			$('#traderStartModal').fadeOut(200);
-			this.startTrader();
-		});
-
-		$('#btnStopTrader').on('click', () => $('#traderStopModal').fadeIn(200));
-		$('#traderStopCancel').on('click', () => $('#traderStopModal').fadeOut(200));
-		$('#traderStopConfirm').on('click', () => {
-			$('#traderStopModal').fadeOut(200);
-			this.stopTrader();
-		});
-
-		$('#btnRefreshLogs').on('click', () => this.loadTraderStatus());
-
-		// 백테스트
-		$('#btnRunBacktest').on('click', () => this.runBacktest());
-		$('#btnToggleBtLog').on('click', () => {
-			$('#btLogBody').slideToggle(200);
-			$('#btnToggleBtLog i').toggleClass('fa-chevron-down fa-chevron-up');
-		});
-
-		// 일봉 수집
-		$('#btnCollectDailyPrices').on('click', () => this.collectDailyPrices());
 	}
 
 	// ============================================
@@ -110,7 +81,8 @@ class StockManager {
 			logs: '거래 로그',
 			trader: '자동매매 제어',
 			backtest: '백테스트',
-			collect: '일봉 수집'
+			collect: '일봉 수집',
+			glossary: '용어 사전'
 		};
 		$('#pageTitle').text(titles[page]);
 
@@ -125,519 +97,8 @@ class StockManager {
 			case 'trader': this.loadTraderStatus(); this.startTraderPolling(); break;
 			case 'backtest': this.initBacktest(); break;
 			case 'collect': this.initCollect(); break;
+			case 'glossary': this.initGlossary(); break;
 		}
-	}
-
-	// ============================================
-	// 종목 관리
-	// ============================================
-
-	loadStocks() {
-		webServer.getData('/Stock/GetStocks', null, (response) => {
-			const stocks = response.stocks || [];
-			$('#stockCount').text(`총 ${stocks.length}개 종목`);
-
-			if (stocks.length === 0) {
-				$('#stockTable').hide();
-				$('#stockEmpty').show();
-				return;
-			}
-
-			$('#stockEmpty').hide();
-			$('#stockTable').show();
-
-			let html = '';
-			stocks.forEach(s => {
-				const activeBadge = s.isActive
-					? '<span class="badge badge-active">활성</span>'
-					: '<span class="badge badge-inactive">비활성</span>';
-				const watchBadge = s.isWatchList
-					? '<span class="badge badge-watch">감시</span>'
-					: '<span class="badge" style="opacity:0.4;">-</span>';
-
-				html += `<tr>
-					<td data-label="종목코드">${this.escapeHtml(s.stockCode)}</td>
-					<td data-label="종목명">${this.escapeHtml(s.stockName)}</td>
-					<td data-label="시장">${this.escapeHtml(s.marketType)}</td>
-					<td data-label="상태">${activeBadge}</td>
-					<td data-label="감시">${watchBadge}</td>
-					<td data-label="관리">
-						<div class="btn-action-group">
-							<button class="btn-table-action edit" title="수정" onclick="stockManager.openStockModal('${this.escapeAttr(s.stockCode)}', '${this.escapeAttr(s.stockName)}', '${this.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
-								<i class="fas fa-pen"></i>
-							</button>
-							<button class="btn-table-action delete" title="삭제" onclick="stockManager.confirmDeleteStock('${this.escapeAttr(s.stockCode)}', '${this.escapeAttr(s.stockName)}')">
-								<i class="fas fa-trash"></i>
-							</button>
-						</div>
-					</td>
-				</tr>`;
-			});
-
-			$('#stockTableBody').html(html);
-		});
-	}
-
-	openStockModal(stockCode, stockName, marketType, isActive, isWatchList) {
-		if (stockCode) {
-			$('#stockModalTitle').html('<i class="fas fa-edit me-2"></i>종목 수정');
-			$('#modalStockCode').val(stockCode).prop('readonly', true);
-			$('#modalStockName').val(stockName);
-			$('#modalMarketType').val(marketType);
-			$('#modalIsActive').prop('checked', isActive);
-			$('#modalIsWatchList').prop('checked', isWatchList);
-			$('#stockEditFields').show();
-		} else {
-			$('#stockModalTitle').html('<i class="fas fa-plus-circle me-2"></i>종목 추가');
-			$('#modalStockCode').val('').prop('readonly', false);
-			$('#modalStockName').val('');
-			$('#modalMarketType').val('KOSPI');
-			$('#modalIsActive').prop('checked', true);
-			$('#modalIsWatchList').prop('checked', false);
-			$('#stockEditFields').hide();
-		}
-		$('#stockModal').fadeIn(200);
-		if (!stockCode) $('#modalStockCode').focus();
-	}
-
-	closeStockModal() {
-		$('#stockModal').fadeOut(200);
-	}
-
-	saveStock() {
-		const stockCode = $('#modalStockCode').val().trim();
-		const stockName = $('#modalStockName').val().trim();
-		const marketType = $('#modalMarketType').val();
-		const isEditing = $('#modalStockCode').prop('readonly');
-
-		if (!stockCode) {
-			$('#modalStockCode').focus();
-			return;
-		}
-		if (!stockName) {
-			$('#modalStockName').focus();
-			return;
-		}
-
-		if (isEditing) {
-			const isActive = $('#modalIsActive').is(':checked');
-			const isWatchList = $('#modalIsWatchList').is(':checked');
-
-			webServer.getData('/Stock/UpdateStock', {
-				stockCode, stockName, marketType, isActive, isWatchList
-			}, (response) => {
-				if (response.success) {
-					this.closeStockModal();
-					this.loadStocks();
-				}
-			});
-		} else {
-			webServer.getData('/Stock/CreateStock', {
-				stockCode, stockName, marketType
-			}, (response) => {
-				if (response.success) {
-					this.closeStockModal();
-					this.loadStocks();
-				}
-			});
-		}
-	}
-
-	confirmDeleteStock(stockCode, stockName) {
-		$('#deleteMessage').text(`'${stockName}' (${stockCode}) 종목을 비활성화하시겠습니까?`);
-		this.deleteCallback = () => {
-			webServer.getData('/Stock/DeleteStock', { stockCode }, (response) => {
-				if (response.success) {
-					this.loadStocks();
-				}
-			});
-		};
-		$('#deleteModal').fadeIn(200);
-	}
-
-	// ============================================
-	// 보유 종목
-	// ============================================
-
-	loadHoldings() {
-		webServer.getData('/Stock/GetHoldings', null, (response) => {
-			const holdings = response.holdings || [];
-			$('#holdingCount').text(`총 ${holdings.length}개 보유`);
-
-			if (holdings.length === 0) {
-				$('#holdingTable').hide();
-				$('#holdingEmpty').show();
-				return;
-			}
-
-			$('#holdingEmpty').hide();
-			$('#holdingTable').show();
-
-			let html = '';
-			holdings.forEach(h => {
-				const rate = h.profitLossRate;
-				let rateClass = 'profit-zero';
-				let rateText = '-';
-				if (rate !== null && rate !== undefined) {
-					if (rate > 0) { rateClass = 'profit-positive'; rateText = `+${rate.toFixed(2)}%`; }
-					else if (rate < 0) { rateClass = 'profit-negative'; rateText = `${rate.toFixed(2)}%`; }
-					else { rateText = '0.00%'; }
-				}
-
-				html += `<tr>
-					<td data-label="종목코드">${this.escapeHtml(h.stockCode)}</td>
-					<td data-label="종목명">${this.escapeHtml(h.stockName)}</td>
-					<td data-label="수량">${h.quantity.toLocaleString()}</td>
-					<td data-label="평균단가">${h.avgBuyPrice.toLocaleString()}</td>
-					<td data-label="현재가">${h.currentPrice ? h.currentPrice.toLocaleString() : '-'}</td>
-					<td data-label="수익률"><span class="${rateClass}">${rateText}</span></td>
-				</tr>`;
-			});
-
-			$('#holdingTableBody').html(html);
-		});
-	}
-
-	// ============================================
-	// 주문 내역
-	// ============================================
-
-	loadOrders() {
-		webServer.getData('/Stock/GetOrders', null, (response) => {
-			const orders = response.orders || [];
-			$('#orderCount').text(`총 ${orders.length}건`);
-
-			if (orders.length === 0) {
-				$('#orderTable').hide();
-				$('#orderEmpty').show();
-				return;
-			}
-
-			$('#orderEmpty').hide();
-			$('#orderTable').show();
-
-			let html = '';
-			orders.forEach(o => {
-				const typeBadge = o.orderType === 'BUY'
-					? '<span class="badge badge-buy">매수</span>'
-					: '<span class="badge badge-sell">매도</span>';
-
-				let statusBadge = '';
-				switch (o.orderStatus) {
-					case 'PENDING': statusBadge = '<span class="badge badge-pending">대기</span>'; break;
-					case 'FILLED': statusBadge = '<span class="badge badge-filled">체결</span>'; break;
-					case 'PARTIAL': statusBadge = '<span class="badge badge-pending">부분체결</span>'; break;
-					case 'CANCELLED': statusBadge = '<span class="badge badge-cancelled">취소</span>'; break;
-					case 'FAILED': statusBadge = '<span class="badge badge-failed">실패</span>'; break;
-					default: statusBadge = `<span class="badge">${this.escapeHtml(o.orderStatus)}</span>`;
-				}
-
-				html += `<tr>
-					<td data-label="주문번호">${this.escapeHtml(o.orderNo || '-')}</td>
-					<td data-label="종목">${this.escapeHtml(o.stockName)} <small style="color:var(--text-muted)">${this.escapeHtml(o.stockCode)}</small></td>
-					<td data-label="구분">${typeBadge}</td>
-					<td data-label="주문가">${o.orderPrice.toLocaleString()}</td>
-					<td data-label="주문수량">${o.orderQuantity.toLocaleString()}</td>
-					<td data-label="체결수량">${o.filledQuantity.toLocaleString()}</td>
-					<td data-label="상태">${statusBadge}</td>
-					<td data-label="일시">${this.formatDate(o.createdAt)}</td>
-				</tr>`;
-			});
-
-			$('#orderTableBody').html(html);
-		});
-	}
-
-	// ============================================
-	// 거래 로그
-	// ============================================
-
-	loadTradeLogs() {
-		webServer.getData('/Stock/GetTradeLogs', null, (response) => {
-			const logs = response.logs || [];
-			$('#logCount').text(`최근 ${logs.length}건`);
-
-			if (logs.length === 0) {
-				$('#logTable').hide();
-				$('#logEmpty').show();
-				return;
-			}
-
-			$('#logEmpty').hide();
-			$('#logTable').show();
-
-			let html = '';
-			logs.forEach(l => {
-				let levelBadge = '';
-				switch (l.logLevel) {
-					case 'INFO': levelBadge = '<span class="badge badge-info">INFO</span>'; break;
-					case 'WARN': levelBadge = '<span class="badge badge-warn">WARN</span>'; break;
-					case 'ERROR': levelBadge = '<span class="badge badge-error">ERROR</span>'; break;
-					default: levelBadge = `<span class="badge">${this.escapeHtml(l.logLevel)}</span>`;
-				}
-
-				html += `<tr>
-					<td data-label="레벨">${levelBadge}</td>
-					<td data-label="메시지" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this.escapeHtml(l.message)}</td>
-					<td data-label="종목코드">${this.escapeHtml(l.stockCode || '-')}</td>
-					<td data-label="일시">${this.formatDate(l.createdAt)}</td>
-				</tr>`;
-			});
-
-			$('#logTableBody').html(html);
-		});
-	}
-
-	// ============================================
-	// 자동매매 제어
-	// ============================================
-
-	loadTraderStatus() {
-		webServer.getData('/Stock/GetTraderStatus', null, (response) => {
-			this.updateTraderUI(response);
-		});
-	}
-
-	updateTraderUI(status) {
-		const running = status.isRunning;
-		const $card = $('#traderStatusCard');
-		const $dot = $('#statusDot');
-		const $text = $('#statusText');
-
-		if (running) {
-			$card.removeClass('stopped').addClass('running');
-			$dot.removeClass('dot-stopped').addClass('dot-running');
-			$text.text('실행 중');
-			$('#btnStartTrader').prop('disabled', true);
-			$('#btnStopTrader').prop('disabled', false);
-		} else {
-			$card.removeClass('running').addClass('stopped');
-			$dot.removeClass('dot-running').addClass('dot-stopped');
-			$text.text('중지됨');
-			$('#btnStartTrader').prop('disabled', false);
-			$('#btnStopTrader').prop('disabled', true);
-		}
-
-		$('#traderPid').text(status.pid || '-');
-		$('#traderStartedAt').text(status.startedAt || '-');
-		$('#traderUptime').text(status.uptime || '-');
-		$('#traderExePath').text(status.exePath || '-');
-
-		// 콘솔 로그 업데이트
-		const $console = $('#traderConsole');
-		if (status.logs && status.logs.length > 0) {
-			// 스크롤이 맨 아래 근처인지 확인 (여유값 30px)
-			const el = $console[0];
-			const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
-
-			let logHtml = '';
-			status.logs.forEach(line => {
-				let cls = 'log-line';
-				if (line.includes('[ERROR]')) cls += ' log-error';
-				else if (line.includes('매수') || line.includes('시작')) cls += ' log-success';
-				else if (line.includes('매도') || line.includes('중지') || line.includes('종료')) cls += ' log-warn';
-				logHtml += `<div class="${cls}">${this.escapeHtml(line)}</div>`;
-			});
-			$console.html(logHtml);
-
-			// 실행 중이고 스크롤이 맨 아래였을 때만 자동 스크롤
-			if (running && wasAtBottom) {
-				$console.scrollTop(el.scrollHeight);
-			}
-		} else {
-			$console.html('<div class="console-empty">로그가 없습니다</div>');
-		}
-	}
-
-	startTrader() {
-		$('#btnStartTrader').prop('disabled', true);
-		webServer.getData('/Stock/StartTrader', null, (response) => {
-			this.loadTraderStatus();
-		});
-	}
-
-	stopTrader() {
-		$('#btnStopTrader').prop('disabled', true);
-		webServer.getData('/Stock/StopTrader', null, (response) => {
-			this.loadTraderStatus();
-		});
-	}
-
-	startTraderPolling() {
-		this.stopTraderPolling();
-		this.traderPollingTimer = setInterval(() => {
-			this.loadTraderStatus();
-		}, 5000);
-	}
-
-	stopTraderPolling() {
-		if (this.traderPollingTimer) {
-			clearInterval(this.traderPollingTimer);
-			this.traderPollingTimer = null;
-		}
-	}
-
-	// ============================================
-	// 백테스트
-	// ============================================
-
-	initBacktest() {
-		// 기본 날짜 설정 (최근 6개월)
-		if (!$('#btEndDate').val()) {
-			const today = new Date();
-			const sixMonthsAgo = new Date();
-			sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-			$('#btEndDate').val(today.toISOString().split('T')[0]);
-			$('#btStartDate').val(sixMonthsAgo.toISOString().split('T')[0]);
-		}
-	}
-
-	async runBacktest() {
-		const startDate = $('#btStartDate').val();
-		const endDate = $('#btEndDate').val();
-		const capital = parseInt($('#btCapital').val()) || 10000000;
-
-		if (!startDate || !endDate) {
-			await this.showModal('시작일과 종료일을 입력해주세요.');
-			return;
-		}
-
-		if (startDate >= endDate) {
-			await this.showModal('종료일은 시작일 이후여야 합니다.');
-			return;
-		}
-
-		$('#btnRunBacktest').prop('disabled', true);
-		$('#backtestLoading').show();
-		$('#backtestResults').hide();
-
-		webServer.getData('/Stock/RunBacktest', { startDate, endDate, capital }, async (response) => {
-			$('#btnRunBacktest').prop('disabled', false);
-			$('#backtestLoading').hide();
-
-			if (!response.success) {
-				await this.showModal(response.msg || '백테스트 실행에 실패했습니다.');
-				return;
-			}
-
-			this.displayBacktestResults(response);
-		});
-	}
-
-	displayBacktestResults(data) {
-		$('#backtestResults').show();
-
-		// 요약 지표
-		const returnVal = data.totalReturn;
-		const returnClass = returnVal > 0 ? 'profit-positive' : returnVal < 0 ? 'profit-negative' : '';
-		$('#btTotalReturn').html(`<span class="${returnClass}">${returnVal > 0 ? '+' : ''}${returnVal}%</span>`);
-		$('#btFinalCapital').text(Number(data.finalCapital).toLocaleString() + '원');
-		$('#btWinRate').text(data.winRate + '%');
-		$('#btTotalTrades').text(`${data.totalTrades}회 (${data.winningTrades}승 ${data.losingTrades}패)`);
-		$('#btMDD').html(`<span class="profit-negative">-${data.maxDrawdownPercent}%</span>`);
-		$('#btProfitFactor').text(data.profitFactor);
-		$('#btAvgWin').html(`<span class="profit-positive">+${data.avgWinPercent}%</span>`);
-		$('#btAvgLoss').html(`<span class="profit-negative">${data.avgLossPercent}%</span>`);
-
-		// 거래 내역
-		const trades = data.trades || [];
-		let html = '';
-		trades.forEach(t => {
-			const plClass = t.profitLossPercent > 0 ? 'profit-positive' : t.profitLossPercent < 0 ? 'profit-negative' : '';
-			const plText = t.profitLossPercent !== null ? `${t.profitLossPercent > 0 ? '+' : ''}${t.profitLossPercent}%` : '-';
-			html += `<tr>
-				<td data-label="종목">${this.escapeHtml(t.stockCode)}</td>
-				<td data-label="매수일">${t.buyDate || '-'}</td>
-				<td data-label="매수가">${Number(t.buyPrice).toLocaleString()}</td>
-				<td data-label="수량">${t.quantity}</td>
-				<td data-label="매도일">${t.sellDate || '-'}</td>
-				<td data-label="매도가">${t.sellPrice ? Number(t.sellPrice).toLocaleString() : '-'}</td>
-				<td data-label="수익률"><span class="${plClass}">${plText}</span></td>
-				<td data-label="사유" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this.escapeHtml(t.sellReason || '-')}</td>
-			</tr>`;
-		});
-		$('#btTradeTableBody').html(html);
-
-		// 실행 로그
-		const logs = data.log || [];
-		let logHtml = '';
-		logs.forEach(line => {
-			let cls = 'log-line';
-			if (line.includes('매도') || line.includes('손절')) cls += ' log-warn';
-			else if (line.includes('매수')) cls += ' log-success';
-			else if (line.includes('====') || line.includes('결과')) cls += ' log-success';
-			logHtml += `<div class="${cls}">${this.escapeHtml(line)}</div>`;
-		});
-		$('#btLogBody').html(logHtml);
-	}
-
-	// ============================================
-	// 일봉 수집
-	// ============================================
-
-	initCollect() {
-		// 기본 날짜 설정 (최근 1년)
-		if (!$('#collectEndDate').val()) {
-			const today = new Date();
-			const oneYearAgo = new Date();
-			oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-			$('#collectEndDate').val(today.toISOString().split('T')[0]);
-			$('#collectStartDate').val(oneYearAgo.toISOString().split('T')[0]);
-		}
-	}
-
-	async collectDailyPrices() {
-		const startDate = $('#collectStartDate').val();
-		const endDate = $('#collectEndDate').val();
-
-		if (!startDate || !endDate) {
-			await this.showModal('시작일과 종료일을 입력해주세요.');
-			return;
-		}
-
-		if (startDate >= endDate) {
-			await this.showModal('종료일은 시작일 이후여야 합니다.');
-			return;
-		}
-
-		const confirmed = await this.showModal(
-			`${startDate} ~ ${endDate} 기간의 일봉 데이터를 수집합니다.`,
-			{
-				type: 'confirm',
-				sub: '감시 종목 수에 따라 시간이 소요됩니다. 진행하시겠습니까?',
-				confirmText: '수집 시작',
-				icon: 'fas fa-database'
-			}
-		);
-		if (!confirmed) return;
-
-		$('#btnCollectDailyPrices').prop('disabled', true);
-		$('#collectLoading').show();
-		$('#collectResults').hide();
-
-		webServer.getData('/Stock/CollectDailyPrices', { startDate, endDate }, (response) => {
-			$('#btnCollectDailyPrices').prop('disabled', false);
-			$('#collectLoading').hide();
-			$('#collectResults').show();
-
-			$('#collectTotalStocks').text(response.totalStocks ? response.totalStocks + '개' : '-');
-			$('#collectTotalRecords').text(response.totalRecords ? response.totalRecords.toLocaleString() + '건' : '-');
-
-			const msgClass = response.success ? 'collect-message-success' : 'collect-message-error';
-			$('#collectMessage').html(`<div class="${msgClass}">${this.escapeHtml(response.msg || '')}</div>`);
-
-			// 오류 목록
-			if (response.errors && response.errors.length > 0) {
-				let errHtml = '<h4><i class="fas fa-exclamation-triangle me-1"></i>오류 목록</h4><ul>';
-				response.errors.forEach(e => {
-					errHtml += `<li>${this.escapeHtml(e)}</li>`;
-				});
-				errHtml += '</ul>';
-				$('#collectErrors').html(errHtml).show();
-			} else {
-				$('#collectErrors').hide();
-			}
-		});
 	}
 
 	// ============================================
@@ -724,3 +185,8 @@ class StockManager {
 }
 
 let stockManager = new StockManager();
+
+// 모든 defer 스크립트 로드 후 초기 페이지 로딩
+$(function () {
+	stockManager.loadStocks();
+});

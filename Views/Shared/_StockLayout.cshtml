@@ -18,6 +18,231 @@
 	<title>@ViewBag.PageTitle</title>
 </head>
 <body>
-	@RenderBody()
+	<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+	<div class="stock-wrapper">
+		<!-- 사이드바 -->
+		<aside class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<div class="sidebar-logo">
+					<i class="fas fa-chart-line"></i>
+					<span>Stock Manager</span>
+				</div>
+				<button class="sidebar-close" id="sidebarClose">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+
+			<div class="sidebar-user">
+				<div class="user-avatar">
+					<i class="fas fa-user"></i>
+				</div>
+				<div class="user-info">
+					<span class="user-name">@ViewBag.UserName</span>
+					<span class="user-status">접속 중</span>
+				</div>
+			</div>
+
+			<nav class="sidebar-nav">
+				<ul class="nav-menu">
+					<li>
+						<a href="#" class="nav-item active" data-page="stocks">
+							<i class="fas fa-list-ul"></i>
+							<span>종목 관리</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-item" data-page="holdings">
+							<i class="fas fa-wallet"></i>
+							<span>보유 종목</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-item" data-page="orders">
+							<i class="fas fa-exchange-alt"></i>
+							<span>주문 내역</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-item" data-page="logs">
+							<i class="fas fa-scroll"></i>
+							<span>거래 로그</span>
+						</a>
+					</li>
+					<li class="nav-divider"></li>
+					<li>
+						<a href="#" class="nav-item" data-page="trader">
+							<i class="fas fa-robot"></i>
+							<span>자동매매 제어</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-item" data-page="backtest">
+							<i class="fas fa-flask"></i>
+							<span>백테스트</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-item" data-page="collect">
+							<i class="fas fa-database"></i>
+							<span>일봉 수집</span>
+						</a>
+					</li>
+					<li class="nav-divider"></li>
+					<li>
+						<a href="#" class="nav-item" data-page="glossary">
+							<i class="fas fa-book"></i>
+							<span>용어 사전</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="sidebar-system-info">
+				<div class="system-info-title">
+					<i class="fas fa-info-circle"></i>
+					<span>System Info</span>
+				</div>
+				<div class="system-info-item">
+					<span class="system-info-label">Version</span>
+					<span class="system-info-value">v@(ViewBag.CacheVersion)</span>
+				</div>
+			</div>
+
+			<div class="sidebar-footer">
+				<a href="#" id="btnLogout" class="btn-logout">
+					<i class="fas fa-sign-out-alt me-2"></i>로그아웃
+				</a>
+			</div>
+		</aside>
+
+		<!-- 메인 콘텐츠 -->
+		<main class="main-content" id="mainContent">
+			<header class="top-bar">
+				<button class="menu-toggle" id="menuToggle">
+					<i class="fas fa-bars"></i>
+				</button>
+				<h2 class="page-title" id="pageTitle">종목 관리</h2>
+			</header>
+
+			@RenderBody()
+			@await Html.PartialAsync("~/Views/Stock/_Stocks.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Holdings.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Orders.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Logs.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Trader.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Backtest.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Collect.cshtml")
+			@await Html.PartialAsync("~/Views/Stock/_Glossary.cshtml")
+		</main>
+	</div>
+
+	<!-- 종목 추가/수정 모달 -->
+	<div class="stock-modal" id="stockModal" style="display:none;">
+		<div class="stock-modal-box">
+			<h3 id="stockModalTitle"><i class="fas fa-plus-circle me-2"></i>종목 추가</h3>
+			<div class="modal-input">
+				<label for="modalStockCode">종목코드</label>
+				<input type="text" id="modalStockCode" placeholder="예: 005930" maxlength="20" />
+			</div>
+			<div class="modal-input">
+				<label for="modalStockName">종목명</label>
+				<input type="text" id="modalStockName" placeholder="예: 삼성전자" maxlength="100" />
+			</div>
+			<div class="modal-input">
+				<label for="modalMarketType">시장구분</label>
+				<select id="modalMarketType">
+					<option value="KOSPI">KOSPI</option>
+					<option value="KOSDAQ">KOSDAQ</option>
+				</select>
+			</div>
+			<div class="modal-input modal-checkbox-group" id="stockEditFields" style="display:none;">
+				<label class="checkbox-label">
+					<input type="checkbox" id="modalIsActive" checked />
+					<span>활성 상태</span>
+				</label>
+				<label class="checkbox-label">
+					<input type="checkbox" id="modalIsWatchList" />
+					<span>감시 종목</span>
+				</label>
+			</div>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="stockModalCancel">취소</button>
+				<button class="btn-modal-confirm" id="stockModalConfirm">저장</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 삭제 확인 모달 -->
+	<div class="stock-modal" id="deleteModal" style="display:none;">
+		<div class="stock-modal-box">
+			<i class="fas fa-exclamation-triangle warning-icon"></i>
+			<p id="deleteMessage">정말 삭제하시겠습니까?</p>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="deleteModalCancel">취소</button>
+				<button class="btn-modal-delete" id="deleteModalConfirm">삭제</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 로그아웃 확인 모달 -->
+	<div class="stock-modal" id="logoutModal" style="display:none;">
+		<div class="stock-modal-box">
+			<i class="fas fa-sign-out-alt" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+			<p>로그아웃 하시겠습니까?</p>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="logoutCancel">취소</button>
+				<button class="btn-modal-confirm" id="logoutConfirm">로그아웃</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 자동매매 실행 확인 모달 -->
+	<div class="stock-modal" id="traderStartModal" style="display:none;">
+		<div class="stock-modal-box">
+			<i class="fas fa-play-circle" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+			<p>자동매매 프로그램을 실행하시겠습니까?</p>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="traderStartCancel">취소</button>
+				<button class="btn-modal-confirm" id="traderStartConfirm">실행</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 자동매매 중지 확인 모달 -->
+	<div class="stock-modal" id="traderStopModal" style="display:none;">
+		<div class="stock-modal-box">
+			<i class="fas fa-exclamation-triangle warning-icon"></i>
+			<p>자동매매 프로그램을 중지하시겠습니까?</p>
+			<p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">진행 중인 매매가 있을 경우 중단됩니다.</p>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="traderStopCancel">취소</button>
+				<button class="btn-modal-delete" id="traderStopConfirm">중지</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 범용 알림/확인 모달 -->
+	<div class="stock-modal" id="commonModal" style="display:none;">
+		<div class="stock-modal-box">
+			<i id="commonModalIcon" class="fas fa-info-circle" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+			<p id="commonModalMessage"></p>
+			<p id="commonModalSub" style="font-size: 13px; color: var(--text-muted); margin-top: 8px; display:none;"></p>
+			<div class="modal-actions">
+				<button class="btn-modal-cancel" id="commonModalCancel" style="display:none;">취소</button>
+				<button class="btn-modal-confirm" id="commonModalConfirm">확인</button>
+			</div>
+		</div>
+	</div>
+
+	<script defer src="~/js/Stock/stock.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/stocks.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/holdings.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/orders.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/logs.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/trader.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/backtest.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/collect.js?v=@ViewBag.CacheVersion"></script>
+	<script defer src="~/js/Stock/glossary.js?v=@ViewBag.CacheVersion"></script>
 </body>
 </html>

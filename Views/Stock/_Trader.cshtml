@@ -1,0 +1,55 @@
+<!-- 자동매매 제어 -->
+<div class="page-content" id="page-trader" style="display:none;">
+	<div class="trader-control">
+		<!-- 상태 카드 -->
+		<div class="trader-status-card" id="traderStatusCard">
+			<div class="trader-status-header">
+				<div class="trader-status-indicator" id="traderIndicator">
+					<span class="status-dot" id="statusDot"></span>
+					<span class="status-text" id="statusText">확인 중...</span>
+				</div>
+				<div class="trader-actions">
+					<button class="btn-trader btn-trader-start" id="btnStartTrader" disabled>
+						<i class="fas fa-play"></i>
+						<span>실행</span>
+					</button>
+					<button class="btn-trader btn-trader-stop" id="btnStopTrader" disabled>
+						<i class="fas fa-stop"></i>
+						<span>중지</span>
+					</button>
+				</div>
+			</div>
+			<div class="trader-info-grid">
+				<div class="trader-info-item">
+					<span class="info-label">PID</span>
+					<span class="info-value" id="traderPid">-</span>
+				</div>
+				<div class="trader-info-item">
+					<span class="info-label">시작 시간</span>
+					<span class="info-value" id="traderStartedAt">-</span>
+				</div>
+				<div class="trader-info-item">
+					<span class="info-label">실행 시간</span>
+					<span class="info-value" id="traderUptime">-</span>
+				</div>
+				<div class="trader-info-item">
+					<span class="info-label">실행 경로</span>
+					<span class="info-value info-path" id="traderExePath">-</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- 콘솔 로그 -->
+		<div class="trader-console">
+			<div class="console-header">
+				<span><i class="fas fa-terminal me-2"></i>콘솔 출력</span>
+				<button class="btn-console-refresh" id="btnRefreshLogs" title="새로고침">
+					<i class="fas fa-sync-alt"></i>
+				</button>
+			</div>
+			<div class="console-body" id="traderConsole">
+				<div class="console-empty">로그가 없습니다</div>
+			</div>
+		</div>
+	</div>
+</div>

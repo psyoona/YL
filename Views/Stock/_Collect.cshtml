@@ -1,0 +1,54 @@
+<!-- 일봉 수집 -->
+<div class="page-content" id="page-collect" style="display:none;">
+	<div class="backtest-container">
+		<div class="backtest-config-card">
+			<h3 class="backtest-section-title"><i class="fas fa-database me-2"></i>일봉 데이터 수집</h3>
+			<p class="collect-description">
+				한국투자증권 KIS API에서 감시 종목의 일봉(OHLCV) 데이터를 수집합니다.<br>
+				백테스트를 실행하려면 먼저 해당 기간의 일봉 데이터가 필요합니다.
+			</p>
+			<div class="backtest-form">
+				<div class="backtest-form-row" style="grid-template-columns: 1fr 1fr;">
+					<div class="backtest-form-group">
+						<label for="collectStartDate">시작일</label>
+						<input type="date" id="collectStartDate" />
+					</div>
+					<div class="backtest-form-group">
+						<label for="collectEndDate">종료일</label>
+						<input type="date" id="collectEndDate" />
+					</div>
+				</div>
+				<div class="backtest-form-actions">
+					<button class="btn-primary-action" id="btnCollectDailyPrices">
+						<i class="fas fa-download me-1"></i>수집 시작
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- 수집 중 표시 -->
+		<div class="backtest-loading" id="collectLoading" style="display:none;">
+			<div class="backtest-spinner"></div>
+			<p>일봉 데이터 수집 중... (종목 수에 따라 최대 10분 소요)</p>
+		</div>
+
+		<!-- 수집 결과 -->
+		<div id="collectResults" style="display:none;">
+			<div class="backtest-summary">
+				<h3 class="backtest-section-title"><i class="fas fa-check-circle me-2"></i>수집 결과</h3>
+				<div class="backtest-metrics" style="grid-template-columns: repeat(2, 1fr);">
+					<div class="backtest-metric">
+						<span class="metric-label">수집 종목 수</span>
+						<span class="metric-value" id="collectTotalStocks">-</span>
+					</div>
+					<div class="backtest-metric">
+						<span class="metric-label">저장 건수</span>
+						<span class="metric-value" id="collectTotalRecords">-</span>
+					</div>
+				</div>
+				<div id="collectMessage" class="collect-message"></div>
+				<div id="collectErrors" class="collect-errors" style="display:none;"></div>
+			</div>
+		</div>
+	</div>
+</div>

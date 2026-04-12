@@ -1,0 +1,32 @@
+<!-- 종목 관리 -->
+<div class="page-content" id="page-stocks">
+	<div class="content-header">
+		<div class="content-header-left">
+			<span class="data-count" id="stockCount"></span>
+		</div>
+		<div class="content-header-right">
+			<button class="btn-primary-action" id="btnAddStock">
+				<i class="fas fa-plus me-1"></i>종목 추가
+			</button>
+		</div>
+	</div>
+	<div class="table-wrapper">
+		<table class="data-table" id="stockTable">
+			<thead>
+				<tr>
+					<th>종목코드</th>
+					<th>종목명</th>
+					<th>시장</th>
+					<th>상태</th>
+					<th>감시</th>
+					<th>관리</th>
+				</tr>
+			</thead>
+			<tbody id="stockTableBody"></tbody>
+		</table>
+		<div class="empty-state" id="stockEmpty">
+			<i class="fas fa-inbox"></i>
+			<p>등록된 종목이 없습니다</p>
+		</div>
+	</div>
+</div>
