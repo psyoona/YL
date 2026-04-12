@@ -98,13 +98,13 @@ namespace YL.Controllers.Webs
 
 		[HttpGet]
 		[StockLoginRequired]
-		public ActionResult Trader()
+		public ActionResult AutoTrading()
 		{
 			this.Initialize();
 			var session = StockCookieHelper.GetSession(Request);
 
 			ViewBag.UserName = session.UserName;
-			ViewBag.CurrentPage = "trader";
+			ViewBag.CurrentPage = "autotrading";
 			ViewBag.PageTitle = "자동매매 제어";
 
 			return this.View();

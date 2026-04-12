@@ -1,8 +1,8 @@
 // ============================================
-// 자동매매 제어 (trader.js)
+// 자동매매 제어 (autoTrading.js)
 // ============================================
 
-class TraderPage {
+class AutoTradingPage {
 	constructor() {
 		this.pollingTimer = null;
 
@@ -103,5 +103,5 @@ class TraderPage {
 	}
 }
 
-let traderPage;
-$(function () { traderPage = new TraderPage(); });
+let autoTradingPage;
+$(function () { autoTradingPage = new AutoTradingPage(); });
