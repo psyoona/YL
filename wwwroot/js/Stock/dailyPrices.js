@@ -1,8 +1,8 @@
 // ============================================
-// 일봉 수집 (collect.js)
+// 일봉 수집 (dailyPrices.js)
 // ============================================
 
-class CollectPage {
+class DailyPricesPage {
 	constructor() {
 		$('#btnCollectDailyPrices').on('click', () => this.collectDailyPrices());
 
@@ -73,5 +73,5 @@ class CollectPage {
 	}
 }
 
-let collectPage;
-$(function () { collectPage = new CollectPage(); });
+let dailyPricesPage;
+$(function () { dailyPricesPage = new DailyPricesPage(); });
