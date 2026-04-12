@@ -84,13 +84,13 @@ namespace YL.Controllers.Webs
 
 		[HttpGet]
 		[StockLoginRequired]
-		public ActionResult Logs()
+		public ActionResult TradeLogs()
 		{
 			this.Initialize();
 			var session = StockCookieHelper.GetSession(Request);
 
 			ViewBag.UserName = session.UserName;
-			ViewBag.CurrentPage = "logs";
+			ViewBag.CurrentPage = "tradelogs";
 			ViewBag.PageTitle = "거래 로그";
 
 			return this.View();

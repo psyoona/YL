@@ -1,8 +1,8 @@
 // ============================================
-// 거래 로그 (logs.js)
+// 거래 로그 (tradeLogs.js)
 // ============================================
 
-class LogsPage {
+class TradeLogsPage {
 	constructor() {
 		this.load();
 	}
@@ -44,5 +44,5 @@ class LogsPage {
 	}
 }
 
-let logsPage;
-$(function () { logsPage = new LogsPage(); });
+let tradeLogsPage;
+$(function () { tradeLogsPage = new TradeLogsPage(); });
