@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using YL.Filters;
 using YL.Helpers;
-using YL.Services;
+using YL.Services.Stock;
 
 namespace YL.Controllers.Webs
 {

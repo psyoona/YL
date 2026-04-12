@@ -2,12 +2,12 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
-namespace YL.Services
+namespace YL.Services.Stock
 {
 	/// <summary>
-	/// StockAutoTrader의 collect CLI 모드를 실행하여 일봉 데이터를 수집합니다.
+	/// StockAutoTrader의 백테스트 CLI 모드를 실행하고 결과를 파싱합니다.
 	/// </summary>
-	public static class DailyPriceCollectManager
+	public static class BacktestManager
 	{
 		private static Process? _process;
 		private static readonly object _lock = new();
@@ -18,8 +18,8 @@ namespace YL.Services
 			get { lock (_lock) { return _isRunning; } }
 		}
 
-		/// <summary>일봉 데이터 수집 실행 (비동기)</summary>
-		public static async Task<JsonElement?> RunAsync(string startDate, string endDate)
+		/// <summary>백테스트 실행 (비동기)</summary>
+		public static async Task<JsonElement?> RunAsync(string startDate, string endDate, decimal capital)
 		{
 			lock (_lock)
 			{
@@ -43,7 +43,7 @@ namespace YL.Services
 				var startInfo = new ProcessStartInfo
 				{
 					FileName = exePath,
-					Arguments = $"collect --start {startDate} --end {endDate}",
+					Arguments = $"backtest --start {startDate} --end {endDate} --capital {capital}",
 					WorkingDirectory = Path.GetDirectoryName(exePath) ?? string.Empty,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
@@ -72,8 +72,8 @@ namespace YL.Services
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 
-				// 최대 10분 대기 (수집은 종목 수에 따라 오래 걸릴 수 있음)
-				var completed = await Task.Run(() => process.WaitForExit(600_000));
+				// 최대 5분 대기
+				var completed = await Task.Run(() => process.WaitForExit(300_000));
 
 				if (!completed)
 				{
@@ -81,13 +81,13 @@ namespace YL.Services
 					return JsonDocument.Parse(JsonSerializer.Serialize(new
 					{
 						success = false,
-						message = "일봉 수집 시간 초과 (10분)"
+						message = "백테스트 시간 초과 (5분)"
 					})).RootElement;
 				}
 
-				// ##COLLECT_RESULT## 마커로 JSON 결과 추출
+				// ##BACKTEST_RESULT## 마커로 JSON 결과 추출
 				var fullOutput = output.ToString();
-				var marker = "##COLLECT_RESULT##";
+				var marker = "##BACKTEST_RESULT##";
 				var markerIndex = fullOutput.IndexOf(marker);
 
 				if (markerIndex >= 0)
@@ -99,7 +99,7 @@ namespace YL.Services
 				return JsonDocument.Parse(JsonSerializer.Serialize(new
 				{
 					success = false,
-					message = "수집 결과를 찾을 수 없습니다.",
+					message = "백테스트 결과를 찾을 수 없습니다.",
 					output = fullOutput.Length > 2000 ? fullOutput[..2000] : fullOutput,
 					errors = errors.ToString()
 				})).RootElement;
@@ -109,7 +109,7 @@ namespace YL.Services
 				return JsonDocument.Parse(JsonSerializer.Serialize(new
 				{
 					success = false,
-					message = $"일봉 수집 실행 오류: {ex.Message}"
+					message = $"백테스트 실행 오류: {ex.Message}"
 				})).RootElement;
 			}
 			finally

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace YL.Services
+namespace YL.Services.Stock
 {
 	public static class StockAutoTraderManager
 	{

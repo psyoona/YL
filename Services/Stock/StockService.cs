@@ -3,7 +3,7 @@ using YL.Models.Daos;
 using YL.Models.Dtos.Commons;
 using YL.Models.Dtos.Webs;
 
-namespace YL.Services
+namespace YL.Services.Stock
 {
 	public class StockService
 	{

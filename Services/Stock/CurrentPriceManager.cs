@@ -2,14 +2,13 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
-namespace YL.Services
+namespace YL.Services.Stock
 {
 	/// <summary>
-	/// StockAutoTrader의 백테스트 CLI 모드를 실행하고 결과를 파싱합니다.
+	/// StockAutoTrader의 prices CLI 모드를 실행하여 실시간 현재가를 조회합니다.
 	/// </summary>
-	public static class BacktestManager
+	public static class CurrentPriceManager
 	{
-		private static Process? _process;
 		private static readonly object _lock = new();
 		private static bool _isRunning;
 
@@ -18,8 +17,8 @@ namespace YL.Services
 			get { lock (_lock) { return _isRunning; } }
 		}
 
-		/// <summary>백테스트 실행 (비동기)</summary>
-		public static async Task<JsonElement?> RunAsync(string startDate, string endDate, decimal capital)
+		/// <summary>감시 종목 실시간 현재가 조회</summary>
+		public static async Task<JsonElement?> RunAsync()
 		{
 			lock (_lock)
 			{
@@ -43,7 +42,7 @@ namespace YL.Services
 				var startInfo = new ProcessStartInfo
 				{
 					FileName = exePath,
-					Arguments = $"backtest --start {startDate} --end {endDate} --capital {capital}",
+					Arguments = "prices",
 					WorkingDirectory = Path.GetDirectoryName(exePath) ?? string.Empty,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
@@ -54,26 +53,21 @@ namespace YL.Services
 				};
 
 				var output = new StringBuilder();
-				var errors = new StringBuilder();
 
 				using var process = new Process { StartInfo = startInfo };
-				_process = process;
 
 				process.OutputDataReceived += (s, e) =>
 				{
 					if (e.Data != null) output.AppendLine(e.Data);
 				};
-				process.ErrorDataReceived += (s, e) =>
-				{
-					if (e.Data != null) errors.AppendLine(e.Data);
-				};
+				process.ErrorDataReceived += (s, e) => { };
 
 				process.Start();
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 
-				// 최대 5분 대기
-				var completed = await Task.Run(() => process.WaitForExit(300_000));
+				// 최대 2분 대기 (종목 수 × API 호출)
+				var completed = await Task.Run(() => process.WaitForExit(120_000));
 
 				if (!completed)
 				{
@@ -81,13 +75,12 @@ namespace YL.Services
 					return JsonDocument.Parse(JsonSerializer.Serialize(new
 					{
 						success = false,
-						message = "백테스트 시간 초과 (5분)"
+						message = "현재가 조회 시간 초과"
 					})).RootElement;
 				}
 
-				// ##BACKTEST_RESULT## 마커로 JSON 결과 추출
 				var fullOutput = output.ToString();
-				var marker = "##BACKTEST_RESULT##";
+				var marker = "##PRICES_RESULT##";
 				var markerIndex = fullOutput.IndexOf(marker);
 
 				if (markerIndex >= 0)
@@ -99,9 +92,7 @@ namespace YL.Services
 				return JsonDocument.Parse(JsonSerializer.Serialize(new
 				{
 					success = false,
-					message = "백테스트 결과를 찾을 수 없습니다.",
-					output = fullOutput.Length > 2000 ? fullOutput[..2000] : fullOutput,
-					errors = errors.ToString()
+					message = "현재가 조회 결과를 찾을 수 없습니다."
 				})).RootElement;
 			}
 			catch (Exception ex)
@@ -109,7 +100,7 @@ namespace YL.Services
 				return JsonDocument.Parse(JsonSerializer.Serialize(new
 				{
 					success = false,
-					message = $"백테스트 실행 오류: {ex.Message}"
+					message = $"현재가 조회 오류: {ex.Message}"
 				})).RootElement;
 			}
 			finally
@@ -117,7 +108,6 @@ namespace YL.Services
 				lock (_lock)
 				{
 					_isRunning = false;
-					_process = null;
 				}
 			}
 		}

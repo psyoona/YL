@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.HttpLogging;
 using YL.Configs;
 using YL.Handlers;
-using YL.Services;
+using YL.Services.Stock;
 using YL.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
