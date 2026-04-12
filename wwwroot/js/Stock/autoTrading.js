@@ -5,6 +5,7 @@
 class AutoTradingPage {
 	constructor() {
 		this.pollingTimer = null;
+		this.lastLogHash = '';
 
 		$('#btnStartTrader').on('click', () => $('#traderStartModal').fadeIn(200));
 		$('#traderStartCancel').on('click', () => $('#traderStartModal').fadeOut(200));
@@ -21,6 +22,9 @@ class AutoTradingPage {
 		});
 
 		$('#btnRefreshLogs').on('click', () => this.loadStatus());
+
+		// 페이지 이탈 시 폴링 정리
+		$(window).on('beforeunload.autoTrading', () => this.stopPolling());
 
 		this.loadStatus();
 		this.startPolling();
@@ -57,8 +61,13 @@ class AutoTradingPage {
 		$('#traderUptime').text(status.uptime || '-');
 		$('#traderExePath').text(status.exePath || '-');
 
+		// 로그가 변경된 경우에만 DOM 업데이트
 		const $console = $('#traderConsole');
 		if (status.logs && status.logs.length > 0) {
+			const newHash = status.logs[status.logs.length - 1] + status.logs.length;
+			if (newHash === this.lastLogHash) return;
+			this.lastLogHash = newHash;
+
 			const el = $console[0];
 			const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
 
@@ -76,6 +85,7 @@ class AutoTradingPage {
 				$console.scrollTop(el.scrollHeight);
 			}
 		} else {
+			this.lastLogHash = '';
 			$console.html('<div class="console-empty">로그가 없습니다</div>');
 		}
 	}
@@ -92,7 +102,7 @@ class AutoTradingPage {
 
 	startPolling() {
 		this.stopPolling();
-		this.pollingTimer = setInterval(() => this.loadStatus(), 5000);
+		this.pollingTimer = setInterval(() => this.loadStatus(), 10000);
 	}
 
 	stopPolling() {
