@@ -43,9 +43,11 @@ class StockLogin {
 
 		this.$btnLogin.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>로그인 중...');
 
+		const passwordHash = hex_sha512(password);
+
 		webServer.getData(
 			'/Stock/Authenticate',
-			{ loginId: loginId, password: password },
+			{ loginId: loginId, password: passwordHash },
 			(response) => {
 				if (response.success) {
 					this.showMessage(response.userName + '님 환영합니다!', 'success');

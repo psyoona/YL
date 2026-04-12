@@ -7,9 +7,9 @@ namespace YL.Services
 {
 	public class StockService
 	{
-		public (bool IsValid, string UserName, StockSession? Session) Authenticate(string loginId, string password)
+		public (bool IsValid, string UserName, StockSession? Session) Authenticate(string loginId, string passwordHash)
 		{
-			string passwordHash = new SecurityHelper().Sha512Hash(password);
+			// 클라이언트에서 SHA-512 해시 후 전송하므로 그대로 사용
 			var user = new StockDao().Login(loginId, passwordHash);
 
 			if (!user.IsValid)

@@ -4,9 +4,12 @@
 
 class StocksPage {
 	constructor() {
+		this.priceMap = {};
+
 		$('#btnAddStock').on('click', () => this.openModal());
 		$('#stockModalCancel').on('click', () => this.closeModal());
 		$('#stockModalConfirm').on('click', () => this.save());
+		$('#btnRefreshPrices').on('click', () => this.loadPrices());
 
 		this.load();
 	}
@@ -14,6 +17,7 @@ class StocksPage {
 	load() {
 		webServer.getData('/Stock/GetStocks', null, (response) => {
 			const stocks = response.stocks || [];
+			this.stocks = stocks;
 			$('#stockCount').text(`총 ${stocks.length}개 종목`);
 
 			if (stocks.length === 0) {
@@ -24,36 +28,71 @@ class StocksPage {
 
 			$('#stockEmpty').hide();
 			$('#stockTable').show();
+			this.renderTable();
+		});
+	}
 
-			let html = '';
-			stocks.forEach(s => {
-				const activeBadge = s.isActive
-					? '<span class="badge badge-active">활성</span>'
-					: '<span class="badge badge-inactive">비활성</span>';
-				const watchBadge = s.isWatchList
-					? '<span class="badge badge-watch">감시</span>'
-					: '<span class="badge" style="opacity:0.4;">-</span>';
+	renderTable() {
+		let html = '';
+		this.stocks.forEach(s => {
+			const activeBadge = s.isActive
+				? '<span class="badge badge-active">활성</span>'
+				: '<span class="badge badge-inactive">비활성</span>';
+			const watchBadge = s.isWatchList
+				? '<span class="badge badge-watch">감시</span>'
+				: '<span class="badge" style="opacity:0.4;">-</span>';
 
-				html += `<tr>
-					<td data-label="종목코드">${stockLayout.escapeHtml(s.stockCode)}</td>
-					<td data-label="종목명">${stockLayout.escapeHtml(s.stockName)}</td>
-					<td data-label="시장">${stockLayout.escapeHtml(s.marketType)}</td>
-					<td data-label="상태">${activeBadge}</td>
-					<td data-label="감시">${watchBadge}</td>
-					<td data-label="관리">
-						<div class="btn-action-group">
-							<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}', '${stockLayout.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
-								<i class="fas fa-pen"></i>
-							</button>
-							<button class="btn-table-action delete" title="삭제" onclick="stocksPage.confirmDelete('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}')">
-								<i class="fas fa-trash"></i>
-							</button>
-						</div>
-					</td>
-				</tr>`;
-			});
+			const p = this.priceMap[s.stockCode];
+			let priceHtml = '<span class="text-muted">-</span>';
+			let changeHtml = '<span class="text-muted">-</span>';
 
-			$('#stockTableBody').html(html);
+			if (p) {
+				priceHtml = `<strong>${Number(p.price).toLocaleString()}</strong>`;
+				const sign = p.change > 0 ? '+' : '';
+				const cls = p.change > 0 ? 'text-up' : p.change < 0 ? 'text-down' : '';
+				changeHtml = `<span class="${cls}">${sign}${Number(p.change).toLocaleString()} (${sign}${p.changeRate}%)</span>`;
+			}
+
+			html += `<tr>
+				<td data-label="종목코드">${stockLayout.escapeHtml(s.stockCode)}</td>
+				<td data-label="종목명">${stockLayout.escapeHtml(s.stockName)}</td>
+				<td data-label="시장">${stockLayout.escapeHtml(s.marketType)}</td>
+				<td data-label="현재가">${priceHtml}</td>
+				<td data-label="전일비">${changeHtml}</td>
+				<td data-label="상태">${activeBadge}</td>
+				<td data-label="감시">${watchBadge}</td>
+				<td data-label="관리">
+					<div class="btn-action-group">
+						<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}', '${stockLayout.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
+							<i class="fas fa-pen"></i>
+						</button>
+						<button class="btn-table-action delete" title="삭제" onclick="stocksPage.confirmDelete('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}')">
+							<i class="fas fa-trash"></i>
+						</button>
+					</div>
+				</td>
+			</tr>`;
+		});
+
+		$('#stockTableBody').html(html);
+	}
+
+	loadPrices() {
+		const $btn = $('#btnRefreshPrices');
+		$btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>조회 중...');
+
+		webServer.getData('/Stock/GetCurrentPrices', null, (response) => {
+			$btn.prop('disabled', false).html('<i class="fas fa-sync-alt me-1"></i>현재가 조회');
+
+			if (response.success && response.prices) {
+				this.priceMap = {};
+				response.prices.forEach(p => {
+					this.priceMap[p.stockCode] = p;
+				});
+				this.renderTable();
+			} else {
+				stockLayout.showModal(response.message || '현재가 조회에 실패했습니다.');
+			}
 		});
 	}
 

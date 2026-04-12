@@ -163,6 +163,20 @@ namespace YL.Controllers.Webs
 
 		[HttpPost]
 		[StockLoginRequired]
+		public async Task<JsonResult> GetCurrentPrices()
+		{
+			var result = await CurrentPriceManager.RunAsync();
+
+			if (result == null)
+			{
+				return this.Json(new { success = false, message = "이미 조회 중입니다." });
+			}
+
+			return this.Json(result);
+		}
+
+		[HttpPost]
+		[StockLoginRequired]
 		public JsonResult CreateStock(string stockCode, string stockName, string marketType)
 		{
 			new StockService().CreateStock(stockCode, stockName, marketType);

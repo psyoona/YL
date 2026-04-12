@@ -549,6 +549,32 @@ body {
 	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.btn-secondary-action {
+	padding: 10px 20px;
+	background: transparent;
+	color: var(--primary-light);
+	border: 1px solid var(--primary);
+	border-radius: var(--radius-sm);
+	font-size: 14px;
+	font-weight: 500;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.btn-secondary-action:hover {
+	background: rgba(16, 185, 129, 0.1);
+}
+
+.btn-secondary-action:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.text-up { color: #ef4444; font-weight: 500; }
+.text-down { color: #3b82f6; font-weight: 500; }
+.text-muted { color: var(--text-muted); }
+
 /* ============================================
    테이블
    ============================================ */
