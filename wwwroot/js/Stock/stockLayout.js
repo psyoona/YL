@@ -8,20 +8,13 @@ class StockLayout {
 		this.bindCoreEvents();
 	}
 
-	// ============================================
-	// 코어 이벤트 바인딩
-	// ============================================
-
 	bindCoreEvents() {
-		// 사이드바 토글
 		$('#menuToggle').on('click', () => this.openSidebar());
 		$('#sidebarClose').on('click', () => this.closeSidebar());
 		$('#sidebarOverlay').on('click', () => this.closeSidebar());
 
-		// 모바일에서 메뉴 클릭 시 사이드바 닫기
 		$('.nav-item').on('click', () => this.closeSidebar());
 
-		// 로그아웃
 		$('#btnLogout').on('click', (e) => {
 			e.preventDefault();
 			$('#logoutModal').fadeIn(200);
@@ -29,7 +22,6 @@ class StockLayout {
 		$('#logoutCancel').on('click', () => $('#logoutModal').fadeOut(200));
 		$('#logoutConfirm').on('click', () => { window.location.href = '/Stock/Logout'; });
 
-		// 삭제 모달
 		$('#deleteModalCancel').on('click', () => this.closeDeleteModal());
 		$('#deleteModalConfirm').on('click', () => {
 			if (this.deleteCallback) {
@@ -38,10 +30,6 @@ class StockLayout {
 			this.closeDeleteModal();
 		});
 	}
-
-	// ============================================
-	// 사이드바
-	// ============================================
 
 	openSidebar() {
 		$('#sidebar').addClass('open');
@@ -53,10 +41,6 @@ class StockLayout {
 		$('#sidebarOverlay').removeClass('active');
 	}
 
-	// ============================================
-	// 삭제 모달
-	// ============================================
-
 	openDeleteModal(message, callback) {
 		$('#deleteMessage').text(message);
 		this.deleteCallback = callback;
@@ -67,10 +51,6 @@ class StockLayout {
 		$('#deleteModal').fadeOut(200);
 		this.deleteCallback = null;
 	}
-
-	// ============================================
-	// 범용 모달
-	// ============================================
 
 	showModal(message, options = {}) {
 		return new Promise((resolve) => {
@@ -117,32 +97,9 @@ class StockLayout {
 		});
 	}
 
-	// ============================================
-	// 유틸리티
-	// ============================================
 
-	escapeHtml(str) {
-		if (!str) return '';
-		const div = document.createElement('div');
-		div.textContent = str;
-		return div.innerHTML;
-	}
-
-	escapeAttr(str) {
-		if (!str) return '';
-		return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
-	}
-
-	formatDate(dateStr) {
-		if (!dateStr) return '-';
-		const d = new Date(dateStr);
-		const pad = n => String(n).padStart(2, '0');
-		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-	}
 }
 
-let stockLayout;
-
 $(function () {
-	stockLayout = new StockLayout();
+	window.stockLayout = new StockLayout();
 });

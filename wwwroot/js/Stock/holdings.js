@@ -33,8 +33,8 @@ class HoldingsPage {
 				}
 
 				html += `<tr>
-					<td data-label="종목코드">${stockLayout.escapeHtml(h.stockCode)}</td>
-					<td data-label="종목명">${stockLayout.escapeHtml(h.stockName)}</td>
+					<td data-label="종목코드">${stringUtility.escapeHtml(h.stockCode)}</td>
+					<td data-label="종목명">${stringUtility.escapeHtml(h.stockName)}</td>
 					<td data-label="수량">${h.quantity.toLocaleString()}</td>
 					<td data-label="평균단가">${h.avgBuyPrice.toLocaleString()}</td>
 					<td data-label="현재가">${h.currentPrice ? h.currentPrice.toLocaleString() : '-'}</td>

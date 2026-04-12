@@ -28,14 +28,14 @@ class TradeLogsPage {
 					case 'INFO': levelBadge = '<span class="badge badge-info">INFO</span>'; break;
 					case 'WARN': levelBadge = '<span class="badge badge-warn">WARN</span>'; break;
 					case 'ERROR': levelBadge = '<span class="badge badge-error">ERROR</span>'; break;
-					default: levelBadge = `<span class="badge">${stockLayout.escapeHtml(l.logLevel)}</span>`;
+					default: levelBadge = `<span class="badge">${stringUtility.escapeHtml(l.logLevel)}</span>`;
 				}
 
 				html += `<tr>
 					<td data-label="레벨">${levelBadge}</td>
-					<td data-label="메시지" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stockLayout.escapeHtml(l.message)}</td>
-					<td data-label="종목코드">${stockLayout.escapeHtml(l.stockCode || '-')}</td>
-					<td data-label="일시">${stockLayout.formatDate(l.createdAt)}</td>
+					<td data-label="메시지" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stringUtility.escapeHtml(l.message)}</td>
+					<td data-label="종목코드">${stringUtility.escapeHtml(l.stockCode || '-')}</td>
+					<td data-label="일시">${format.formatDate(l.createdAt)}</td>
 				</tr>`;
 			});
 

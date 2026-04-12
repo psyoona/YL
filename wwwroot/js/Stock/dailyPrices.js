@@ -57,12 +57,12 @@ class DailyPricesPage {
 			$('#collectTotalRecords').text(response.totalRecords ? response.totalRecords.toLocaleString() + '건' : '-');
 
 			const msgClass = response.success ? 'collect-message-success' : 'collect-message-error';
-			$('#collectMessage').html(`<div class="${msgClass}">${stockLayout.escapeHtml(response.msg || '')}</div>`);
+			$('#collectMessage').html(`<div class="${msgClass}">${stringUtility.escapeHtml(response.msg || '')}</div>`);
 
 			if (response.errors && response.errors.length > 0) {
 				let errHtml = '<h4><i class="fas fa-exclamation-triangle me-1"></i>오류 목록</h4><ul>';
 				response.errors.forEach(e => {
-					errHtml += `<li>${stockLayout.escapeHtml(e)}</li>`;
+					errHtml += `<li>${stringUtility.escapeHtml(e)}</li>`;
 				});
 				errHtml += '</ul>';
 				$('#collectErrors').html(errHtml).show();

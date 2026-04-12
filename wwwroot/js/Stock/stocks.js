@@ -54,19 +54,19 @@ class StocksPage {
 			}
 
 			html += `<tr>
-				<td data-label="종목코드">${stockLayout.escapeHtml(s.stockCode)}</td>
-				<td data-label="종목명">${stockLayout.escapeHtml(s.stockName)}</td>
-				<td data-label="시장">${stockLayout.escapeHtml(s.marketType)}</td>
+				<td data-label="종목코드">${stringUtility.escapeHtml(s.stockCode)}</td>
+				<td data-label="종목명">${stringUtility.escapeHtml(s.stockName)}</td>
+				<td data-label="시장">${stringUtility.escapeHtml(s.marketType)}</td>
 				<td data-label="현재가">${priceHtml}</td>
 				<td data-label="전일비">${changeHtml}</td>
 				<td data-label="상태">${activeBadge}</td>
 				<td data-label="감시">${watchBadge}</td>
 				<td data-label="관리">
 					<div class="btn-action-group">
-						<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}', '${stockLayout.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
+						<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stringUtility.escapeAttr(s.stockCode)}', '${stringUtility.escapeAttr(s.stockName)}', '${stringUtility.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
 							<i class="fas fa-pen"></i>
 						</button>
-						<button class="btn-table-action delete" title="삭제" onclick="stocksPage.confirmDelete('${stockLayout.escapeAttr(s.stockCode)}', '${stockLayout.escapeAttr(s.stockName)}')">
+						<button class="btn-table-action delete" title="삭제" onclick="stocksPage.confirmDelete('${stringUtility.escapeAttr(s.stockCode)}', '${stringUtility.escapeAttr(s.stockName)}')">
 							<i class="fas fa-trash"></i>
 						</button>
 					</div>

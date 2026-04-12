@@ -77,7 +77,7 @@ class AutoTradingPage {
 				if (line.includes('[ERROR]')) cls += ' log-error';
 				else if (line.includes('매수') || line.includes('시작')) cls += ' log-success';
 				else if (line.includes('매도') || line.includes('중지') || line.includes('종료')) cls += ' log-warn';
-				logHtml += `<div class="${cls}">${stockLayout.escapeHtml(line)}</div>`;
+				logHtml += `<div class="${cls}">${stringUtility.escapeHtml(line)}</div>`;
 			});
 			$console.html(logHtml);
 

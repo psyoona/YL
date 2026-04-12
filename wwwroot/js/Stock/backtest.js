@@ -75,14 +75,14 @@ class BacktestPage {
 			const plClass = t.profitLossPercent > 0 ? 'profit-positive' : t.profitLossPercent < 0 ? 'profit-negative' : '';
 			const plText = t.profitLossPercent !== null ? `${t.profitLossPercent > 0 ? '+' : ''}${t.profitLossPercent}%` : '-';
 			html += `<tr>
-				<td data-label="종목">${stockLayout.escapeHtml(t.stockCode)}</td>
+				<td data-label="종목">${stringUtility.escapeHtml(t.stockCode)}</td>
 				<td data-label="매수일">${t.buyDate || '-'}</td>
 				<td data-label="매수가">${Number(t.buyPrice).toLocaleString()}</td>
 				<td data-label="수량">${t.quantity}</td>
 				<td data-label="매도일">${t.sellDate || '-'}</td>
 				<td data-label="매도가">${t.sellPrice ? Number(t.sellPrice).toLocaleString() : '-'}</td>
 				<td data-label="수익률"><span class="${plClass}">${plText}</span></td>
-				<td data-label="사유" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stockLayout.escapeHtml(t.sellReason || '-')}</td>
+				<td data-label="사유" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stringUtility.escapeHtml(t.sellReason || '-')}</td>
 			</tr>`;
 		});
 		$('#btTradeTableBody').html(html);
@@ -94,7 +94,7 @@ class BacktestPage {
 			if (line.includes('매도') || line.includes('손절')) cls += ' log-warn';
 			else if (line.includes('매수')) cls += ' log-success';
 			else if (line.includes('====') || line.includes('결과')) cls += ' log-success';
-			logHtml += `<div class="${cls}">${stockLayout.escapeHtml(line)}</div>`;
+			logHtml += `<div class="${cls}">${stringUtility.escapeHtml(line)}</div>`;
 		});
 		$('#btLogBody').html(logHtml);
 	}

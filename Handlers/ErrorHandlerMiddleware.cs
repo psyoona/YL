@@ -41,7 +41,7 @@ namespace YL.Handlers
 				else if (exception is CustomException customException)
 				{
 					errorCode = customException.Code;
-					result = JsonSerializer.Serialize(new { success = false, code = customException.Code }, options);
+					result = JsonSerializer.Serialize(new { success = false, code = customException.Code, message = StockErrors.GetMessage(customException.Code) }, options);
 				}
 				else
 				{
