@@ -14,7 +14,7 @@ namespace YL.Controllers.Webs
 
 			if (StockCookieHelper.GetSession(Request) != null)
 			{
-				return this.RedirectToAction("Index");
+				return this.RedirectToAction("Stocks");
 			}
 
 			return this.View();
@@ -40,22 +40,52 @@ namespace YL.Controllers.Webs
 			return this.RedirectToAction("Login");
 		}
 
-		[HttpGet]
-		public ActionResult Index()
+		// ============================================
+		// 페이지 라우팅
+		// ============================================
+
+		private ActionResult StockPage(string page, string title)
 		{
 			this.Initialize();
-
 			var session = StockCookieHelper.GetSession(Request);
-
-			if (session == null)
-			{
-				return this.RedirectToAction("Login");
-			}
-
+			if (session == null) return RedirectToAction("Login");
 			ViewBag.UserName = session.UserName;
-
-			return this.View();
+			ViewBag.CurrentPage = page;
+			ViewBag.PageTitle = title;
+			return View($"_{char.ToUpper(page[0])}{page[1..]}");
 		}
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Stocks() => StockPage("stocks", "종목 관리");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Holdings() => StockPage("holdings", "보유 종목");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Orders() => StockPage("orders", "주문 내역");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Logs() => StockPage("logs", "거래 로그");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Trader() => StockPage("trader", "자동매매 제어");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Backtest() => StockPage("backtest", "백테스트");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Collect() => StockPage("collect", "일봉 수집");
+
+		[HttpGet]
+		[StockLoginRequired]
+		public ActionResult Glossary() => StockPage("glossary", "용어 사전");
 
 		// ============================================
 		// 종목 관리 API

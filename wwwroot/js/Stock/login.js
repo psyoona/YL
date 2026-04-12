@@ -49,7 +49,7 @@ class StockLogin {
 			(response) => {
 				if (response.success) {
 					this.showMessage(response.userName + '님 환영합니다!', 'success');
-					setTimeout(() => { window.location.href = '/Stock/Index'; }, 800);
+					setTimeout(() => { window.location.href = '/Stock/Stocks'; }, 800);
 				} else {
 					this.showMessage('아이디 또는 비밀번호가 일치하지 않습니다.', 'error');
 					this.$btnLogin.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>로그인');

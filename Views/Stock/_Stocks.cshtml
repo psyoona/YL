@@ -30,3 +30,41 @@
 		</div>
 	</div>
 </div>
+
+<!-- 종목 추가/수정 모달 -->
+<div class="stock-modal" id="stockModal" style="display:none;">
+	<div class="stock-modal-box">
+		<h3 id="stockModalTitle"><i class="fas fa-plus-circle me-2"></i>종목 추가</h3>
+		<div class="modal-input">
+			<label for="modalStockCode">종목코드</label>
+			<input type="text" id="modalStockCode" placeholder="예: 005930" maxlength="20" />
+		</div>
+		<div class="modal-input">
+			<label for="modalStockName">종목명</label>
+			<input type="text" id="modalStockName" placeholder="예: 삼성전자" maxlength="100" />
+		</div>
+		<div class="modal-input">
+			<label for="modalMarketType">시장구분</label>
+			<select id="modalMarketType">
+				<option value="KOSPI">KOSPI</option>
+				<option value="KOSDAQ">KOSDAQ</option>
+			</select>
+		</div>
+		<div class="modal-input modal-checkbox-group" id="stockEditFields" style="display:none;">
+			<label class="checkbox-label">
+				<input type="checkbox" id="modalIsActive" checked />
+				<span>활성 상태</span>
+			</label>
+			<label class="checkbox-label">
+				<input type="checkbox" id="modalIsWatchList" />
+				<span>감시 종목</span>
+			</label>
+		</div>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="stockModalCancel">취소</button>
+			<button class="btn-modal-confirm" id="stockModalConfirm">저장</button>
+		</div>
+	</div>
+</div>
+
+<script defer src="/js/Stock/stocks.js?v=@ViewBag.CacheVersion"></script>

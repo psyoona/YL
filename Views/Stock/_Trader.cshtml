@@ -1,5 +1,5 @@
 <!-- 자동매매 제어 -->
-<div class="page-content" id="page-trader" style="display:none;">
+<div class="page-content" id="page-trader">
 	<div class="trader-control">
 		<!-- 상태 카드 -->
 		<div class="trader-status-card" id="traderStatusCard">
@@ -53,3 +53,30 @@
 		</div>
 	</div>
 </div>
+
+<!-- 자동매매 실행 확인 모달 -->
+<div class="stock-modal" id="traderStartModal" style="display:none;">
+	<div class="stock-modal-box">
+		<i class="fas fa-play-circle" style="font-size: 48px; color: var(--primary-light); margin-bottom: 16px;"></i>
+		<p>자동매매 프로그램을 실행하시겠습니까?</p>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="traderStartCancel">취소</button>
+			<button class="btn-modal-confirm" id="traderStartConfirm">실행</button>
+		</div>
+	</div>
+</div>
+
+<!-- 자동매매 중지 확인 모달 -->
+<div class="stock-modal" id="traderStopModal" style="display:none;">
+	<div class="stock-modal-box">
+		<i class="fas fa-exclamation-triangle warning-icon"></i>
+		<p>자동매매 프로그램을 중지하시겠습니까?</p>
+		<p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">진행 중인 매매가 있을 경우 중단됩니다.</p>
+		<div class="modal-actions">
+			<button class="btn-modal-cancel" id="traderStopCancel">취소</button>
+			<button class="btn-modal-delete" id="traderStopConfirm">중지</button>
+		</div>
+	</div>
+</div>
+
+<script defer src="/js/Stock/trader.js?v=@ViewBag.CacheVersion"></script>

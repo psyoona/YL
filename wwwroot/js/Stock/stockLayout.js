@@ -1,13 +1,10 @@
 // ============================================
-// Stock Manager - 코어 (네비게이션, 사이드바, 유틸리티)
+// Stock Layout - 공통 (사이드바, 모달, 유틸리티)
 // ============================================
 
-class StockManager {
+class StockLayout {
 	constructor() {
-		this.currentPage = 'stocks';
 		this.deleteCallback = null;
-		this.traderPollingTimer = null;
-
 		this.bindCoreEvents();
 	}
 
@@ -21,12 +18,8 @@ class StockManager {
 		$('#sidebarClose').on('click', () => this.closeSidebar());
 		$('#sidebarOverlay').on('click', () => this.closeSidebar());
 
-		// 네비게이션
-		$('.nav-item').on('click', (e) => {
-			e.preventDefault();
-			const page = $(e.currentTarget).data('page');
-			this.navigateTo(page);
-		});
+		// 모바일에서 메뉴 클릭 시 사이드바 닫기
+		$('.nav-item').on('click', () => this.closeSidebar());
 
 		// 로그아웃
 		$('#btnLogout').on('click', (e) => {
@@ -61,49 +54,14 @@ class StockManager {
 	}
 
 	// ============================================
-	// 네비게이션
-	// ============================================
-
-	navigateTo(page) {
-		this.currentPage = page;
-		this.closeSidebar();
-
-		$('.nav-item').removeClass('active');
-		$(`.nav-item[data-page="${page}"]`).addClass('active');
-
-		$('.page-content').hide();
-		$(`#page-${page}`).show();
-
-		const titles = {
-			stocks: '종목 관리',
-			holdings: '보유 종목',
-			orders: '주문 내역',
-			logs: '거래 로그',
-			trader: '자동매매 제어',
-			backtest: '백테스트',
-			collect: '일봉 수집',
-			glossary: '용어 사전'
-		};
-		$('#pageTitle').text(titles[page]);
-
-		// 자동매매 페이지 떠날 때 폴링 중지
-		this.stopTraderPolling();
-
-		switch (page) {
-			case 'stocks': this.loadStocks(); break;
-			case 'holdings': this.loadHoldings(); break;
-			case 'orders': this.loadOrders(); break;
-			case 'logs': this.loadTradeLogs(); break;
-			case 'trader': this.loadTraderStatus(); this.startTraderPolling(); break;
-			case 'backtest': this.initBacktest(); break;
-			case 'collect': this.initCollect(); break;
-			case 'glossary': this.initGlossary(); break;
-		}
-	}
-
-	// ============================================
 	// 삭제 모달
 	// ============================================
+
+	openDeleteModal(message, callback) {
+		$('#deleteMessage').text(message);
+		this.deleteCallback = callback;
+		$('#deleteModal').fadeIn(200);
+	}
 
 	closeDeleteModal() {
 		$('#deleteModal').fadeOut(200);
@@ -124,13 +82,13 @@ class StockManager {
 			const $cancel = $('#commonModalCancel');
 			const $confirm = $('#commonModalConfirm');
 
-			// 아이콘 설정
+			const iconStyle = 'font-size:48px; margin-bottom:16px;';
 			if (icon) {
-				$icon.attr('class', icon).css('color', '');
+				$icon.replaceWith(`<i id="commonModalIcon" class="${icon}" style="${iconStyle} color:var(--primary-light);"></i>`);
 			} else if (type === 'confirm') {
-				$icon.attr('class', 'fas fa-question-circle').css({ fontSize: '48px', color: 'var(--primary-light)' });
+				$icon.replaceWith(`<i id="commonModalIcon" class="fas fa-question-circle" style="${iconStyle} color:var(--primary-light);"></i>`);
 			} else {
-				$icon.attr('class', 'fas fa-exclamation-circle').css({ fontSize: '48px', color: 'var(--accent)' });
+				$icon.replaceWith(`<i id="commonModalIcon" class="fas fa-exclamation-circle" style="${iconStyle} color:var(--accent);"></i>`);
 			}
 
 			$msg.text(message);
@@ -152,7 +110,6 @@ class StockManager {
 				$confirm.attr('class', 'btn-modal-confirm');
 			}
 
-			// 이벤트 바인딩 (한 번만)
 			$confirm.off('click').on('click', () => { $modal.fadeOut(200); resolve(true); });
 			$cancel.off('click').on('click', () => { $modal.fadeOut(200); resolve(false); });
 
@@ -184,9 +141,8 @@ class StockManager {
 	}
 }
 
-let stockManager = new StockManager();
+let stockLayout;
 
-// 모든 defer 스크립트 로드 후 초기 페이지 로딩
 $(function () {
-	stockManager.loadStocks();
+	stockLayout = new StockLayout();
 });
