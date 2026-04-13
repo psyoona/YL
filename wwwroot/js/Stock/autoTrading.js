@@ -86,7 +86,11 @@ class AutoTradingPage {
 			}
 		} else {
 			this.lastLogHash = '';
-			$console.html('<div class="console-empty">로그가 없습니다</div>');
+			if (running) {
+				$console.html('<div class="console-empty">프로세스가 실행 중이지만 수집된 로그가 없습니다.<br>서버 재시작 등으로 로그가 초기화되었을 수 있습니다.</div>');
+			} else {
+				$console.html('<div class="console-empty">로그가 없습니다</div>');
+			}
 		}
 	}
 

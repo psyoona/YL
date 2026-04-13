@@ -33,7 +33,7 @@ class TradeLogsPage {
 
 				html += `<tr>
 					<td data-label="레벨">${levelBadge}</td>
-					<td data-label="메시지" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stringUtility.escapeHtml(l.message)}</td>
+					<td data-label="메시지" class="td-message">${stringUtility.escapeHtml(l.message)}</td>
 					<td data-label="종목코드">${stringUtility.escapeHtml(l.stockCode || '-')}</td>
 					<td data-label="일시">${format.formatDate(l.createdAt)}</td>
 				</tr>`;

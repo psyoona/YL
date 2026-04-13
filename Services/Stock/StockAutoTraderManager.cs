@@ -161,6 +161,17 @@ namespace YL.Services.Stock
 						try { startTime = existing.StartTime; } catch { }
 						_process = existing;
 						_startedAt = startTime;
+
+						// 외부 프로세스 감지 시 로그가 없으면 안내 로그 추가
+						lock (_recentLogs)
+						{
+							if (_recentLogs.Count == 0)
+							{
+								_recentLogs.Add($"[{DateTime.Now:HH:mm:ss}] 외부에서 실행된 프로세스가 감지되었습니다. (PID: {pid})");
+								_recentLogs.Add($"[{DateTime.Now:HH:mm:ss}] 서버 재시작 등으로 이전 로그가 초기화되었습니다.");
+								_recentLogs.Add($"[{DateTime.Now:HH:mm:ss}] 새로운 로그는 프로세스를 중지 후 재시작하면 수집됩니다.");
+							}
+						}
 					}
 				}
 
