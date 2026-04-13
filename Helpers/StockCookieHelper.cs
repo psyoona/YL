@@ -7,7 +7,7 @@ namespace YL.Helpers
 	public static class StockCookieHelper
 	{
 		private const string CookieName = "StockAuth";
-		private const int ExpirationHours = 1;
+		private const int ExpirationHours = 4;
 
 		public static void SetSession(HttpResponse response, StockSession session)
 		{

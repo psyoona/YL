@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using YL.Helpers;
-using YL.Models.Dtos.Commons;
 
 namespace YL.Filters
 {
@@ -12,7 +12,8 @@ namespace YL.Filters
 
 			if (session == null)
 			{
-				throw new CustomException(StockErrors.LoginRequired);
+				context.Result = new RedirectToActionResult("Login", "Stock", null);
+				return;
 			}
 
 			base.OnActionExecuting(context);
