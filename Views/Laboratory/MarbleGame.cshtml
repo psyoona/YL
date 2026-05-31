@@ -1,0 +1,61 @@
+@{
+	Layout = "~/Views/Shared/_NoLoginLayout.cshtml";
+}
+
+<style>
+	#marbleCanvas {
+		display: block;
+		margin: 0 auto;
+		background: #2d5a1b;
+		border-radius: 8px;
+		cursor: crosshair;
+		touch-action: none;
+	}
+
+	#gameInfo {
+		display: flex;
+		justify-content: center;
+		gap: 40px;
+		margin: 12px 0;
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	.player-info {
+		padding: 6px 20px;
+		border-radius: 20px;
+		color: #fff;
+	}
+
+	.player1-info { background: #3b82f6; }
+	.player2-info { background: #ef4444; }
+
+	#turnMsg {
+		text-align: center;
+		font-size: 1.2rem;
+		font-weight: bold;
+		margin-bottom: 8px;
+		min-height: 2rem;
+	}
+
+	#controls {
+		text-align: center;
+		margin-top: 12px;
+	}
+
+	#aimLine {
+		pointer-events: none;
+	}
+</style>
+
+<div id="turnMsg">게임 시작!</div>
+<div id="gameInfo">
+	<div class="player-info player1-info">🔵 플레이어1: <span id="p1Count">8</span>개</div>
+	<div class="player-info player2-info">🔴 플레이어2: <span id="p2Count">8</span>개</div>
+</div>
+<canvas id="marbleCanvas" width="600" height="600"></canvas>
+<div id="controls">
+	<button class="btn btn-secondary mt-2" id="restartBtn">다시 시작</button>
+</div>
+
+<script defer src="~/js/Laboratory/Games/MarbleGame.js"></script>
