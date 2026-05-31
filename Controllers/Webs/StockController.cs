@@ -186,9 +186,9 @@ namespace YL.Controllers.Webs
 
 		[HttpPost]
 		[StockLoginRequired]
-		public JsonResult UpdateStock(string stockCode, string stockName, string marketType, bool isActive, bool isWatchList)
+		public JsonResult UpdateStock(string stockCode, string stockName, string marketType, bool isActive)
 		{
-			new StockService().UpdateStock(stockCode, stockName, marketType, isActive, isWatchList);
+			new StockService().UpdateStock(stockCode, stockName, marketType, isActive);
 
 			return this.Json(new { success = true });
 		}

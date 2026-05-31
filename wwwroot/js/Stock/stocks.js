@@ -36,11 +36,8 @@ class StocksPage {
 		let html = '';
 		this.stocks.forEach(s => {
 			const activeBadge = s.isActive
-				? '<span class="badge badge-active">활성</span>'
-				: '<span class="badge badge-inactive">비활성</span>';
-			const watchBadge = s.isWatchList
-				? '<span class="badge badge-watch">감시</span>'
-				: '<span class="badge" style="opacity:0.4;">-</span>';
+				? '<span class="badge badge-active" title="자동매매·백테스트·일봉수집 포함">사용중</span>'
+				: '<span class="badge badge-inactive" title="모든 기능에서 제외">미사용</span>';
 
 			const p = this.priceMap[s.stockCode];
 			let priceHtml = '<span class="text-muted">-</span>';
@@ -59,11 +56,10 @@ class StocksPage {
 				<td data-label="시장">${stringUtility.escapeHtml(s.marketType)}</td>
 				<td data-label="현재가">${priceHtml}</td>
 				<td data-label="전일비">${changeHtml}</td>
-				<td data-label="상태">${activeBadge}</td>
-				<td data-label="감시">${watchBadge}</td>
+				<td data-label="사용여부">${activeBadge}</td>
 				<td data-label="관리">
 					<div class="btn-action-group">
-						<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stringUtility.escapeAttr(s.stockCode)}', '${stringUtility.escapeAttr(s.stockName)}', '${stringUtility.escapeAttr(s.marketType)}', ${s.isActive}, ${s.isWatchList})">
+						<button class="btn-table-action edit" title="수정" onclick="stocksPage.openModal('${stringUtility.escapeAttr(s.stockCode)}', '${stringUtility.escapeAttr(s.stockName)}', '${stringUtility.escapeAttr(s.marketType)}', ${s.isActive})">
 							<i class="fas fa-pen"></i>
 						</button>
 						<button class="btn-table-action delete" title="삭제" onclick="stocksPage.confirmDelete('${stringUtility.escapeAttr(s.stockCode)}', '${stringUtility.escapeAttr(s.stockName)}')">
@@ -96,14 +92,13 @@ class StocksPage {
 		});
 	}
 
-	openModal(stockCode, stockName, marketType, isActive, isWatchList) {
+	openModal(stockCode, stockName, marketType, isActive) {
 		if (stockCode) {
 			$('#stockModalTitle').html('<i class="fas fa-edit me-2"></i>종목 수정');
 			$('#modalStockCode').val(stockCode).prop('readonly', true);
 			$('#modalStockName').val(stockName);
 			$('#modalMarketType').val(marketType);
 			$('#modalIsActive').prop('checked', isActive);
-			$('#modalIsWatchList').prop('checked', isWatchList);
 			$('#stockEditFields').show();
 		} else {
 			$('#stockModalTitle').html('<i class="fas fa-plus-circle me-2"></i>종목 추가');
@@ -111,7 +106,6 @@ class StocksPage {
 			$('#modalStockName').val('');
 			$('#modalMarketType').val('KOSPI');
 			$('#modalIsActive').prop('checked', true);
-			$('#modalIsWatchList').prop('checked', false);
 			$('#stockEditFields').hide();
 		}
 		$('#stockModal').fadeIn(200);
@@ -133,10 +127,9 @@ class StocksPage {
 
 		if (isEditing) {
 			const isActive = $('#modalIsActive').is(':checked');
-			const isWatchList = $('#modalIsWatchList').is(':checked');
 
 			webServer.getData('/Stock/UpdateStock', {
-				stockCode, stockName, marketType, isActive, isWatchList
+				stockCode, stockName, marketType, isActive
 			}, (response) => {
 				if (response.success) { this.closeModal(); this.load(); }
 			});

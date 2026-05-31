@@ -16,9 +16,6 @@ namespace YL.Models.Dtos.Webs
 		[JsonPropertyName("isActive")]
 		public bool IS_ACTIVE { get; set; }
 
-		[JsonPropertyName("isWatchList")]
-		public bool IS_WATCH_LIST { get; set; }
-
 		[JsonPropertyName("createdAt")]
 		public DateTime CREATED_AT { get; set; }
 

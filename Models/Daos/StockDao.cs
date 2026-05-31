@@ -88,15 +88,14 @@ namespace YL.Models.Daos
 			return success;
 		}
 
-		public bool UpdateStock(string stockCode, string stockName, string marketType, bool isActive, bool isWatchList)
+		public bool UpdateStock(string stockCode, string stockName, string marketType, bool isActive)
 		{
 			SqlParameter[] parameters = new SqlParameter[]
 			{
 				new SqlParameter("@STOCK_CODE", SqlDbType.NVarChar) { Value = stockCode },
 				new SqlParameter("@STOCK_NAME", SqlDbType.NVarChar) { Value = stockName },
 				new SqlParameter("@MARKET_TYPE", SqlDbType.NVarChar) { Value = marketType },
-				new SqlParameter("@IS_ACTIVE", SqlDbType.Bit) { Value = isActive },
-				new SqlParameter("@IS_WATCH_LIST", SqlDbType.Bit) { Value = isWatchList }
+				new SqlParameter("@IS_ACTIVE", SqlDbType.Bit) { Value = isActive }
 			};
 
 			SqlDataReader sqlDataReader = SqlHelper.ExecuteReader(

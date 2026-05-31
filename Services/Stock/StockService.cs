@@ -55,14 +55,14 @@ namespace YL.Services.Stock
 			}
 		}
 
-		public void UpdateStock(string stockCode, string stockName, string marketType, bool isActive, bool isWatchList)
+		public void UpdateStock(string stockCode, string stockName, string marketType, bool isActive)
 		{
 			if (string.IsNullOrWhiteSpace(stockCode))
 			{
 				throw new CustomException(StockErrors.StockCodeRequired);
 			}
 
-			bool success = new StockDao().UpdateStock(stockCode, stockName, marketType, isActive, isWatchList);
+			bool success = new StockDao().UpdateStock(stockCode, stockName, marketType, isActive);
 
 			if (!success)
 			{
