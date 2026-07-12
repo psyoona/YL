@@ -10,6 +10,9 @@ namespace YL.Models.Dtos.Webs
 		[JsonPropertyName("orderNo")]
 		public string ORDER_NO { get; set; } = string.Empty;
 
+		[JsonPropertyName("parentOrderId")]
+		public int? PARENT_ORDER_ID { get; set; }
+
 		[JsonPropertyName("stockCode")]
 		public string STOCK_CODE { get; set; } = string.Empty;
 
@@ -31,6 +34,21 @@ namespace YL.Models.Dtos.Webs
 		[JsonPropertyName("filledPrice")]
 		public decimal? FILLED_PRICE { get; set; }
 
+		[JsonPropertyName("costBasisPrice")]
+		public decimal? COST_BASIS_PRICE { get; set; }
+
+		[JsonPropertyName("estimatedCommission")]
+		public decimal ESTIMATED_COMMISSION { get; set; }
+
+		[JsonPropertyName("estimatedTax")]
+		public decimal ESTIMATED_TAX { get; set; }
+
+		[JsonPropertyName("realizedProfit")]
+		public decimal? REALIZED_PROFIT { get; set; }
+
+		[JsonPropertyName("netRealizedProfit")]
+		public decimal? NET_REALIZED_PROFIT { get; set; }
+
 		[JsonPropertyName("orderStatus")]
 		public string ORDER_STATUS { get; set; } = string.Empty;
 
@@ -42,5 +60,14 @@ namespace YL.Models.Dtos.Webs
 
 		[JsonPropertyName("updatedAt")]
 		public DateTime UPDATED_AT { get; set; }
+
+		[JsonPropertyName("filledAt")]
+		public DateTime? FILLED_AT { get; set; }
+
+		[JsonPropertyName("lastReconciledAt")]
+		public DateTime? LAST_RECONCILED_AT { get; set; }
+
+		[JsonPropertyName("reconciliationNote")]
+		public string? RECONCILIATION_NOTE { get; set; }
 	}
 }
