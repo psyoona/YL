@@ -8,6 +8,9 @@ namespace YL.Services
 {
 	public class LottoService
 	{
+		private const string LottoColumns =
+			"Turn, Number1, Number2, Number3, Number4, Number5, Number6, NumberBonus, Date, Reward1";
+
 		public List<LottoInformation> GetLottoList(int pageNumber, int pageSize, int? turn = null, 
 			int? number1 = null, int? number2 = null, int? number3 = null, 
 			int? number4 = null, int? number5 = null, int? number6 = null, int? bonus = null)
@@ -76,8 +79,9 @@ namespace YL.Services
 				parameters.Add(new SqlParameter("@PageSize", pageSize));
 
 				string query = $@"
-					SELECT * FROM (
-						SELECT *, ROW_NUMBER() OVER (ORDER BY Turn DESC) AS RowNum
+					SELECT {LottoColumns}, RowNum
+					FROM (
+						SELECT {LottoColumns}, ROW_NUMBER() OVER (ORDER BY Turn DESC) AS RowNum
 						FROM HWSY.dbo.Lotto_Information
 						{whereClause}
 					) AS NumberedResults
@@ -105,12 +109,10 @@ namespace YL.Services
 				};
 
 				using (SqlDataReader reader = SqlHelper.ExecuteReader(connection, CommandType.Text,
-					"SELECT * FROM HWSY.dbo.Lotto_Information WHERE Turn = @Turn", parameters))
+					$"SELECT {LottoColumns} FROM HWSY.dbo.Lotto_Information WHERE Turn = @Turn", parameters))
 				{
-					if (reader.Read())
-					{
-						lotto = (LottoInformation)Binder.BindToModel(reader, lotto);
-					}
+					lotto = Binder.BindToList<LottoInformation>(reader).FirstOrDefault()
+						?? new LottoInformation();
 				}
 			}
 
@@ -270,8 +272,8 @@ namespace YL.Services
 					new SqlParameter("@Count", count)
 				};
 
-				string query = @"
-					SELECT TOP (@Count) *
+				string query = $@"
+					SELECT TOP (@Count) {LottoColumns}
 					FROM HWSY.dbo.Lotto_Information
 					ORDER BY Turn DESC";
 
@@ -338,8 +340,7 @@ namespace YL.Services
 			{
 				// Get all lotto data
 				string query = @"
-					SELECT Turn, Date, Number1, Number2, Number3, Number4, Number5, Number6, NumberBonus, 
-						   Reward1, Reward2, Reward3
+					SELECT Turn, Date, Number1, Number2, Number3, Number4, Number5, Number6, Reward1
 					FROM HWSY.dbo.Lotto_Information
 					ORDER BY Turn DESC";
 
@@ -360,54 +361,20 @@ namespace YL.Services
 							Convert.ToInt32(reader["Number6"])
 						};
 						
-						int bonusNumber = Convert.ToInt32(reader["NumberBonus"]);
-
 						// Count matching numbers
 						int matchCount = numbers.Count(n => winningNumbers.Contains(n));
-						bool bonusMatch = numbers.Contains(bonusNumber);
-
-						string rank = null;
-						object reward = null;
 
 						// 1등: 6개 숫자 모두 일치
 						if (matchCount == 6)
 						{
-							rank = "1등";
-							reward = reader["Reward1"];
-						}
-						// 2등: 5개 숫자 + 보너스 번호 일치
-						else if (matchCount == 5 && bonusMatch)
-						{
-							rank = "2등";
-							reward = reader["Reward2"];
-						}
-						// 3등: 5개 숫자 일치
-						else if (matchCount == 5)
-						{
-							rank = "3등";
-							reward = reader["Reward3"];
-						}
-
-						// If there's a match, add to results
-						if (rank != null)
-						{
 							Dictionary<string, object> match = new Dictionary<string, object>();
 							match["TURN"] = reader["Turn"];
 							match["DATE"] = reader["Date"];
-							match["RANK"] = rank;
-							match["REWARD"] = reward;
+							match["RANK"] = "1등";
+							match["REWARD"] = reader["Reward1"];
 							match["MATCH_COUNT"] = matchCount;
-							match["BONUS_MATCH"] = bonusMatch;
 							matches.Add(match);
-
-							// Store highest rank
-							if (result["RANK"] == null || 
-								(rank == "1등") ||
-								(rank == "2등" && result["RANK"].ToString() != "1등") ||
-								(rank == "3등" && result["RANK"].ToString() != "1등" && result["RANK"].ToString() != "2등"))
-							{
-								result["RANK"] = rank;
-							}
+							result["RANK"] = "1등";
 						}
 					}
 
@@ -562,10 +529,7 @@ namespace YL.Services
 			using (SqlConnection connection = new SqlConnection(ConfigManager.Settings.ConnectionString))
 			{
 				string query = @"
-					SELECT 
-						AVG(CAST(Reward1 AS BIGINT)) AS AvgReward1,
-						AVG(CAST(Reward2 AS BIGINT)) AS AvgReward2,
-						AVG(CAST(Reward3 AS BIGINT)) AS AvgReward3
+					SELECT AVG(CAST(Reward1 AS BIGINT)) AS AvgReward1
 					FROM HWSY.dbo.Lotto_Information
 					WHERE Reward1 IS NOT NULL";
 
@@ -574,8 +538,6 @@ namespace YL.Services
 					if (reader.Read())
 					{
 						result["AVG_REWARD_1"] = reader["AvgReward1"];
-						result["AVG_REWARD_2"] = reader["AvgReward2"];
-						result["AVG_REWARD_3"] = reader["AvgReward3"];
 					}
 				}
 			}

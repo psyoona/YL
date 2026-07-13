@@ -22,10 +22,6 @@ namespace YL.Models.Dtos.Webs
 
 		public long Reward1 { get; set; }
 
-		public long Reward2 { get; set; }
-
-		public long Reward3 { get; set; }
-
 		public long RowNum { get; set; }
 	}
 }

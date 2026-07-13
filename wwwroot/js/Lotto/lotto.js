@@ -265,7 +265,7 @@ class LottoPage {
 		let html = '';
 		
 		if (!lottoList || lottoList.length === 0) {
-			html = '<tr><td colspan="12" class="text-center py-4">조회된 데이터가 없습니다.</td></tr>';
+			html = '<tr><td colspan="10" class="text-center py-4">조회된 데이터가 없습니다.</td></tr>';
 		} else {
 			lottoList.forEach(lotto => {
 				html += `
@@ -280,8 +280,6 @@ class LottoPage {
 						<td class="text-center">${this.createNumberBall(lotto.NUMBER6)}</td>
 						<td class="text-center">${this.createNumberBall(lotto.NUMBERBONUS, true)}</td>
 						<td class="text-end">${this.formatNumber(lotto.REWARD1)}</td>
-						<td class="text-end">${this.formatNumber(lotto.REWARD2)}</td>
-						<td class="text-end">${this.formatNumber(lotto.REWARD3)}</td>
 					</tr>
 				`;
 			});
@@ -361,16 +359,14 @@ class LottoPage {
 
 		// Create CSV content with proper comma delimiter
 		let csvContent = '\uFEFF'; // UTF-8 BOM
-		csvContent += '회차,추첨일,번호1,번호2,번호3,번호4,번호5,번호6,보너스,1등상금,2등상금,3등상금\n';
+		csvContent += '회차,추첨일,번호1,번호2,번호3,번호4,번호5,번호6,보너스,1등상금\n';
 		
 		this.currentData.forEach(lotto => {
 			// Wrap large numbers in quotes to keep them as text in Excel
 			const reward1 = lotto.REWARD1 ? `"${lotto.REWARD1}"` : '""';
-			const reward2 = lotto.REWARD2 ? `"${lotto.REWARD2}"` : '""';
-			const reward3 = lotto.REWARD3 ? `"${lotto.REWARD3}"` : '""';
 			const date = lotto.DATE ? `"${lotto.DATE}"` : '""';
 			
-			csvContent += `${lotto.TURN},${date},${lotto.NUMBER1},${lotto.NUMBER2},${lotto.NUMBER3},${lotto.NUMBER4},${lotto.NUMBER5},${lotto.NUMBER6},${lotto.NUMBERBONUS},${reward1},${reward2},${reward3}\n`;
+			csvContent += `${lotto.TURN},${date},${lotto.NUMBER1},${lotto.NUMBER2},${lotto.NUMBER3},${lotto.NUMBER4},${lotto.NUMBER5},${lotto.NUMBER6},${lotto.NUMBERBONUS},${reward1}\n`;
 		});
 
 		// Create blob and download
@@ -604,9 +600,7 @@ class LottoPage {
 
 	getRankInfo(rank) {
 		const rankMap = {
-			'1등': { icon: 'fas fa-crown', class: 'first' },
-			'2등': { icon: 'fas fa-medal', class: 'second' },
-			'3등': { icon: 'fas fa-trophy', class: 'third' }
+			'1등': { icon: 'fas fa-crown', class: 'first' }
 		};
 		return rankMap[rank] || { icon: 'fas fa-trophy', class: 'default' };
 	}
@@ -675,16 +669,6 @@ class LottoPage {
 				avgReward = avgRewards.AVG_REWARD_1;
 				rankName = '1등';
 				probability = 1 / 8145060;
-				break;
-			case '5b':
-				avgReward = avgRewards.AVG_REWARD_2;
-				rankName = '2등';
-				probability = 6 / 8145060;
-				break;
-			case '5':
-				avgReward = avgRewards.AVG_REWARD_3;
-				rankName = '3등';
-				probability = 210 / 8145060;
 				break;
 			case '4':
 				avgReward = 50000;
@@ -814,8 +798,7 @@ class LottoPage {
 				• <strong>통계:</strong> 800만 명이 같은 구매를 했을 때 평균 → ${statisticalROI}% 손실<br>
 				<br>
 				<i class="fas fa-info-circle"></i> 
-				<strong>참고:</strong> 1~5등을 모두 고려하면 1,000원당 평균 약 450원 회수 (약 -55% ROI)입니다.<br>
-				하지만 개인에게는 대부분 낙첨이므로 실제 손실은 -100%에 가깝습니다.
+				<strong>참고:</strong> 기대값은 선택한 등수 기준 통계이며 개인의 실제 결과와 다를 수 있습니다.
 			</div>
 		`;
 		
